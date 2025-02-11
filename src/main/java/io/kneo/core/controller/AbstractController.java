@@ -32,6 +32,7 @@ import jakarta.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.time.Duration;
 import java.util.List;
 import java.util.Random;
@@ -290,7 +291,7 @@ public abstract class AbstractController<T, V> {
     protected Response postNotFoundError(Throwable e) {
         Random rand = new Random();
         int randomNum = rand.nextInt(800000) + 100000;
-        LOGGER.warn(String.format("code: %s, msg: %s ", randomNum, e.getMessage()), e);
+        LOGGER.warn("code: {}, msg: {} ", randomNum, e.getMessage(), e);
         return Response.status(Response.Status.NOT_FOUND).entity(String.format("code: %s, msg: %s ", randomNum, e.getMessage())).build();
     }
 
@@ -301,4 +302,18 @@ public abstract class AbstractController<T, V> {
             return LanguageCode.ENG;
         }
     }
+
+    protected static String getMimeType(File file) {
+        String fileName = file.getName();
+        String fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+
+        return switch (fileExtension) {
+            case "mp3" -> "audio/mpeg";
+            case "wav" -> "audio/wav";
+            case "ogg" -> "audio/ogg";
+            case "flac" -> "audio/flac";
+            default -> "application/octet-stream";
+        };
+    }
+
 }
