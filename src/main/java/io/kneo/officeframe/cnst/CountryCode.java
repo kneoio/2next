@@ -11,10 +11,18 @@ import lombok.Getter;
 public enum CountryCode {
     UNKNOWN(0), KZ(777), RU(778), BY(779), UA(780), DE(781), FR(782), TR(783), US(784), CN(785), BG(786), GB(787), JP(788), ES(789), PT(790);
 
-    private int code;
+    private final int code;
 
     CountryCode(int code) {
         this.code = code;
+    }
+
+    public static CountryCode fromString(String code) {
+        try {
+            return CountryCode.valueOf(code);
+        } catch (IllegalArgumentException e) {
+            return UNKNOWN;
+        }
     }
 
     public static CountryCode getType(int code) {
