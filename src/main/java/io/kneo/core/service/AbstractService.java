@@ -22,6 +22,12 @@ public abstract class AbstractService<T, V> {
 
     }
 
+    @Deprecated
+    public AbstractService(UserService userService) {
+        this.userService = userService;
+    }
+
+    @Deprecated
     public AbstractService(UserRepository userRepository, UserService userService) {
         this.userRepository = userRepository;
         this.userService = userService;

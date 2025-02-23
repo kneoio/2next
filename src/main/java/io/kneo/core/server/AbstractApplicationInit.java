@@ -32,6 +32,7 @@ public class AbstractApplicationInit {
             PgPool client
     ) {
         this.client = client;
+        LOGGER.info("===== 2next {} =====", EnvConst.VERSION);
     }
 
     protected void setupRoutes(Router router) {
