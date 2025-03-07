@@ -35,10 +35,10 @@ public class ModuleController extends AbstractSecuredController<Module, ModuleDT
     }
 
     public void setupRoutes(Router router) {
-        router.route(HttpMethod.GET, "/api/:org/modules").handler(this::get);
-        router.route(HttpMethod.GET, "/api/:org/modules/:id").handler(this::getById);
-        router.route(HttpMethod.PUT, "/api/:org/modules/:id").handler(this::upsert);
-        router.route(HttpMethod.DELETE, "/api/:org/modules/:id").handler(this::delete);
+        router.route(HttpMethod.GET, "/api/modules").handler(this::get);
+        router.route(HttpMethod.GET, "/api/modules/:id").handler(this::getById);
+        router.route(HttpMethod.PUT, "/api/modules/:id").handler(this::upsert);
+        router.route(HttpMethod.DELETE, "/api/modules/:id").handler(this::delete);
     }
 
     private void get(RoutingContext rc) {

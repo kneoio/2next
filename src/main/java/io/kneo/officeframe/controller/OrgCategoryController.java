@@ -38,9 +38,9 @@ public class OrgCategoryController extends AbstractSecuredController<OrgCategory
     }
 
     public void setupRoutes(Router router) {
-        router.route(HttpMethod.GET, "/api/:org/orgcategories").handler(this::get);
-        router.route(HttpMethod.GET, "/api/:org/orgcategories/:id").handler(this::getById);
-        router.route(HttpMethod.DELETE, "/api/:org/orgcategories/:id").handler(this::delete);
+        router.route(HttpMethod.GET, "/api/orgcategories").handler(this::get);
+        router.route(HttpMethod.GET, "/api/orgcategories/:id").handler(this::getById);
+        router.route(HttpMethod.DELETE, "/api/orgcategories/:id").handler(this::delete);
     }
 
     private void get(RoutingContext rc) {

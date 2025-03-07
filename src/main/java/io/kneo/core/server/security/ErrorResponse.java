@@ -1,5 +1,8 @@
 package io.kneo.core.server.security;
 
+import lombok.Getter;
+
+@Getter
 public class ErrorResponse {
     private final int status;
     private final String code;
@@ -38,23 +41,4 @@ public class ErrorResponse {
         this.logError = code.logError;
     }
 
-    public int getStatus() {
-        return status;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public String getDetails() {
-        return details;
-    }
-
-    public boolean isLogError() {
-        return logError;
-    }
 }

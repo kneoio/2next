@@ -39,11 +39,11 @@ public class EmployeeController extends AbstractSecuredController<Employee, Empl
     }
 
     public void setupRoutes(Router router) {
-        router.route(HttpMethod.GET, "/api/:org/employees").handler(this::get);
-        router.route(HttpMethod.GET, "/api/:org/employees/search/:keyword").handler(this::search);
-        router.route(HttpMethod.GET, "/api/:org/employees/:id").handler(this::getById);
-        router.route(HttpMethod.POST, "/api/:org/employees/:id?").handler(this::upsert);
-        router.route(HttpMethod.DELETE, "/api/:org/employees/:id").handler(this::delete);
+        router.route(HttpMethod.GET, "/api/employees").handler(this::get);
+        router.route(HttpMethod.GET, "/api/employees/search/:keyword").handler(this::search);
+        router.route(HttpMethod.GET, "/api/employees/:id").handler(this::getById);
+        router.route(HttpMethod.POST, "/api/employees/:id?").handler(this::upsert);
+        router.route(HttpMethod.DELETE, "/api/employees/:id").handler(this::delete);
     }
 
     private void get(RoutingContext rc) {

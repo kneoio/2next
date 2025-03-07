@@ -39,12 +39,12 @@ public class LabelController extends AbstractSecuredController<Label, LabelDTO> 
     }
 
     public void setupRoutes(Router router) {
-        router.route(HttpMethod.GET, "/api/:org/labels").handler(this::getAll);
-        router.route(HttpMethod.GET, "/api/:org/labels/only/category/:category_name").handler(this::getLabelsOfCategory);
-        router.route(HttpMethod.GET, "/api/:org/labels/:id").handler(this::get);
-        router.route(HttpMethod.GET, "/api/:org/labels/identifier/:id").handler(this::getByIdentifier);
-        router.route(HttpMethod.POST, "/api/:org/labels/:id").handler(this::upsert);
-        router.route(HttpMethod.DELETE, "/api/:org/labels/:id").handler(this::delete);
+        router.route(HttpMethod.GET, "/api/labels").handler(this::getAll);
+        router.route(HttpMethod.GET, "/api/labels/only/category/:category_name").handler(this::getLabelsOfCategory);
+        router.route(HttpMethod.GET, "/api/labels/:id").handler(this::get);
+        router.route(HttpMethod.GET, "/api/labels/identifier/:id").handler(this::getByIdentifier);
+        router.route(HttpMethod.POST, "/api/labels/:id").handler(this::upsert);
+        router.route(HttpMethod.DELETE, "/api/labels/:id").handler(this::delete);
     }
 
     private void getAll(RoutingContext rc) {

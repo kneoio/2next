@@ -13,11 +13,7 @@ public class ClientContextFilter {
     void filter(RoutingContext rc) {
         String path = rc.request().uri();
         if (path.startsWith("/api/")) {
-            String[] parts = path.split("/", 4);
-            if (parts.length >= 4) {
-                rc.put("client_database", clientDatabaseUrl);
-                rc.next();
-            }
+            rc.next();
         } else {
             rc.next();
         }

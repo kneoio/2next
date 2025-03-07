@@ -38,10 +38,10 @@ public class TaskTypeController extends AbstractSecuredController<TaskType, Task
     }
 
     public void setupRoutes(Router router) {
-        router.route(HttpMethod.GET, "/api/:org/tasktypes").handler(this::getAll);
-        router.route(HttpMethod.GET, "/api/:org/tasktypes/:id").handler(this::get);
-        router.route(HttpMethod.POST, "/api/:org/tasktypes").handler(this::upsert);
-        router.route(HttpMethod.DELETE, "/api/:org/tasktypes/:id").handler(this::delete);
+        router.route(HttpMethod.GET, "/api/tasktypes").handler(this::getAll);
+        router.route(HttpMethod.GET, "/api/tasktypes/:id").handler(this::get);
+        router.route(HttpMethod.POST, "/api/tasktypes").handler(this::upsert);
+        router.route(HttpMethod.DELETE, "/api/tasktypes/:id").handler(this::delete);
     }
 
     private void getAll(RoutingContext rc) {

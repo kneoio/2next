@@ -39,11 +39,11 @@ public class DepartmentController extends AbstractSecuredController<Department, 
     }
 
     public void setupRoutes(Router router) {
-        router.route(HttpMethod.GET, "/api/:org/departments").handler(this::get);
-        router.route(HttpMethod.GET, "/api/:org/departments/only/member_of/:primary_org").handler(this::getDepartmentsOfOrg);
-        router.route(HttpMethod.GET, "/api/:org/departments/:id").handler(this::getById);
-        router.route(HttpMethod.POST, "/api/:org/departments").handler(this::upsert);
-        router.route(HttpMethod.DELETE, "/api/:org/departments/:id").handler(this::delete);
+        router.route(HttpMethod.GET, "/api/departments").handler(this::get);
+        router.route(HttpMethod.GET, "/api/departments/only/member_of/:primary_org").handler(this::getDepartmentsOfOrg);
+        router.route(HttpMethod.GET, "/api/departments/:id").handler(this::getById);
+        router.route(HttpMethod.POST, "/api/departments").handler(this::upsert);
+        router.route(HttpMethod.DELETE, "/api/departments/:id").handler(this::delete);
     }
 
     private void get(RoutingContext rc) {

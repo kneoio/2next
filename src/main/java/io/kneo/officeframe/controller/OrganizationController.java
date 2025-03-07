@@ -40,11 +40,11 @@ public class OrganizationController extends AbstractSecuredController<Organizati
     }
 
     public void setupRoutes(Router router) {
-        router.route(HttpMethod.GET, "/api/:org/orgs").handler(this::get);
-        router.route(HttpMethod.GET, "/api/:org/orgs/only/primary").handler(this::getPrimary);
-        router.route(HttpMethod.GET, "/api/:org/orgs/:id").handler(this::getById);
-        router.route(HttpMethod.POST, "/api/:org/orgs/:id?").handler(this::upsert);
-        router.route(HttpMethod.DELETE, "/api/:org/orgs/:id").handler(this::delete);
+        router.route(HttpMethod.GET, "/api/orgs").handler(this::get);
+        router.route(HttpMethod.GET, "/api/orgs/only/primary").handler(this::getPrimary);
+        router.route(HttpMethod.GET, "/api/orgs/:id").handler(this::getById);
+        router.route(HttpMethod.POST, "/api/orgs/:id?").handler(this::upsert);
+        router.route(HttpMethod.DELETE, "/api/orgs/:id").handler(this::delete);
     }
 
     private void get(RoutingContext rc) {

@@ -38,11 +38,11 @@ public class RoleController extends AbstractSecuredController<Role, RoleDTO> {
     }
 
     public void setupRoutes(Router router) {
-        router.route(HttpMethod.GET, "/api/:org/roles").handler(this::get);
-        router.route(HttpMethod.GET, "/api/:org/roles/:id").handler(this::getById);
-        router.route(HttpMethod.POST, "/api/:org/roles").handler(this::create);
-        router.route(HttpMethod.PUT, "/api/:org/roles/:id").handler(this::update);
-        router.route(HttpMethod.DELETE, "/api/:org/roles/:id").handler(this::delete);
+        router.route(HttpMethod.GET, "/api/roles").handler(this::get);
+        router.route(HttpMethod.GET, "/api/roles/:id").handler(this::getById);
+        router.route(HttpMethod.POST, "/api/roles").handler(this::create);
+        router.route(HttpMethod.PUT, "/api/roles/:id").handler(this::update);
+        router.route(HttpMethod.DELETE, "/api/roles/:id").handler(this::delete);
     }
 
     private void get(RoutingContext rc)  {

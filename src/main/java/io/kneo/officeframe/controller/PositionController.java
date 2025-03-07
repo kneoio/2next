@@ -29,10 +29,10 @@ public class PositionController extends AbstractSecuredController<Position, Posi
     }
 
     public void setupRoutes(Router router) {
-        router.route(HttpMethod.GET, "/api/:org/positions").handler(this::get);
-        router.route(HttpMethod.GET, "/api/:org/positions/:id").handler(this::getOne);
-        router.route(HttpMethod.POST, "/api/:org/positions/:id?").handler(this::upsert);
-        router.route(HttpMethod.DELETE, "/api/:org/positions/:id").handler(this::delete);
+        router.route(HttpMethod.GET, "/api/positions").handler(this::get);
+        router.route(HttpMethod.GET, "/api/positions/:id").handler(this::getOne);
+        router.route(HttpMethod.POST, "/api/positions/:id?").handler(this::upsert);
+        router.route(HttpMethod.DELETE, "/api/positions/:id").handler(this::delete);
     }
 
     private void get(RoutingContext rc) {

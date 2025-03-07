@@ -29,10 +29,10 @@ public class UserController extends AbstractController<User, UserDTO> {
     }
 
     public void setupRoutes(Router router) {
-        router.get("/api/:org/users").handler(this::getAll);
-        router.post("/api/:org/users").handler(this::create);
-        router.put("/api/:org/users/:id").handler(this::update);
-        router.delete("/api/:org/users/:id").handler(this::delete);
+        router.get("/api/users").handler(this::getAll);
+        router.post("/api/users").handler(this::create);
+        router.put("/api/users/:id").handler(this::update);
+        router.delete("/api/users/:id").handler(this::delete);
     }
 
     private void getAll(RoutingContext rc) {

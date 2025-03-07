@@ -27,10 +27,10 @@ public class LanguageController extends AbstractSecuredController<Language, Lang
 
     public void setupRoutes(Router router) {
         router.route( "/*").handler(this::addHeaders);
-        router.route(HttpMethod.GET, "/api/:org/languages").handler(this::get);
-        router.route(HttpMethod.GET, "/api/:org/languages/:id").handler(this::getOne);
-        router.route(HttpMethod.POST, "/api/:org/languages/:id?").handler(this::upsert);
-        router.route(HttpMethod.DELETE, "/api/:org/languages/:id").handler(this::delete);
+        router.route(HttpMethod.GET, "/api/languages").handler(this::get);
+        router.route(HttpMethod.GET, "/api/languages/:id").handler(this::getOne);
+        router.route(HttpMethod.POST, "/api/languages/:id?").handler(this::upsert);
+        router.route(HttpMethod.DELETE, "/api/languages/:id").handler(this::delete);
     }
 
     private void get(RoutingContext rc) {
