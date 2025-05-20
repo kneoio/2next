@@ -15,6 +15,7 @@ public class Action {
     @JsonIgnore
     private RunMode isOn = RunMode.ON;
     private String caption;
+    private String identifier;
 
     public Action(String alias) {
         this.caption = alias;
