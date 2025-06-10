@@ -12,13 +12,13 @@ import java.util.UUID;
 @Getter
 @Setter
 public class Language extends SimpleReferenceEntity {
-    private LanguageCode code = LanguageCode.UNKNOWN;
+    private LanguageCode code = LanguageCode.unknown;
     private boolean isOn;
     private int position;
 
 
     public static class Builder extends AbstractEntityBuilder {
-        private LanguageCode code = LanguageCode.ENG;
+        private LanguageCode code = LanguageCode.en;
         private boolean isOn;
         private int position = 999;
         private EnumMap<LanguageCode, String> localizedName = new EnumMap<>(LanguageCode.class);

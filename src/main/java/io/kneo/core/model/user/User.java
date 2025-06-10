@@ -57,7 +57,7 @@ public class User extends DataEntity<Long> implements IUser {
         private boolean isSupervisor;
         private TimeZone timeZone = TimeZone.getDefault();
         private List<Role> roles;
-        private Integer defaultLang = LanguageCode.ENG.getCode();
+        private Integer defaultLang = LanguageCode.en.getCode();
         private List<Module> modules = Collections.singletonList(new Module.Builder().build());
         private UserRegStatus regStatus;
         private int confirmationCode;

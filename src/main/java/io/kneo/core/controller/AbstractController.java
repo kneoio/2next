@@ -124,7 +124,7 @@ public abstract class AbstractController<T, V> {
                 .unis(pageNumUni, Uni.createFrom().item(user.getPageSize()))
                 .asTuple()
                 .map(tuple -> RuntimeUtil.calcStartEntry(tuple.getItem1(), tuple.getItem2()));
-        Uni<List<V>> unis = offsetUni.onItem().transformToUni(offset -> service.getAll(size, offset, LanguageCode.ENG));
+        Uni<List<V>> unis = offsetUni.onItem().transformToUni(offset -> service.getAll(size, offset, LanguageCode.en));
         return Uni.combine().all()
                 .unis(unis, offsetUni, pageNumUni, countUni, maxPageUni)
                 .asTuple()
@@ -136,7 +136,7 @@ public abstract class AbstractController<T, V> {
                     int maxPage = tuple.getItem5();
 
                     ViewPage viewPage = new ViewPage();
-                    viewPage.addPayload(PayloadType.CONTEXT_ACTIONS, ActionsFactory.getDefaultViewActions(LanguageCode.ENG));
+                    viewPage.addPayload(PayloadType.CONTEXT_ACTIONS, ActionsFactory.getDefaultViewActions(LanguageCode.en));
                     if (pageNum == 0) pageNum = 1;
                     View<V> dtoEntries = new View<>(dtoList, count, pageNum, maxPage, size);
                     viewPage.addPayload(PayloadType.VIEW_DATA, dtoEntries);
@@ -150,8 +150,8 @@ public abstract class AbstractController<T, V> {
         IUser user = getUserId(requestContext);
         if (user != null) {
             FormPage page = new FormPage();
-            page.addPayload(PayloadType.CONTEXT_ACTIONS, ActionsFactory.getDefaultFormActions(LanguageCode.ENG));
-            return service.getDTO(UUID.fromString(id), user, LanguageCode.ENG)
+            page.addPayload(PayloadType.CONTEXT_ACTIONS, ActionsFactory.getDefaultFormActions(LanguageCode.en));
+            return service.getDTO(UUID.fromString(id), user, LanguageCode.en)
                     .onItem().transform(p -> {
                         page.addPayload(PayloadType.DOC_DATA, p);
                         return Response.ok(page).build();
@@ -178,7 +178,7 @@ public abstract class AbstractController<T, V> {
     protected Uni<Response> getDocument(AbstractService<T, V> service, String id) {
         FormPage page = new FormPage();
         page.addPayload(PayloadType.CONTEXT_ACTIONS, new ActionBox());
-        return service.getDTO(UUID.fromString(id), AnonymousUser.build(), LanguageCode.ENG)
+        return service.getDTO(UUID.fromString(id), AnonymousUser.build(), LanguageCode.en)
                 .onItem().transform(p -> {
                     page.addPayload(PayloadType.DOC_DATA, p);
                     return Response.ok(page).build();
@@ -299,7 +299,7 @@ public abstract class AbstractController<T, V> {
         try {
             return LanguageCode.valueOf(rc.acceptableLanguages().get(0).value().toUpperCase());
         } catch (Exception e) {
-            return LanguageCode.ENG;
+            return LanguageCode.en;
         }
     }
 

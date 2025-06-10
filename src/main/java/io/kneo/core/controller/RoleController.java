@@ -77,7 +77,7 @@ public class RoleController extends AbstractSecuredController<Role, RoleDTO> {
         FormPage page = new FormPage();
         page.addPayload(PayloadType.CONTEXT_ACTIONS, new ActionBox());
 
-        service.getDTO(UUID.fromString(id), AnonymousUser.build(), LanguageCode.ENG)
+        service.getDTO(UUID.fromString(id), AnonymousUser.build(), LanguageCode.en)
                 .onItem().transform(p -> {
                     page.addPayload(PayloadType.DOC_DATA, p);
                     return page;
