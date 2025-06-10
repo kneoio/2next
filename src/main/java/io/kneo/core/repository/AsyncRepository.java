@@ -228,7 +228,7 @@ public class AsyncRepository {
                 LanguageCode key = LanguageCode.valueOf(entry.getKey().toUpperCase());
                 enumMap.put(key, (String) entry.getValue());
             } catch (IllegalArgumentException e) {
-                enumMap.put(LanguageCode.UNKNOWN, (String) entry.getValue());
+                enumMap.put(LanguageCode.unknown, (String) entry.getValue());
             }
         }
 
