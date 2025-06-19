@@ -20,41 +20,83 @@ public class GlobalErrorHandler implements Handler<RoutingContext> {
     private static final String JSON_TYPE = "application/json";
 
     private final Map<Class<? extends Throwable>, ErrorResponse> errorMappings = Map.of(
-            IllegalArgumentException.class, new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST),
-            DocumentHasNotFoundException.class, new ErrorResponse(ErrorResponse.ErrorCode.DOCUMENT_NOT_FOUND),
-            UserNotFoundException.class, new ErrorResponse(ErrorResponse.ErrorCode.USER_NOT_FOUND),
-            DocumentModificationAccessException.class, new ErrorResponse(ErrorResponse.ErrorCode.DOCUMENT_ACCESS_DENIED),
-            ConnectException.class, new ErrorResponse(ErrorResponse.ErrorCode.CONNECTION_ERROR),
-            PgException.class, new ErrorResponse(ErrorResponse.ErrorCode.DATABASE_ERROR),
-            NoSuchElementException.class, new ErrorResponse(ErrorResponse.ErrorCode.RESOURCE_NOT_AVAILABLE)
+            IllegalArgumentException.class, new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "Unauthorized"),
+            DocumentHasNotFoundException.class, new ErrorResponse(ErrorResponse.ErrorCode.DOCUMENT_NOT_FOUND, "Unauthorized"),
+            UserNotFoundException.class, new ErrorResponse(ErrorResponse.ErrorCode.USER_NOT_FOUND, "Unauthorized"),
+            DocumentModificationAccessException.class, new ErrorResponse(ErrorResponse.ErrorCode.DOCUMENT_ACCESS_DENIED, "Unauthorized"),
+            ConnectException.class, new ErrorResponse(ErrorResponse.ErrorCode.CONNECTION_ERROR, "Unauthorized"),
+            PgException.class, new ErrorResponse(ErrorResponse.ErrorCode.DATABASE_ERROR, "Unauthorized"),
+            NoSuchElementException.class, new ErrorResponse(ErrorResponse.ErrorCode.RESOURCE_NOT_AVAILABLE, "Unauthorized")
     );
 
     @Override
     public void handle(RoutingContext context) {
         Throwable failure = context.failure();
+        int statusCode = context.statusCode();
+
+        String userName = "undefined";
+        if (context.user() != null && context.user().containsKey("username")) {
+            userName = context.user().attributes().getMap().get("username").toString();
+        }
+
+        // Log request details for debugging
+        String contentLength = context.request().getHeader("Content-Length");
+        String contentType = context.request().getHeader("Content-Type");
+        String requestPath = context.request().uri();
+        String method = context.request().method().toString();
+
+        LOGGER.info("GlobalErrorHandler triggered - Method: {}, Path: {}, Status: {}, Content-Length: {}, Content-Type: {}, User: {}",
+                method, requestPath, statusCode, contentLength, contentType, userName);
+
+        // Handle HTTP status codes (like 413 Payload Too Large)
+        if (statusCode != -1) {
+            LOGGER.warn("HTTP error detected - Status: {}, Path: {}, Content-Length: {}",
+                    statusCode, requestPath, contentLength);
+
+            // Handle 413 Payload Too Large specifically
+            if (statusCode == 413) {
+                LOGGER.error("File upload rejected - Payload too large. Status: 413, Path: {}, Content-Length: {}",
+                        requestPath, contentLength);
+                sendErrorResponse(context, new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "File size exceeds server limits"));
+                return;
+            }
+
+            // Handle other HTTP status codes
+            ErrorResponse response = createHttpStatusErrorResponse(statusCode);
+            sendErrorResponse(context, response);
+            return;
+        }
+
+        // Handle cases where failure is null
+        if (failure == null) {
+            LOGGER.warn("Global error handler called with null failure for path: {} user: {}", requestPath, userName);
+            sendErrorResponse(context, new ErrorResponse(ErrorResponse.ErrorCode.UNKNOWN_ERROR, "Unauthorized"));
+            return;
+        }
+
         Throwable rootCause = getRootCause(failure);
 
         ErrorResponse response = errorMappings.entrySet().stream()
                 .filter(entry -> entry.getKey().isInstance(rootCause))
                 .map(Map.Entry::getValue)
                 .findFirst()
-                .orElse(new ErrorResponse(ErrorResponse.ErrorCode.UNKNOWN_ERROR));
+                .orElse(new ErrorResponse(ErrorResponse.ErrorCode.UNKNOWN_ERROR, "Unauthorized"));
 
-        // Log all errors with appropriate levels
         if (response.isLogError()) {
             LOGGER.error("Global error handler - Critical error: ", failure);
         } else {
-            // Log client errors at warning level
             if (response.getStatus() >= 400 && response.getStatus() < 500) {
-                LOGGER.warn("Global error handler - Client error: {} - {}",
+                LOGGER.warn("Global error handler - Client error: {} - {}, user: {}, path: {}",
                         response.getCode(),
                         failure.getMessage(),
+                        userName,
+                        requestPath,
                         failure);
             } else {
-                // Log other errors at error level
-                LOGGER.error("Global error handler - Server error: {} - {}",
+                LOGGER.error("Global error handler - Server error: {} - {}, path: {}",
                         response.getCode(),
                         failure.getMessage(),
+                        requestPath,
                         failure);
             }
         }
@@ -62,7 +104,25 @@ public class GlobalErrorHandler implements Handler<RoutingContext> {
         sendErrorResponse(context, response);
     }
 
+    private ErrorResponse createHttpStatusErrorResponse(int statusCode) {
+        return switch (statusCode) {
+            case 400 -> new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "Bad Request");
+            case 401 -> new ErrorResponse(ErrorResponse.ErrorCode.UNAUTHORIZED, "Unauthorized");
+            case 403 -> new ErrorResponse(ErrorResponse.ErrorCode.FORBIDDEN, "Forbidden");
+            case 404 -> new ErrorResponse(ErrorResponse.ErrorCode.DOCUMENT_NOT_FOUND, "Not Found");
+            case 413 -> new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "Payload Too Large");
+            case 415 -> new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "Unsupported Media Type");
+            case 500 -> new ErrorResponse(ErrorResponse.ErrorCode.INTERNAL_SERVER_ERROR, "Internal Server Error");
+            case 502 -> new ErrorResponse(ErrorResponse.ErrorCode.CONNECTION_ERROR, "Bad Gateway");
+            case 503 -> new ErrorResponse(ErrorResponse.ErrorCode.SERVICE_UNAVAILABLE, "Service Unavailable");
+            default -> new ErrorResponse(ErrorResponse.ErrorCode.UNKNOWN_ERROR, "HTTP Error " + statusCode);
+        };
+    }
+
     private Throwable getRootCause(Throwable throwable) {
+        if (throwable == null) {
+            return null;
+        }
         return throwable.getCause() != null ? getRootCause(throwable.getCause()) : throwable;
     }
 

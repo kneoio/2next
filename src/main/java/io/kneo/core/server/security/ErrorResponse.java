@@ -18,7 +18,11 @@ public class ErrorResponse {
         CONNECTION_ERROR(500, "API server connection error", "Failed to establish connection with the server", true),
         DATABASE_ERROR(500, "Database operation failed", "An error occurred while processing the database operation", true),
         RESOURCE_NOT_AVAILABLE(500, "Resource not available", "The requested resource is not available in the system", true),
-        UNKNOWN_ERROR(500, "Internal server error", "An unexpected error occurred", true);
+        UNKNOWN_ERROR(500, "Internal server error", "An unexpected error occurred", true),
+        INTERNAL_SERVER_ERROR(500, "Internal server error", "An unexpected error occurred", true),
+        UNAUTHORIZED(403,"Unauthorized", "Unauthorized" ,false),
+        FORBIDDEN(401, "Forbidden", "Forbidden", true),
+        SERVICE_UNAVAILABLE(500,"Service Unavailable" ,"Service Unavailable" , false);
 
         private final int status;
         private final String message;
@@ -33,10 +37,10 @@ public class ErrorResponse {
         }
     }
 
-    public ErrorResponse(ErrorCode code) {
+    public ErrorResponse(ErrorCode code, String message) {
         this.status = code.status;
         this.code = code.name();
-        this.message = code.message;
+        this.message = message;
         this.details = code.details;
         this.logError = code.logError;
     }
