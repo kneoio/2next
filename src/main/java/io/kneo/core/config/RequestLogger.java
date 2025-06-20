@@ -11,29 +11,38 @@ public class RequestLogger {
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestLogger.class);
 
     void configureRouter(@Observes Router router) {
-        // Log ALL incoming requests - highest priority
+
         router.route().order(-1000).handler(context -> {
             String contentLength = context.request().getHeader("Content-Length");
             String contentType = context.request().getHeader("Content-Type");
+            String maskedUri = maskTokenInUri(context.request().uri());
 
-         /*   LOGGER.info("=== INCOMING REQUEST === Method: {} {}, Content-Length: {}, Content-Type: {}",
+            LOGGER.info("=== INCOMING REQUEST === Method: {} {}, Content-Length: {}, Content-Type: {}",
                     context.request().method(),
-                    context.request().uri(),
+                    maskedUri,
                     contentLength != null ? contentLength : "not-set",
-                    contentType != null ? contentType : "not-set");*/
+                    contentType != null ? contentType : "not-set");
 
             context.next();
         });
 
-        // Log request completion
+
         router.route().order(1000).handler(context -> {
             context.addEndHandler(result -> {
-          /*      LOGGER.info("=== REQUEST COMPLETED === {} {} -> Status: {}",
+                String maskedUri = maskTokenInUri(context.request().uri());
+                LOGGER.info("=== REQUEST COMPLETED === {} {} -> Status: {}",
                         context.request().method(),
-                        context.request().uri(),
-                        context.response().getStatusCode());*/
+                        maskedUri,
+                        context.response().getStatusCode());
             });
             context.next();
         });
+    }
+
+    private String maskTokenInUri(String uri) {
+        if (uri == null) {
+            return uri;
+        }
+        return uri.replaceAll("(token=)[^&\\s]*", "$1*****");
     }
 }

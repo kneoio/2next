@@ -40,7 +40,7 @@ import java.util.UUID;
 
 import static io.kneo.core.util.RuntimeUtil.countMaxPage;
 
-public abstract class AbstractController<T, V> {
+public abstract class AbstractController<T, V> extends BaseController {
     private static final Duration TIMEOUT = Duration.ofSeconds(5);
     protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
@@ -165,28 +165,6 @@ public abstract class AbstractController<T, V> {
         }
     }
 
-    private void sendJsonResponse(RoutingContext rc, int statusCode, JsonObject body) {
-        rc.response()
-                .setStatusCode(statusCode)
-                .end(body.encode());
-    }
-
-    private void sendErrorResponse(RoutingContext rc, int statusCode, String errorMessage) {
-        sendJsonResponse(rc, statusCode, new JsonObject().put("error", errorMessage));
-    }
-
-    protected Uni<Response> getDocument(AbstractService<T, V> service, String id) {
-        FormPage page = new FormPage();
-        page.addPayload(PayloadType.CONTEXT_ACTIONS, new ActionBox());
-        return service.getDTO(UUID.fromString(id), AnonymousUser.build(), LanguageCode.en)
-                .onItem().transform(p -> {
-                    page.addPayload(PayloadType.DOC_DATA, p);
-                    return Response.ok(page).build();
-                })
-                .onFailure().invoke(failure -> LOGGER.error(failure.getMessage()))
-                .onFailure().recoverWithItem(Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build());
-    }
-
     @Deprecated
     protected IUser getUserId(ContainerRequestContext requestContext) throws UserNotFoundException {
         try {
@@ -213,7 +191,6 @@ public abstract class AbstractController<T, V> {
         }
         return userService.findByLogin(username);
     }
-
 
     @Deprecated
     protected IUser getUser(RoutingContext rc) {
@@ -279,28 +256,6 @@ public abstract class AbstractController<T, V> {
         int randomNum = rand.nextInt(900000) + 100000;
         LOGGER.error(String.format("code: %s, msg: %s ", randomNum, e.getMessage()), e);
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(String.format("code: %s, msg: %s ", randomNum, e.getMessage())).build();
-    }
-
-    protected Response postForbidden(String userOIDCName) {
-        LOGGER.warn(String.format("%s is not allowed", userOIDCName));
-        return Response.status(Response.Status.FORBIDDEN)
-                .entity(String.format("%s is not allowed", userOIDCName))
-                .build();
-    }
-
-    protected Response postNotFoundError(Throwable e) {
-        Random rand = new Random();
-        int randomNum = rand.nextInt(800000) + 100000;
-        LOGGER.warn("code: {}, msg: {} ", randomNum, e.getMessage(), e);
-        return Response.status(Response.Status.NOT_FOUND).entity(String.format("code: %s, msg: %s ", randomNum, e.getMessage())).build();
-    }
-
-    protected static LanguageCode resolveLanguage(RoutingContext rc) {
-        try {
-            return LanguageCode.valueOf(rc.acceptableLanguages().get(0).value().toUpperCase());
-        } catch (Exception e) {
-            return LanguageCode.en;
-        }
     }
 
     protected static String getMimeType(File file) {
