@@ -3,6 +3,7 @@ package io.kneo.core.config;
 import io.vertx.ext.web.Router;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,14 +11,20 @@ import org.slf4j.LoggerFactory;
 public class RequestLogger {
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestLogger.class);
 
+    @Inject
+    TwoNextConfig config;
+
     void configureRouter(@Observes Router router) {
+        if (!config.getRequestLoggerEnabled()) {
+            return;
+        }
 
         router.route().order(-1000).handler(context -> {
             String contentLength = context.request().getHeader("Content-Length");
             String contentType = context.request().getHeader("Content-Type");
             String maskedUri = maskTokenInUri(context.request().uri());
 
-            LOGGER.info("=== INCOMING REQUEST === Method: {} {}, Content-Length: {}, Content-Type: {}",
+            LOGGER.info("=>: {} {}, Content-Length: {}, Content-Type: {}",
                     context.request().method(),
                     maskedUri,
                     contentLength != null ? contentLength : "not-set",
@@ -26,11 +33,10 @@ public class RequestLogger {
             context.next();
         });
 
-
         router.route().order(1000).handler(context -> {
             context.addEndHandler(result -> {
                 String maskedUri = maskTokenInUri(context.request().uri());
-                LOGGER.info("=== REQUEST COMPLETED === {} {} -> Status: {}",
+                LOGGER.info("=>{} {} -> Status: {}",
                         context.request().method(),
                         maskedUri,
                         context.response().getStatusCode());
