@@ -79,7 +79,7 @@ public class RoleController extends AbstractSecuredController<Role, RoleDTO> {
         String id = rc.pathParam("id");
         LanguageCode languageCode = LanguageCode.valueOf(rc.request().getParam("lang", LanguageCode.en.name()));
 
-        getContextUser(rc)
+        getContextUser(rc, true, true)
                 .chain(user -> {
                     if ("new".equals(id)) {
                         RoleDTO dto = new RoleDTO();

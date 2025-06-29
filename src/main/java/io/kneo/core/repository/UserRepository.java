@@ -162,20 +162,20 @@ public class UserRepository extends AsyncRepository {
         return user;
     }
 
-    public Uni<Long> insert(User user) {
-        ZonedDateTime zonedDateTime = ZonedDateTime.now();
-        LocalDateTime localDateTime = zonedDateTime.toLocalDateTime();
-        String sql = "INSERT INTO _users (default_lang, email, i_su, login, reg_date, status, confirmation_code)VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id";
+    public Uni<Long> insert(User doc, IUser user) {
+        ZonedDateTime nowZonedTime = ZonedDateTime.now();
+        LocalDateTime nowLocalDateTime = nowZonedTime.toLocalDateTime();
+        String sql = "INSERT INTO _users (author, default_lang, email, i_su, login, reg_date, status, confirmation_code, last_mod_user) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id";
         String modulesSQL = "INSERT INTO _user_modules (module_id, user_id, is_on) VALUES($1, $2, $3)";
         String rolesSQL = "INSERT INTO _user_roles (role_id, user_id, is_on) VALUES($1, $2, $3)";
-        Tuple params = Tuple.of(user.getDefaultLang(), user.getEmail(), user.isSupervisor(), user.getLogin(), localDateTime);
-        Tuple finalParams = params.addValue(user.getRegStatus()).addInteger(user.getConfirmationCode());
+        Tuple params = Tuple.of(user.getId(), doc.getDefaultLang(), doc.getEmail(), doc.isSupervisor(), doc.getLogin(), nowLocalDateTime);
+        Tuple finalParams = params.addValue(doc.getRegStatus()).addInteger(doc.getConfirmationCode()).addLong(user.getId());
         return client.withTransaction(tx -> tx.preparedQuery(sql)
                 .execute(finalParams)
                 .onItem().transform(result -> result.iterator().next().getLong("id"))
                 .onItem().transformToUni(id -> {
                     List<Uni<Integer>> userModulesList = new ArrayList<>();
-                    for (Module module : user.getModules()) {
+                    for (Module module : doc.getModules()) {
                         userModulesList.add(tx.preparedQuery(modulesSQL)
                                 .execute(Tuple.of(module.getId(), id, true))
                                 .onItem().transform(SqlResult::rowCount));
@@ -188,7 +188,7 @@ public class UserRepository extends AsyncRepository {
                 })
                 .onItem().transformToUni(id -> {
                     List<Uni<Integer>> userRolesList = new ArrayList<>();
-                    for (Role role : user.getRoles()) {
+                    for (Role role : doc.getRoles()) {
                         userRolesList.add(tx.preparedQuery(rolesSQL)
                                 .execute(Tuple.of(role.getId(), id, true))
                                 .onItem().transform(SqlResult::rowCount));
@@ -206,14 +206,17 @@ public class UserRepository extends AsyncRepository {
                 }));
     }
 
-    public Uni<Long> update(User user) {
-        String sql = "UPDATE _users SET default_lang=$1, email='', i_su=$2, status=$3, ui_theme=$4, time_zone=0 WHERE id=$5";
-        Tuple params = Tuple.of(user.getDefaultLang(), user.getEmail(), user.isSupervisor(), user.getLogin());
-        params = params.addValue(user.getRegStatus()).addValue("cinzento").addInteger(user.getConfirmationCode());
+    public Uni<Long> update(User doc, IUser user) {
+        String sql = "UPDATE _users SET default_lang=$1, email=$2, i_su=$3, status=$4, ui_theme=$5, time_zone=$6, last_mod_date=CURRENT_TIMESTAMP, last_mod_user=$7 WHERE id=$8";
+        Tuple params = Tuple.of(doc.getDefaultLang(), doc.getEmail(), doc.isSupervisor(), doc.getRegStatus())
+                .addValue("cinzento")
+                .addValue("0")
+                .addLong(user.getId())
+                .addLong(doc.getId());
 
         Uni<Long> longUni = client.preparedQuery(sql)
                 .execute(params)
-                .onItem().transform(result -> result.iterator().next().getLong("id"));
+                .onItem().transform(result -> (long) result.rowCount());
         userCache.clear();
         userAltCache.clear();
         return longUni;

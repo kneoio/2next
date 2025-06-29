@@ -3,12 +3,14 @@ package io.kneo.core.controller;
 
 import io.kneo.core.dto.actions.ActionsFactory;
 import io.kneo.core.dto.cnst.PayloadType;
+import io.kneo.core.dto.document.UserDTO;
 import io.kneo.core.dto.form.FormPage;
 import io.kneo.core.dto.view.View;
 import io.kneo.core.dto.view.ViewPage;
 import io.kneo.core.localization.LanguageCode;
 import io.kneo.core.model.user.AnonymousUser;
 import io.kneo.core.model.user.IUser;
+import io.kneo.core.model.user.UndefinedUser;
 import io.kneo.core.repository.exception.DocumentModificationAccessException;
 import io.kneo.core.repository.exception.UserNotFoundException;
 import io.kneo.core.service.AbstractService;
@@ -31,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
@@ -145,6 +148,14 @@ public abstract class AbstractController<T, V> extends BaseController {
     }
 
     protected Uni<IUser> getContextUser(RoutingContext rc) {
+        return getContextUser(rc, true, false);
+    }
+
+    protected Uni<IUser> getContextUser(RoutingContext rc, boolean allowUndefinedUser) {
+        return getContextUser(rc, allowUndefinedUser, false);
+    }
+
+    protected Uni<IUser> getContextUser(RoutingContext rc, boolean allowUndefinedUser, boolean autoRegisterUser) {
         User vertxUser = rc.user();
         if (vertxUser == null) {
             return Uni.createFrom().failure(new IllegalStateException("No authenticated user found"));
@@ -152,17 +163,29 @@ public abstract class AbstractController<T, V> extends BaseController {
         JsonObject principal = vertxUser.principal();
         String username = principal.getString(USER_NAME);
         if (username == null || username.isEmpty()) {
-            return Uni.createFrom().failure(new UserNotFoundException("Username is null or empty"));
+            return Uni.createFrom().failure(new IllegalArgumentException("Username is null or empty"));
         } else {
             return userService.findByLogin(username)
-                    .onItem().ifNull().continueWith(() -> {
-                        io.kneo.core.model.user.User user = new io.kneo.core.model.user.User();
-                        user.setLogin(username);
-                        return user;
+                    .onItem().transformToUni(user -> {
+                        if (user == null || user instanceof UndefinedUser) {
+                            if (autoRegisterUser) {
+                                UserDTO newUserDTO = new UserDTO();
+                                newUserDTO.setLogin(username);
+                                return userService.add(newUserDTO)
+                                        .onItem().transformToUni(userId -> userService.get(userId))
+                                        .onItem().transform(Optional::get);
+                            } else if (allowUndefinedUser) {
+                                io.kneo.core.model.user.User newUser = new io.kneo.core.model.user.User();
+                                newUser.setLogin(username);
+                                return Uni.createFrom().item(newUser);
+                            } else {
+                                return Uni.createFrom().failure(new UserNotFoundException(username));
+                            }
+                        }
+                        return Uni.createFrom().item(user);
                     });
         }
     }
-
 
     public Uni<Response> delete(String uuid, AbstractService<T, V> service, @Context ContainerRequestContext requestContext) throws DocumentModificationAccessException, UserNotFoundException {
         IUser userOptional = getUserId(requestContext);

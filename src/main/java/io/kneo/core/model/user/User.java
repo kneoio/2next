@@ -51,6 +51,7 @@ public class User extends DataEntity<Long> implements IUser {
         return new ArrayList<>(roles);
     }
 
+    @Deprecated
     public static class Builder {
         private String login;
         private String email;

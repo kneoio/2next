@@ -2,10 +2,12 @@ package io.kneo.core.service;
 
 import io.kneo.core.dto.cnst.UserRegStatus;
 import io.kneo.core.dto.document.UserDTO;
+import io.kneo.core.localization.LanguageCode;
 import io.kneo.core.model.Module;
 import io.kneo.core.model.SimpleReferenceEntity;
 import io.kneo.core.model.user.IUser;
 import io.kneo.core.model.user.Role;
+import io.kneo.core.model.user.SuperUser;
 import io.kneo.core.model.user.User;
 import io.kneo.core.repository.ModuleRepository;
 import io.kneo.core.repository.RoleRepository;
@@ -77,11 +79,12 @@ public class UserService {
     }
 
     public Uni<Long> add(UserDTO dto) {
-        User user = new User.Builder()
-                .setLogin(dto.getLogin())
-                .setEmail(dto.getEmail())
-                .setRegStatus(UserRegStatus.REGISTERED)
-                .build();
+        User user = new User();
+        user.setLogin(dto.getLogin());
+        user.setEmail("place_holder@kneo.io");
+        user.setDefaultLang(0);
+        user.setRegStatus(UserRegStatus.REGISTERED_AUTOMATICALLY);
+
         Uni<List<Role>> rolesUni = roleRepository.getAll(0, 1000);
         Uni<List<Module>> moduleUni = moduleRepository.getAll(0, 1000);
 
@@ -93,7 +96,7 @@ public class UserService {
         }).onItem().transformToUni(modules -> {
             try {
                 user.setModules(getAllValidReferences(modules, dto.getModules()));
-                return repository.insert(user);
+                return repository.insert(user, SuperUser.build());
             } catch (Exception e) {
                 return Uni.createFrom().failure(e);
             }
@@ -106,7 +109,7 @@ public class UserService {
                 .setEmail(userDTO.getEmail())
                 .build();
 
-        return repository.insert(user);
+        return repository.insert(user, SuperUser.build());
     }
 
     private <T extends SimpleReferenceEntity> List<T> getAllValidReferences(List<T> allAvailable, List<String> provided) {
