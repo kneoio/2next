@@ -48,32 +48,33 @@ public class GlobalErrorHandler implements Handler<RoutingContext> {
         LOGGER.info("GlobalErrorHandler triggered - Method: {}, Path: {}, Status: {}, Content-Length: {}, Content-Type: {}, User: {}",
                 method, requestPath, statusCode, contentLength, contentType, userName);
 
-        // Handle HTTP status codes (like 413 Payload Too Large)
-        if (statusCode != -1) {
-            LOGGER.warn("HTTP error detected - Status: {}, Path: {}, Content-Length: {}",
-                    statusCode, requestPath, contentLength);
+        // Handle cases where failure is null first
+        if (failure == null) {
+            // Only handle HTTP status codes when there's no failure exception
+            if (statusCode != -1) {
+                LOGGER.warn("HTTP error detected - Status: {}, Path: {}, Content-Length: {}",
+                        statusCode, requestPath, contentLength);
 
-            // Handle 413 Payload Too Large specifically
-            if (statusCode == 413) {
-                LOGGER.error("File upload rejected - Payload too large. Status: 413, Path: {}, Content-Length: {}",
-                        requestPath, contentLength);
-                sendErrorResponse(context, new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "File size exceeds server limits"));
+                // Handle 413 Payload Too Large specifically
+                if (statusCode == 413) {
+                    LOGGER.error("File upload rejected - Payload too large. Status: 413, Path: {}, Content-Length: {}",
+                            requestPath, contentLength);
+                    sendErrorResponse(context, new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "File size exceeds server limits"));
+                    return;
+                }
+
+                // Handle other HTTP status codes
+                ErrorResponse response = createHttpStatusErrorResponse(statusCode);
+                sendErrorResponse(context, response);
                 return;
             }
 
-            // Handle other HTTP status codes
-            ErrorResponse response = createHttpStatusErrorResponse(statusCode);
-            sendErrorResponse(context, response);
-            return;
-        }
-
-        // Handle cases where failure is null
-        if (failure == null) {
-            LOGGER.warn("Global error handler called with null failure for path: {} user: {}", requestPath, userName);
+            LOGGER.warn("Global error handler called with null failure and no status code for path: {} user: {}", requestPath, userName);
             sendErrorResponse(context, new ErrorResponse(ErrorResponse.ErrorCode.UNKNOWN_ERROR, "Unauthorized"));
             return;
         }
 
+        // If we have a failure exception, process it regardless of status code
         Throwable rootCause = getRootCause(failure);
 
         ErrorResponse response = errorMappings.entrySet().stream()
@@ -93,10 +94,11 @@ public class GlobalErrorHandler implements Handler<RoutingContext> {
                         requestPath,
                         failure);
             } else {
-                LOGGER.error("Global error handler - Server error: {} - {}, path: {}",
+                LOGGER.error("Global error handler - Server error: {} - {}, path: {}, rootCause: {}",
                         response.getCode(),
                         failure.getMessage(),
                         requestPath,
+                        rootCause.getClass().getSimpleName() + ": " + rootCause.getMessage(),
                         failure);
             }
         }

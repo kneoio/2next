@@ -7,16 +7,16 @@ import io.kneo.core.dto.form.FormPage;
 import io.kneo.core.dto.view.View;
 import io.kneo.core.dto.view.ViewPage;
 import io.kneo.core.localization.LanguageCode;
-import io.kneo.core.model.user.AnonymousUser;
-import io.kneo.core.model.user.IUser;
 import io.kneo.core.model.user.Role;
 import io.kneo.core.service.RoleService;
 import io.kneo.core.service.UserService;
 import io.kneo.core.util.RuntimeUtil;
+import io.smallrye.mutiny.Uni;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.BodyHandler;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -32,40 +32,43 @@ public class RoleController extends AbstractSecuredController<Role, RoleDTO> {
         super(null);
     }
 
+    @Inject
     public RoleController(UserService userService, RoleService roleService) {
         super(userService);
         this.service = roleService;
     }
 
     public void setupRoutes(Router router) {
-        router.route(HttpMethod.GET, "/api/roles").handler(this::get);
-        router.route(HttpMethod.GET, "/api/roles/:id").handler(this::getById);
-        router.route(HttpMethod.POST, "/api/roles").handler(this::create);
-        router.route(HttpMethod.PUT, "/api/roles/:id").handler(this::update);
-        router.route(HttpMethod.DELETE, "/api/roles/:id").handler(this::delete);
+        String path = "/api/roles";
+
+        BodyHandler jsonBodyHandler = BodyHandler.create().setHandleFileUploads(false);
+
+        router.route(path + "*").handler(this::addHeaders);
+        router.route(HttpMethod.GET, path).handler(this::get);
+        router.route(HttpMethod.GET, path + "/:id").handler(this::getById);
+        router.route(HttpMethod.POST, path + "/:id?").handler(jsonBodyHandler).handler(this::upsert);
+        router.route(HttpMethod.DELETE, path + "/:id").handler(this::delete);
     }
 
-    private void get(RoutingContext rc)  {
+    private void get(RoutingContext rc) {
         int page = Integer.parseInt(rc.request().getParam("page", "1"));
         int size = Integer.parseInt(rc.request().getParam("size", "10"));
         LanguageCode languageCode = resolveLanguage(rc);
-        IUser user = getUser(rc);
 
-        service.getAllCount()
-                .onItem().transformToUni(count -> {
-                    int maxPage = RuntimeUtil.countMaxPage(count, size);
-                    int pageNum = (page == 0) ? 1 : page;
-                    int offset = RuntimeUtil.calcStartEntry(pageNum, size);
-
-                    return service.getAll(size, offset)
-                            .onItem().transform(dtoList -> {
-                                ViewPage viewPage = new ViewPage();
-                                viewPage.addPayload(PayloadType.CONTEXT_ACTIONS, languageCode);
-                                View<RoleDTO> dtoEntries = new View<>(dtoList, count, pageNum, maxPage, user.getPageSize());
-                                viewPage.addPayload(PayloadType.VIEW_DATA, dtoEntries);
-                                return viewPage;
-                            });
-                })
+        getContextUser(rc)
+                .chain(user -> Uni.combine().all().unis(
+                        service.getAllCount(),
+                        service.getAll(size, (page - 1) * size)
+                ).asTuple().map(tuple -> {
+                    ViewPage viewPage = new ViewPage();
+                    viewPage.addPayload(PayloadType.CONTEXT_ACTIONS, languageCode);
+                    View<RoleDTO> dtoEntries = new View<>(tuple.getItem2(),
+                            tuple.getItem1(), page,
+                            RuntimeUtil.countMaxPage(tuple.getItem1(), size),
+                            size);
+                    viewPage.addPayload(PayloadType.VIEW_DATA, dtoEntries);
+                    return viewPage;
+                }))
                 .subscribe().with(
                         viewPage -> rc.response().setStatusCode(200).end(JsonObject.mapFrom(viewPage).encode()),
                         rc::fail
@@ -74,53 +77,67 @@ public class RoleController extends AbstractSecuredController<Role, RoleDTO> {
 
     private void getById(RoutingContext rc) {
         String id = rc.pathParam("id");
-        FormPage page = new FormPage();
-        page.addPayload(PayloadType.CONTEXT_ACTIONS, new ActionBox());
+        LanguageCode languageCode = LanguageCode.valueOf(rc.request().getParam("lang", LanguageCode.en.name()));
 
-        service.getDTO(UUID.fromString(id), AnonymousUser.build(), LanguageCode.en)
-                .onItem().transform(p -> {
-                    page.addPayload(PayloadType.DOC_DATA, p);
-                    return page;
+        getContextUser(rc)
+                .chain(user -> {
+                    if ("new".equals(id)) {
+                        RoleDTO dto = new RoleDTO();
+                        dto.setAuthor(user.getUserName());
+                        dto.setLastModifier(user.getUserName());
+                        return Uni.createFrom().item(dto);
+                    }
+                    return service.getDTO(UUID.fromString(id), user, languageCode);
                 })
                 .subscribe().with(
-                        formPage -> rc.response().setStatusCode(200).end(JsonObject.mapFrom(formPage).encode()),
+                        dto -> {
+                            FormPage page = new FormPage();
+                            page.addPayload(PayloadType.CONTEXT_ACTIONS, new ActionBox());
+                            page.addPayload(PayloadType.DOC_DATA, dto);
+                            rc.response().setStatusCode(200).end(JsonObject.mapFrom(page).encode());
+                        },
                         rc::fail
                 );
     }
 
-    private void create(RoutingContext rc) {
-        RoleDTO dto = rc.body().asJsonObject().mapTo(RoleDTO.class);
+    private void upsert(RoutingContext rc) {
+        try {
+            JsonObject json = rc.body().asJsonObject();
+            if (json == null) {
+                rc.response().setStatusCode(400).end("Request body must be a valid JSON object");
+                return;
+            }
 
-        service.add(dto)
-                .subscribe().with(
-                        id -> rc.response().setStatusCode(201).end(),
-                        rc::fail
-                );
-    }
+            RoleDTO dto = json.mapTo(RoleDTO.class);
+            String id = rc.pathParam("id");
 
-    private void update(RoutingContext rc) {
-        String id = rc.pathParam("id");
-        RoleDTO dto = rc.body().asJsonObject().mapTo(RoleDTO.class);
+            getContextUser(rc)
+                    .chain(user -> {
+                        if (id == null || "new".equals(id)) {
+                            return service.add(dto);
+                        } else {
+                            return service.update(id, dto);
+                        }
+                    })
+                    .subscribe().with(
+                            result -> rc.response()
+                                    .setStatusCode(id == null || "new".equals(id) ? 201 : 200)
+                                    .end(),
+                            rc::fail
+                    );
 
-        service.update(id, dto)
-                .subscribe().with(
-                        res -> rc.response().setStatusCode(200).end(),
-                        rc::fail
-                );
+        } catch (Exception e) {
+            rc.response().setStatusCode(400).end("Invalid JSON payload");
+        }
     }
 
     private void delete(RoutingContext rc) {
         String id = rc.pathParam("id");
 
-        service.delete(id)
+        getContextUser(rc)
+                .chain(user -> service.delete(id))
                 .subscribe().with(
-                        count -> {
-                            if (count > 0) {
-                                rc.response().setStatusCode(200).end();
-                            } else {
-                                rc.fail(404);
-                            }
-                        },
+                        count -> rc.response().setStatusCode(count > 0 ? 204 : 404).end(),
                         rc::fail
                 );
     }

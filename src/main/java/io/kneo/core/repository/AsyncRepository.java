@@ -27,7 +27,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class AsyncRepository {
+public class AsyncRepository extends AbstractRepository{
 
     protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass().getSimpleName());
     protected static final String COLUMN_AUTHOR = "author";

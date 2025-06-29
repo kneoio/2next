@@ -45,7 +45,7 @@ public class OrganizationService extends AbstractService<Organization, Organizat
     }
 
     @Override
-    public Uni<Integer> getAllCount() {
+    public Uni<Integer> getAllCount(IUser user) {
         return repository.getAllCount();
     }
 

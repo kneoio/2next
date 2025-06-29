@@ -36,7 +36,7 @@ public class PositionService extends AbstractService<Position, PositionDTO> impl
     }
 
     @Override
-    public Uni<Integer> getAllCount() {
+    public Uni<Integer> getAllCount(IUser user) {
         return repository.getAllCount();
     }
 
@@ -58,7 +58,7 @@ public class PositionService extends AbstractService<Position, PositionDTO> impl
     }
 
     @Override
-    public Uni<Integer> delete(String id, IUser user) throws DocumentModificationAccessException {
+    public Uni<Integer> delete(String id, IUser user){
         return null;
     }
 

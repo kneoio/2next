@@ -33,7 +33,7 @@ public class LanguageService extends AbstractService<Language, LanguageDTO> impl
     }
 
     @Override
-    public Uni<Integer> getAllCount() {
+    public Uni<Integer> getAllCount(IUser user) {
         return repository.getAllCount();
     }
 
@@ -107,4 +107,5 @@ public class LanguageService extends AbstractService<Language, LanguageDTO> impl
                         .build()
         );
     }
+
 }

@@ -37,7 +37,7 @@ public class LabelService extends AbstractService<Label, LabelDTO> implements IR
                 ).andFailFast());
     }
 
-    public Uni<Integer> getAllCount() {
+    public Uni<Integer> getAllCount(IUser user) {
         return repository.getAllCount();
     }
 
@@ -111,7 +111,7 @@ public class LabelService extends AbstractService<Label, LabelDTO> implements IR
     }
 
     @Override
-    public Uni<Integer> delete(String id, IUser user) throws DocumentModificationAccessException {
+    public Uni<Integer> delete(String id, IUser user) {
         return null;
     }
 }

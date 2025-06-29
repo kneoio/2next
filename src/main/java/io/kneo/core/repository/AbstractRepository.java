@@ -1,14 +1,30 @@
 package io.kneo.core.repository;
 
-import java.time.ZoneId;
+import io.kneo.core.repository.table.IRepository;
+import org.apache.tika.Tika;
 
-public class AbstractRepository {
-    public static int NO_ACCESS = 0;
-    public static int READ_ONLY = 1;
-    public static int EDIT_IS_ALLOWED = 2;
-    public static int EDIT_AND_DELETE_ARE_ALLOWED = 3;
+import java.io.IOException;
+import java.nio.file.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    private static final ZoneId zoneId = ZoneId.of( "Europe/Riga" );
+public class AbstractRepository implements IRepository {
+    protected final Logger LOGGER = LoggerFactory.getLogger(AbstractRepository.class);
 
+    protected String detectMimeType(String filePath) {
+        Tika tika = new Tika();
+        try {
+            String detectedMimeType = tika.detect(Paths.get(filePath));
+            if (detectedMimeType == null || detectedMimeType.isEmpty()) {
+                LOGGER.warn("Tika could not determine MIME type for file {}. Defaulting to application/octet-stream.", filePath);
+                return "application/octet-stream";
+            } else {
+                return detectedMimeType;
+            }
+        } catch (IOException e) {
+            LOGGER.error("Tika could not determine MIME type for file {}. Defaulting to application/octet-stream.", filePath);
+            return "application/octet-stream";
+        }
+    }
 
 }

@@ -5,6 +5,7 @@ import io.kneo.core.dto.document.LanguageDTO;
 import io.kneo.core.dto.document.ModuleDTO;
 import io.kneo.core.dto.document.UserModuleDTO;
 import io.kneo.core.model.Module;
+import io.kneo.core.model.user.AnonymousUser;
 import io.kneo.core.model.user.IUser;
 import io.kneo.core.service.LanguageService;
 import io.kneo.core.service.UserService;
@@ -45,7 +46,7 @@ public class WorkspaceController extends AbstractSecuredController<Module, Modul
         if (acceptLanguage != null) {
             Locale preferredLocale = Locale.forLanguageTag(acceptLanguage.split(",")[0].trim());
         }
-        IUser user = getUserId(rc);
+        IUser user = AnonymousUser.build();
         Uni<List<UserModuleDTO>> moduleUnis = workspaceService.getAvailableModules(user);
         Uni<List<LanguageDTO>> languageUnis = workspaceService.getAvailableLanguages();
 

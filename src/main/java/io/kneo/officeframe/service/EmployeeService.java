@@ -86,7 +86,7 @@ public class EmployeeService extends AbstractService<Employee, EmployeeDTO> impl
     }
 
     @Override
-    public Uni<Integer> getAllCount() {
+    public Uni<Integer> getAllCount(IUser user) {
         assert repository != null;
         return repository.getAllCount();
     }

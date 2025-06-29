@@ -44,7 +44,7 @@ public class ModuleService extends AbstractService<Module, ModuleDTO> implements
         return null;
     }
 
-    public Uni<Integer> getAllCount() {
+    public Uni<Integer> getAllCount(IUser user) {
         return repository.getAllCount();
     }
 

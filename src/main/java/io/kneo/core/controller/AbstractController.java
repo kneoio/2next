@@ -1,9 +1,6 @@
 
 package io.kneo.core.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.kneo.core.dto.actions.ActionBox;
 import io.kneo.core.dto.actions.ActionsFactory;
 import io.kneo.core.dto.cnst.PayloadType;
 import io.kneo.core.dto.form.FormPage;
@@ -12,7 +9,6 @@ import io.kneo.core.dto.view.ViewPage;
 import io.kneo.core.localization.LanguageCode;
 import io.kneo.core.model.user.AnonymousUser;
 import io.kneo.core.model.user.IUser;
-import io.kneo.core.model.user.UndefinedUser;
 import io.kneo.core.repository.exception.DocumentModificationAccessException;
 import io.kneo.core.repository.exception.UserNotFoundException;
 import io.kneo.core.service.AbstractService;
@@ -58,7 +54,7 @@ public abstract class AbstractController<T, V> extends BaseController {
     protected void getAll(IRESTService<V> service, RoutingContext rc) {
         int page = Integer.parseInt(rc.request().getParam("page", "0"));
         int size = Integer.parseInt(rc.request().getParam("size", "10"));
-        service.getAllCount()
+        service.getAllCount(AnonymousUser.build())
                 .onItem().transformToUni(count -> {
                     int maxPage = countMaxPage(count, size);
                     int pageNum = (page == 0) ? 1 : page;
@@ -80,44 +76,13 @@ public abstract class AbstractController<T, V> extends BaseController {
 
     }
 
-    protected void getById(IRESTService<V> service, RoutingContext rc) {
-        FormPage page = new FormPage();
-        page.addPayload(PayloadType.CONTEXT_ACTIONS, new ActionBox());
-        service.getDTO(UUID.fromString(rc.pathParam("id")), getUser(rc), resolveLanguage(rc))
-                .onItem().transform(dto -> {
-                    page.addPayload(PayloadType.DOC_DATA, dto);
-                    return page;
-                })
-                .subscribe().with(
-                        formPage -> rc.response().setStatusCode(200).end(JsonObject.mapFrom(formPage).encode()),
-                        rc::fail
-                );
-    }
 
-    protected void upsert(IRESTService<V> service, String id, RoutingContext rc) {
-        JsonObject jsonObject = rc.body().asJsonObject();
-
-        ObjectMapper mapper = new ObjectMapper();
-        V dto = mapper.convertValue(jsonObject, new TypeReference<V>() {
-        });
-
-        service.upsert(id, dto, getUser(rc), resolveLanguage(rc))
-                .subscribe().with(
-                        doc -> {
-                            int statusCode = (id == null) ? 201 : 200;
-                            rc.response()
-                                    .setStatusCode(statusCode)
-                                    .end(JsonObject.mapFrom(doc).encode());
-                        },
-                        rc::fail
-                );
-    }
 
     @Deprecated
     protected Uni<Response> getAll(IRESTService<V> service, ContainerRequestContext requestContext, int page, int size) throws UserNotFoundException {
         IUser user = getUserId(requestContext);
         String languageHeader = requestContext.getHeaderString("Accept-Language");
-        Uni<Integer> countUni = service.getAllCount();
+        Uni<Integer> countUni = service.getAllCount(AnonymousUser.build());
         Uni<Integer> maxPageUni = countUni.onItem().transform(c -> countMaxPage(c, size));
         Uni<Integer> pageNumUni = Uni.createFrom().item(page);
         Uni<Integer> offsetUni = Uni.combine().all()
@@ -171,10 +136,10 @@ public abstract class AbstractController<T, V> extends BaseController {
             DefaultJWTCallerPrincipal securityIdentity = (DefaultJWTCallerPrincipal) requestContext.getSecurityContext().getUserPrincipal();
             return userService.findByLogin(securityIdentity.getClaim(USER_NAME_CLAIM)).await().atMost(TIMEOUT);
         } catch (NullPointerException e) {
-            LOGGER.warn(String.format("msg: %s ", e.getMessage()));
+            LOGGER.warn("msg: {} ", e.getMessage());
             throw new UserNotFoundException("User not authorized");
         } catch (Exception e) {
-            LOGGER.error(String.format("msg: %s ", e.getMessage()), e);
+            LOGGER.error("msg: {} ", e.getMessage(), e);
             throw new UserNotFoundException("User not authorized");
         }
     }
@@ -182,67 +147,22 @@ public abstract class AbstractController<T, V> extends BaseController {
     protected Uni<IUser> getContextUser(RoutingContext rc) {
         User vertxUser = rc.user();
         if (vertxUser == null) {
-            return Uni.createFrom().item(UndefinedUser.Build());
+            return Uni.createFrom().failure(new IllegalStateException("No authenticated user found"));
         }
         JsonObject principal = vertxUser.principal();
         String username = principal.getString(USER_NAME);
         if (username == null || username.isEmpty()) {
-            return Uni.createFrom().item(UndefinedUser.Build());
-        }
-        return userService.findByLogin(username);
-    }
-
-    @Deprecated
-    protected IUser getUser(RoutingContext rc) {
-        try {
-            User vertxUser = rc.user();
-            if (vertxUser == null) {
-                throw new UserNotFoundException("No user found in context");
-            }
-
-            JsonObject principal = vertxUser.principal();
-            String username = principal.getString(USER_NAME);
-            if (username == null) {
-                throw new UserNotFoundException("Username not found in user principal");
-            }
-
-            IUser user = userService.findByLogin(username).await().atMost(TIMEOUT);
-            ;
-            if (user == null) {
-                throw new UserNotFoundException(username);
-            }
-
-            return user;
-        } catch (NullPointerException e) {
-            LOGGER.warn("Failed to get user ID: {}", e.getMessage());
-
-        } catch (Exception e) {
-            LOGGER.error("Error while getting user ID: ", e);
-
-        }
-        return UndefinedUser.Build();
-    }
-
-    @Deprecated
-    protected IUser getUserId(RoutingContext rc) {
-        try {
-            User vertxUser = rc.user();
-            if (vertxUser != null) {
-                JsonObject principal = vertxUser.principal();
-                String username = principal.getString(USER_NAME);
-                if (username != null) {
-                    return userService.findByLogin(username).await().atMost(TIMEOUT);
-                }
-            }
-            return null;
-        } catch (NullPointerException e) {
-            LOGGER.warn("Failed to get user ID: {}", e.getMessage());
-            return null;
-        } catch (Exception e) {
-            LOGGER.error("Error while getting user ID: ", e);
-            return null;
+            return Uni.createFrom().failure(new UserNotFoundException("Username is null or empty"));
+        } else {
+            return userService.findByLogin(username)
+                    .onItem().ifNull().continueWith(() -> {
+                        io.kneo.core.model.user.User user = new io.kneo.core.model.user.User();
+                        user.setLogin(username);
+                        return user;
+                    });
         }
     }
+
 
     public Uni<Response> delete(String uuid, AbstractService<T, V> service, @Context ContainerRequestContext requestContext) throws DocumentModificationAccessException, UserNotFoundException {
         IUser userOptional = getUserId(requestContext);
@@ -254,7 +174,7 @@ public abstract class AbstractController<T, V> extends BaseController {
     protected Response postError(Throwable e) {
         Random rand = new Random();
         int randomNum = rand.nextInt(900000) + 100000;
-        LOGGER.error(String.format("code: %s, msg: %s ", randomNum, e.getMessage()), e);
+        LOGGER.error("code: {}, msg: {} ", randomNum, e.getMessage(), e);
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(String.format("code: %s, msg: %s ", randomNum, e.getMessage())).build();
     }
 

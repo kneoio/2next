@@ -32,6 +32,11 @@ public abstract class AbstractService<T, V> {
         this.userService = userService;
     }
 
+    //TODO keep temporarily until all migrate to Uni<Integer> getAllCount(IUser user)
+    Uni<Integer> getAllCount(){
+        return Uni.createFrom().item(0);
+    }
+
     public abstract Uni<V> getDTO(UUID id, IUser user, LanguageCode language);
 
     public Uni<V> upsert(String id, V dto, IUser user, LanguageCode code) throws DocumentModificationAccessException {

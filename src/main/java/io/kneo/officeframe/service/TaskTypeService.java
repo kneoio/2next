@@ -43,7 +43,7 @@ public class TaskTypeService extends AbstractService<TaskType, TaskTypeDTO> impl
         return repository.findByIdentifier(identifier).chain(this::mapToDTO);
     }
 
-    public Uni<Integer> getAllCount() {
+    public Uni<Integer> getAllCount(IUser user) {
         return repository.getAllCount();
     }
 
@@ -83,7 +83,7 @@ public class TaskTypeService extends AbstractService<TaskType, TaskTypeDTO> impl
     }
 
     @Override
-    public Uni<Integer> delete(String id, IUser user) throws DocumentModificationAccessException {
+    public Uni<Integer> delete(String id, IUser user){
         return null;
     }
 

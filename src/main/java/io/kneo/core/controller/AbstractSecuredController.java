@@ -12,7 +12,6 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import java.util.Set;
 
 public abstract class AbstractSecuredController<T, V> extends AbstractController<T, V> {
-    protected static final String UUID_PATTERN = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
 
     public AbstractSecuredController(UserService userService) {
         super(userService);
@@ -55,21 +54,4 @@ public abstract class AbstractSecuredController<T, V> extends AbstractController
                 .end(errorResponse.encode());
     }
 
-    protected void sendJsonError(RoutingContext rc, int statusCode, String errorMessage) {
-        JsonObject errorResponse = new JsonObject().put("error", errorMessage);
-        rc.response()
-                .setStatusCode(statusCode)
-                .putHeader("Content-Type", "application/json")
-                .end(errorResponse.encode());
-    }
-
-    protected void sendJsonError(RoutingContext rc, int statusCode, String errorMessage, String errorDetail) {
-        JsonObject errorResponse = new JsonObject()
-                .put("error", errorMessage)
-                .put("detail", errorDetail);
-        rc.response()
-                .setStatusCode(statusCode)
-                .putHeader("Content-Type", "application/json")
-                .end(errorResponse.encode());
-    }
 }

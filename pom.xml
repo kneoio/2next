@@ -6,7 +6,7 @@
 
     <groupId>io.kneo</groupId>
     <artifactId>2next</artifactId>
-    <version>1.1.9</version>
+    <version>1.2.0</version>
     <packaging>jar</packaging>
     <name>2next</name>
 
@@ -18,6 +18,7 @@
         <os-maven-plugin-version>1.7.1</os-maven-plugin-version>
         <lombok.version>1.18.34</lombok.version>
         <sendgrid.version>4.10.2</sendgrid.version>
+        <tika.version>2.9.2</tika.version>
     </properties>
 
     <dependencyManagement>
@@ -121,6 +122,12 @@
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>${tika.version}</version>
+        </dependency>
+
 
         <!-- Testing -->
         <dependency>

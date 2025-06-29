@@ -13,16 +13,16 @@ import io.kneo.core.util.RuntimeUtil;
 import io.kneo.officeframe.dto.OrganizationDTO;
 import io.kneo.officeframe.model.Organization;
 import io.kneo.officeframe.service.OrganizationService;
+import io.smallrye.mutiny.Uni;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.BodyHandler;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import java.util.UUID;
-
-import static io.kneo.core.util.RuntimeUtil.countMaxPage;
 
 @ApplicationScoped
 public class OrganizationController extends AbstractSecuredController<Organization, OrganizationDTO> {
@@ -34,37 +34,44 @@ public class OrganizationController extends AbstractSecuredController<Organizati
         super(null);
     }
 
+    @Inject
     public OrganizationController(UserService userService, OrganizationService service) {
         super(userService);
         this.service = service;
     }
 
     public void setupRoutes(Router router) {
-        router.route(HttpMethod.GET, "/api/orgs").handler(this::get);
-        router.route(HttpMethod.GET, "/api/orgs/only/primary").handler(this::getPrimary);
-        router.route(HttpMethod.GET, "/api/orgs/:id").handler(this::getById);
-        router.route(HttpMethod.POST, "/api/orgs/:id?").handler(this::upsert);
-        router.route(HttpMethod.DELETE, "/api/orgs/:id").handler(this::delete);
+        String path = "/api/orgs";
+
+        BodyHandler jsonBodyHandler = BodyHandler.create().setHandleFileUploads(false);
+
+        router.route(path + "*").handler(this::addHeaders);
+        router.route(HttpMethod.GET, path).handler(this::get);
+        router.route(HttpMethod.GET, path + "/only/primary").handler(this::getPrimary);
+        router.route(HttpMethod.GET, path + "/:id").handler(this::getById);
+        router.route(HttpMethod.POST, path + "/:id?").handler(jsonBodyHandler).handler(this::upsert);
+        router.route(HttpMethod.DELETE, path + "/:id").handler(this::delete);
     }
 
     private void get(RoutingContext rc) {
-        int page = Integer.parseInt(rc.request().getParam("page", "0"));
+        int page = Integer.parseInt(rc.request().getParam("page", "1"));
         int size = Integer.parseInt(rc.request().getParam("size", "10"));
-        service.getAllCount()
-                .onItem().transformToUni(count -> {
-                    int maxPage = countMaxPage(count, size);
-                    int pageNum = (page == 0) ? 1 : page;
-                    int offset = RuntimeUtil.calcStartEntry(pageNum, size);
-                    LanguageCode languageCode = resolveLanguage(rc);
-                    return service.getAll(size, offset, languageCode)
-                            .onItem().transform(dtoList -> {
-                                ViewPage viewPage = new ViewPage();
-                                viewPage.addPayload(PayloadType.CONTEXT_ACTIONS, ActionsFactory.getDefaultViewActions(languageCode));
-                                View<OrganizationDTO> dtoEntries = new View<>(dtoList, count, pageNum, maxPage, size);
-                                viewPage.addPayload(PayloadType.VIEW_DATA, dtoEntries);
-                                return viewPage;
-                            });
-                })
+        LanguageCode languageCode = resolveLanguage(rc);
+
+        getContextUser(rc)
+                .chain(user -> Uni.combine().all().unis(
+                        service.getAllCount(user),
+                        service.getAll(size, (page - 1) * size, languageCode)
+                ).asTuple().map(tuple -> {
+                    ViewPage viewPage = new ViewPage();
+                    viewPage.addPayload(PayloadType.CONTEXT_ACTIONS, ActionsFactory.getDefaultViewActions(languageCode));
+                    View<OrganizationDTO> dtoEntries = new View<>(tuple.getItem2(),
+                            tuple.getItem1(), page,
+                            RuntimeUtil.countMaxPage(tuple.getItem1(), size),
+                            size);
+                    viewPage.addPayload(PayloadType.VIEW_DATA, dtoEntries);
+                    return viewPage;
+                }))
                 .subscribe().with(
                         viewPage -> rc.response().setStatusCode(200).end(JsonObject.mapFrom(viewPage).encode()),
                         rc::fail
@@ -74,61 +81,80 @@ public class OrganizationController extends AbstractSecuredController<Organizati
     private void getPrimary(RoutingContext rc) {
         LanguageCode languageCode = resolveLanguage(rc);
 
-        service.getPrimary(languageCode)
-                .onItem().transform(dtoList -> {
-                    ViewPage viewPage = new ViewPage();
-                    viewPage.addPayload(PayloadType.CONTEXT_ACTIONS, ActionsFactory.getDefaultViewActions(languageCode));
-                    int pageNum = 1;
-                    int pageSize = dtoList.size();
-                    int count = dtoList.size();
-                    View<OrganizationDTO> dtoEntries = new View<>(dtoList, count, pageNum, 1, pageSize);
-                    viewPage.addPayload(PayloadType.VIEW_DATA, dtoEntries);
-                    return viewPage;
-                })
+        getContextUser(rc)
+                .chain(user -> service.getPrimary(languageCode))
                 .subscribe().with(
-                        viewPage -> rc.response().setStatusCode(200).end(JsonObject.mapFrom(viewPage).encode()),
+                        dtoList -> {
+                            ViewPage viewPage = new ViewPage();
+                            viewPage.addPayload(PayloadType.CONTEXT_ACTIONS, ActionsFactory.getDefaultViewActions(languageCode));
+                            int pageNum = 1;
+                            int pageSize = dtoList.size();
+                            int count = dtoList.size();
+                            View<OrganizationDTO> dtoEntries = new View<>(dtoList, count, pageNum, 1, pageSize);
+                            viewPage.addPayload(PayloadType.VIEW_DATA, dtoEntries);
+                            rc.response().setStatusCode(200).end(JsonObject.mapFrom(viewPage).encode());
+                        },
                         rc::fail
                 );
     }
 
-    private void getById(RoutingContext rc)  {
-        FormPage page = new FormPage();
-        page.addPayload(PayloadType.CONTEXT_ACTIONS, new ActionBox());
-        service.getDTO(UUID.fromString(rc.pathParam("id")), getUser(rc), resolveLanguage(rc))
-                .onItem().transform(dto -> {
-                    page.addPayload(PayloadType.DOC_DATA, dto);
-                    return page;
-                })
-                .subscribe().with(
-                        formPage -> rc.response().setStatusCode(200).end(JsonObject.mapFrom(formPage).encode()),
-                        rc::fail
-                );
-    }
-
-    private void upsert(RoutingContext rc)  {
-        JsonObject jsonObject = rc.body().asJsonObject();
-        OrganizationDTO dto = jsonObject.mapTo(OrganizationDTO.class);
+    private void getById(RoutingContext rc) {
         String id = rc.pathParam("id");
-        service.upsert(id, dto, getUser(rc), LanguageCode.en)
+        LanguageCode languageCode = resolveLanguage(rc);
+
+        getContextUser(rc)
+                .chain(user -> {
+                    if ("new".equals(id)) {
+                        OrganizationDTO dto = new OrganizationDTO();
+                        dto.setAuthor(user.getUserName());
+                        dto.setLastModifier(user.getUserName());
+                        return Uni.createFrom().item(dto);
+                    }
+                    return service.getDTO(UUID.fromString(id), user, languageCode);
+                })
                 .subscribe().with(
-                        organization -> {
-                            int statusCode = id.isEmpty() ? 201 : 200;
-                            rc.response().setStatusCode(statusCode).end(JsonObject.mapFrom(organization).encode());
+                        dto -> {
+                            FormPage page = new FormPage();
+                            page.addPayload(PayloadType.CONTEXT_ACTIONS, new ActionBox());
+                            page.addPayload(PayloadType.DOC_DATA, dto);
+                            rc.response().setStatusCode(200).end(JsonObject.mapFrom(page).encode());
                         },
                         rc::fail
                 );
     }
 
-    private void delete(RoutingContext rc)  {
-        service.delete(rc.pathParam("id"), getUser(rc))
+    private void upsert(RoutingContext rc) {
+        try {
+            JsonObject json = rc.body().asJsonObject();
+            if (json == null) {
+                rc.response().setStatusCode(400).end("Request body must be a valid JSON object");
+                return;
+            }
+
+            OrganizationDTO dto = json.mapTo(OrganizationDTO.class);
+            String id = rc.pathParam("id");
+
+            getContextUser(rc)
+                    .chain(user -> service.upsert(id, dto, user, LanguageCode.en))
+                    .subscribe().with(
+                            organization -> rc.response()
+                                    .setStatusCode(id == null ? 201 : 200)
+                                    .end(JsonObject.mapFrom(organization).encode()),
+                            rc::fail
+                    );
+
+        } catch (Exception e) {
+            rc.response().setStatusCode(400).end("Invalid JSON payload");
+        }
+    }
+
+    private void delete(RoutingContext rc) {
+        String id = rc.pathParam("id");
+
+        getContextUser(rc)
+                .chain(user -> service.delete(id, user))
                 .subscribe().with(
-                        count -> {
-                            if (count > 0) {
-                                rc.response().setStatusCode(200).end();
-                            } else {
-                                rc.fail(404);
-                            }
-                        },
+                        count -> rc.response().setStatusCode(count > 0 ? 204 : 404).end(),
                         rc::fail
                 );
     }

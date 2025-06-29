@@ -40,7 +40,7 @@ public class OrgCategoryService extends AbstractService<OrgCategory, OrgCategory
 
     @Override
     @SuppressWarnings("ConstantConditions")
-    public Uni<Integer> getAllCount() {
+    public Uni<Integer> getAllCount(IUser user) {
         return repository.getAllCount();
     }
 
