@@ -84,7 +84,11 @@ public class UserRepository extends AsyncRepository {
                 .execute()
                 .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
                 .onItem().call(row -> Uni.createFrom().item(row).onItem().delayIt().by(Duration.ofMillis(100)))
-                .onItem().transform(row -> new User.Builder().setLogin(row.getString("login")).build());
+                .onItem().transform(row -> {
+                    User user = new User();
+                    user.setLogin(row.getString("login"));
+                    return user;
+                });
     }
 
     public Uni<IUser> getId(String login) {
@@ -106,6 +110,7 @@ public class UserRepository extends AsyncRepository {
                     .onItem().transform(Optional::ofNullable);
         }
     }
+
     public Uni<Optional<IUser>> findById(long id) {
         if (userCache.isEmpty()) {
             return initializeCache()
@@ -149,15 +154,14 @@ public class UserRepository extends AsyncRepository {
     }
 
     private IUser from(Row row) {
-        User user = new User.Builder()
-                .setLogin(row.getString("login"))
-                .setEmail(row.getString("email"))
-                .setDefaultLang(row.getInteger("default_lang"))
-                .setRoles(List.of())
-                .setTimeZone(TimeZone.getDefault())
-                .build();
+        User user = new User();
+        user.setLogin(row.getString("login"));
+        user.setEmail(row.getString("email"));
+        user.setDefaultLang(row.getInteger("default_lang"));
+        user.setRoles(List.of());
+        user.setTimeZone(TimeZone.getDefault());
         user.setId(row.getLong("id"));
-        user.setRegDate(ZonedDateTime.from(row.getLocalDateTime("reg_date").atZone(ZoneId.systemDefault())));
+        user.setRegDate(row.getLocalDateTime("reg_date").atZone(ZoneId.systemDefault()));
         userCache.put(row.getLong("id"), user);
         return user;
     }

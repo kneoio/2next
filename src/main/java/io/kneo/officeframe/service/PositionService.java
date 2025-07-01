@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 public class PositionService extends AbstractService<Position, PositionDTO> implements IRESTService<PositionDTO> {
     private final PositionRepository repository;
 
-    public PositionService(UserRepository userRepository, UserService userService, PositionRepository repository) {
-        super(userRepository, userService);
+    public PositionService(UserService userService, PositionRepository repository) {
+        super(userService);
         this.repository = repository;
     }
 

@@ -23,8 +23,8 @@ public class OrgCategoryService extends AbstractService<OrgCategory, OrgCategory
     private final OrgCategoryRepository repository;
 
     @Inject
-    public OrgCategoryService(UserRepository userRepository, UserService userService, OrgCategoryRepository repository) {
-        super(userRepository, userService);
+    public OrgCategoryService(UserService userService, OrgCategoryRepository repository) {
+        super(userService);
         this.repository = repository;
     }
 
@@ -73,7 +73,7 @@ public class OrgCategoryService extends AbstractService<OrgCategory, OrgCategory
                         .lastModifier(tuple.getItem2())
                         .lastModifiedDate(category.getLastModifiedDate())
                         .identifier(category.getIdentifier())
-                        .localizedNames(category.getLocalizedName())
+                        .localizedName(category.getLocalizedName())
                         .build()
         );
     }

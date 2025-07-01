@@ -20,9 +20,9 @@ public class ErrorResponse {
         RESOURCE_NOT_AVAILABLE(500, "Resource not available", "The requested resource is not available in the system", true),
         UNKNOWN_ERROR(500, "Internal server error", "An unexpected error occurred", true),
         INTERNAL_SERVER_ERROR(500, "Internal server error", "An unexpected error occurred", true),
-        UNAUTHORIZED(403,"Unauthorized", "Unauthorized" ,false),
-        FORBIDDEN(401, "Forbidden", "Forbidden", true),
-        SERVICE_UNAVAILABLE(500,"Service Unavailable" ,"Service Unavailable" , false);
+        UNAUTHORIZED(401, "Unauthorized", "Authentication required", false),  // Fixed: 401 for authentication
+        FORBIDDEN(403, "Forbidden", "Access denied", false),                 // Fixed: 403 for authorization
+        SERVICE_UNAVAILABLE(503, "Service Unavailable", "Service Unavailable", false); // Fixed: 503
 
         private final int status;
         private final String message;
@@ -44,5 +44,4 @@ public class ErrorResponse {
         this.details = code.details;
         this.logError = code.logError;
     }
-
 }

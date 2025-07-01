@@ -26,11 +26,10 @@ public class OrganizationService extends AbstractService<Organization, Organizat
     private final OrgCategoryRepository orgCategoryRepository;
 
     @Inject
-    public OrganizationService(UserRepository userRepository,
-                               UserService userService,
+    public OrganizationService(UserService userService,
                                OrganizationRepository repository,
                                OrgCategoryRepository orgCategoryRepository) {
-        super(userRepository, userService);
+        super(userService);
         this.repository = repository;
         this.orgCategoryRepository = orgCategoryRepository;
     }
@@ -119,7 +118,7 @@ public class OrganizationService extends AbstractService<Organization, Organizat
             OrgCategory category = tuple.getItem3();
             dto.setOrgCategory(OrgCategoryDTO.builder()
                     .identifier(category.getIdentifier())
-                    .localizedNames(category.getLocalizedName())
+                    .localizedName(category.getLocalizedName())
                     .id(category.getId())
                     .build());
 

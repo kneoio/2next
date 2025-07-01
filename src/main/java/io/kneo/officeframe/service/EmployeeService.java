@@ -35,7 +35,7 @@ public class EmployeeService extends AbstractService<Employee, EmployeeDTO> impl
     private final PositionService positionService;
 
     protected EmployeeService() {
-        super(null, null);
+        super( null);
         this.repository = null;
         this.orgRepository = null;
         this.depRepository = null;
@@ -46,8 +46,7 @@ public class EmployeeService extends AbstractService<Employee, EmployeeDTO> impl
     }
 
     @Inject
-    public EmployeeService(UserRepository userRepository,
-                           UserService userService,
+    public EmployeeService(UserService userService,
                            EmployeeRepository repository,
                            OrganizationRepository orgRepository,
                            DepartmentRepository depRepository,
@@ -55,7 +54,7 @@ public class EmployeeService extends AbstractService<Employee, EmployeeDTO> impl
                            PositionService positionService,
                            OrganizationService organizationService,
                            DepartmentService departmentService) {
-        super(userRepository, userService);
+        super(userService);
         this.repository = repository;
         this.orgRepository = orgRepository;
         this.depRepository = depRepository;

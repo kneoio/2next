@@ -24,8 +24,8 @@ public class DepartmentService extends AbstractService<Department, DepartmentDTO
     private final DepartmentRepository repository;
 
     @Inject
-    public DepartmentService(UserRepository userRepository, UserService userService, DepartmentRepository repository) {
-        super(userRepository, userService);
+    public DepartmentService(UserService userService, DepartmentRepository repository) {
+        super(userService);
         this.repository = repository;
     }
 

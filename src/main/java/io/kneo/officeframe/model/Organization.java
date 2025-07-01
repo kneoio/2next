@@ -1,6 +1,5 @@
 package io.kneo.officeframe.model;
 
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.kneo.core.model.SimpleReferenceEntity;
 import lombok.Getter;

@@ -2,8 +2,6 @@ package io.kneo.officeframe.service;
 
 import io.kneo.core.localization.LanguageCode;
 import io.kneo.core.model.user.IUser;
-import io.kneo.core.repository.UserRepository;
-import io.kneo.core.repository.exception.DocumentModificationAccessException;
 import io.kneo.core.service.AbstractService;
 import io.kneo.core.service.IRESTService;
 import io.kneo.core.service.UserService;
@@ -24,8 +22,8 @@ public class TaskTypeService extends AbstractService<TaskType, TaskTypeDTO> impl
     private final TaskTypeRepository repository;
 
     @Inject
-    public TaskTypeService(UserRepository userRepository, UserService userService, TaskTypeRepository repository) {
-        super(userRepository, userService);
+    public TaskTypeService(UserService userService, TaskTypeRepository repository) {
+        super(userService);
         this.repository = repository;
     }
 

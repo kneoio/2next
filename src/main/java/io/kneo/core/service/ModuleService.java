@@ -19,17 +19,18 @@ public class ModuleService extends AbstractService<Module, ModuleDTO> implements
     private final ModuleRepository repository;
 
     protected ModuleService() {
-        super(null, null);
+        super(null);
         this.repository = null;
     }
 
     @Inject
-    public ModuleService(UserRepository userRepository, UserService userService, ModuleRepository repository) {
-        super(userRepository, userService);
+    public ModuleService(UserService userService, ModuleRepository repository) {
+        super(userService);
         this.repository = repository;
     }
 
     public Uni<List<ModuleDTO>> getAll(final int limit, final int offset, LanguageCode languageCode) {
+        assert repository != null;
         return repository.getAll(limit, offset)
                 .chain(list -> {
                     List<Uni<ModuleDTO>> unis = list.stream()
@@ -45,14 +46,17 @@ public class ModuleService extends AbstractService<Module, ModuleDTO> implements
     }
 
     public Uni<Integer> getAllCount(IUser user) {
+        assert repository != null;
         return repository.getAllCount();
     }
 
     public Uni<Integer> getAllCount(Long id) {
+        assert repository != null;
         return repository.getAllCount();
     }
 
     public Uni<List<ModuleDTO>> findAll(String[] defaultModules) {
+        assert repository != null;
         return repository.getModules(defaultModules)
                 .chain(modules ->
                         Multi.createFrom().iterable(modules)
@@ -65,6 +69,7 @@ public class ModuleService extends AbstractService<Module, ModuleDTO> implements
 
     @Override
     public Uni<ModuleDTO> getDTO(UUID id, IUser user, LanguageCode language) {
+        assert repository != null;
         return repository.findById(id)
                 .chain(optional -> mapToDTO(optional.orElseThrow()));
     }

@@ -29,81 +29,64 @@ public class GlobalErrorHandler implements Handler<RoutingContext> {
             NoSuchElementException.class, new ErrorResponse(ErrorResponse.ErrorCode.RESOURCE_NOT_AVAILABLE, "Unauthorized")
     );
 
-    @Override
     public void handle(RoutingContext context) {
         Throwable failure = context.failure();
         int statusCode = context.statusCode();
-
         String userName = "undefined";
         if (context.user() != null && context.user().containsKey("username")) {
             userName = context.user().attributes().getMap().get("username").toString();
         }
 
-        // Log request details for debugging
         String contentLength = context.request().getHeader("Content-Length");
         String contentType = context.request().getHeader("Content-Type");
         String requestPath = context.request().uri();
         String method = context.request().method().toString();
+        LOGGER.info("GlobalErrorHandler triggered - Method: {}, Path: {}, Status: {}, Content-Length: {}, Content-Type: {}, User: {}", new Object[]{method, requestPath, statusCode, contentLength, contentType, userName});
 
-        LOGGER.info("GlobalErrorHandler triggered - Method: {}, Path: {}, Status: {}, Content-Length: {}, Content-Type: {}, User: {}",
-                method, requestPath, statusCode, contentLength, contentType, userName);
-
-        // Handle cases where failure is null first
         if (failure == null) {
-            // Only handle HTTP status codes when there's no failure exception
             if (statusCode != -1) {
-                LOGGER.warn("HTTP error detected - Status: {}, Path: {}, Content-Length: {}",
-                        statusCode, requestPath, contentLength);
-
-                // Handle 413 Payload Too Large specifically
+                LOGGER.warn("HTTP error detected - Status: {}, Path: {}, Content-Length: {}", new Object[]{statusCode, requestPath, contentLength});
                 if (statusCode == 413) {
-                    LOGGER.error("File upload rejected - Payload too large. Status: 413, Path: {}, Content-Length: {}",
-                            requestPath, contentLength);
-                    sendErrorResponse(context, new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "File size exceeds server limits"));
-                    return;
+                    LOGGER.error("File upload rejected - Payload too large. Status: 413, Path: {}, Content-Length: {}", requestPath, contentLength);
+                    this.sendErrorResponse(context, new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "File size exceeds server limits"));
+                } else {
+                    ErrorResponse response = this.createHttpStatusErrorResponse(statusCode);
+                    this.sendErrorResponse(context, response);
                 }
-
-                // Handle other HTTP status codes
-                ErrorResponse response = createHttpStatusErrorResponse(statusCode);
-                sendErrorResponse(context, response);
-                return;
-            }
-
-            LOGGER.warn("Global error handler called with null failure and no status code for path: {} user: {}", requestPath, userName);
-            sendErrorResponse(context, new ErrorResponse(ErrorResponse.ErrorCode.UNKNOWN_ERROR, "Unauthorized"));
-            return;
-        }
-
-        // If we have a failure exception, process it regardless of status code
-        Throwable rootCause = getRootCause(failure);
-
-        ErrorResponse response = errorMappings.entrySet().stream()
-                .filter(entry -> entry.getKey().isInstance(rootCause))
-                .map(Map.Entry::getValue)
-                .findFirst()
-                .orElse(new ErrorResponse(ErrorResponse.ErrorCode.UNKNOWN_ERROR, "Unauthorized"));
-
-        if (response.isLogError()) {
-            LOGGER.error("Global error handler - Critical error: ", failure);
-        } else {
-            if (response.getStatus() >= 400 && response.getStatus() < 500) {
-                LOGGER.warn("Global error handler - Client error: {} - {}, user: {}, path: {}",
-                        response.getCode(),
-                        failure.getMessage(),
-                        userName,
-                        requestPath,
-                        failure);
             } else {
-                LOGGER.error("Global error handler - Server error: {} - {}, path: {}, rootCause: {}",
-                        response.getCode(),
-                        failure.getMessage(),
-                        requestPath,
-                        rootCause.getClass().getSimpleName() + ": " + rootCause.getMessage(),
-                        failure);
+                LOGGER.warn("Global error handler called with null failure and no status code for path: {} user: {}", requestPath, userName);
+                this.sendErrorResponse(context, new ErrorResponse(ErrorResponse.ErrorCode.UNKNOWN_ERROR, "Unauthorized"));
             }
-        }
+        } else {
+            Throwable rootCause = this.getRootCause(failure);
 
-        sendErrorResponse(context, response);
+            ErrorResponse response;
+            if (rootCause instanceof IllegalArgumentException &&
+                    rootCause.getMessage() != null &&
+                    rootCause.getMessage().contains("Username is null or empty")) {
+                response = new ErrorResponse(ErrorResponse.ErrorCode.UNAUTHORIZED, "Authentication required");
+            } else {
+                response = (ErrorResponse)this.errorMappings.entrySet().stream()
+                        .filter((entry) -> (entry.getKey()).isInstance(rootCause))
+                        .map(Map.Entry::getValue)
+                        .findFirst()
+                        .orElse(new ErrorResponse(ErrorResponse.ErrorCode.UNKNOWN_ERROR, "Unauthorized"));
+            }
+
+            if (response.isLogError()) {
+                LOGGER.error("Global error handler - Critical error: ", failure);
+            } else if (response.getStatus() >= 400 && response.getStatus() < 500) {
+                LOGGER.warn("Global error handler - Client error: {} - {}, user: {}, path: {}", new Object[]{response.getCode(), failure.getMessage(), userName, requestPath, failure});
+            } else {
+                Object[] errBody = new Object[]{response.getCode(), failure.getMessage(), requestPath, null, null};
+                String simpleName = rootCause.getClass().getSimpleName();
+                errBody[3] = simpleName + ": " + rootCause.getMessage();
+                errBody[4] = failure;
+                LOGGER.error("Global error handler - Server error: {} - {}, path: {}, rootCause: {}", errBody);
+            }
+
+            this.sendErrorResponse(context, response);
+        }
     }
 
     private ErrorResponse createHttpStatusErrorResponse(int statusCode) {

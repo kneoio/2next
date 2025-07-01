@@ -23,8 +23,8 @@ public class LabelService extends AbstractService<Label, LabelDTO> implements IR
     private final LabelRepository repository;
 
     @Inject
-    public LabelService(UserRepository userRepository, UserService userService, LabelRepository repository) {
-        super(userRepository, userService);
+    public LabelService(UserService userService, LabelRepository repository) {
+        super(userService);
         this.repository = repository;
     }
 

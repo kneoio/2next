@@ -24,14 +24,11 @@ public abstract class AbstractSecuredController<T, V> extends AbstractController
     }
 
     protected void addHeaders(RoutingContext rc) {
-        rc.response()
-                .putHeader("Content-Type", "application/json");
-             //   .putHeader("Access-Control-Allow-Origin", "*")
-             //   .putHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-             //   .putHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
         if (rc.request().method() == HttpMethod.OPTIONS) {
             rc.response().setStatusCode(200).end();
+        } else if (rc.request().method() != HttpMethod.DELETE) {
+            rc.response().putHeader("Content-Type", "application/json");
+            rc.next();
         } else {
             rc.next();
         }

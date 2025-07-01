@@ -2,7 +2,6 @@ package io.kneo.core.service;
 
 import io.kneo.core.dto.cnst.UserRegStatus;
 import io.kneo.core.dto.document.UserDTO;
-import io.kneo.core.localization.LanguageCode;
 import io.kneo.core.model.Module;
 import io.kneo.core.model.SimpleReferenceEntity;
 import io.kneo.core.model.user.IUser;
@@ -103,11 +102,10 @@ public class UserService {
         });
     }
 
-    public Uni<Long> update(String id, UserDTO userDTO) {
-        User user = new User.Builder()
-                .setLogin(userDTO.getLogin())
-                .setEmail(userDTO.getEmail())
-                .build();
+    public Uni<Long> upsert(String id, UserDTO userDTO) {
+        User user = new User();
+        user.setLogin(userDTO.getLogin());
+        user.setEmail(userDTO.getEmail());
 
         return repository.insert(user, SuperUser.build());
     }

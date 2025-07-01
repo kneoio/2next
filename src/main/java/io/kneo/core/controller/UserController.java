@@ -88,7 +88,7 @@ public class UserController extends AbstractController<User, UserDTO> {
             JsonObject jsonObject = rc.getBodyAsJson();
             UserDTO userDTO = jsonObject.mapTo(UserDTO.class);
 
-            service.update(id, userDTO)
+            service.upsert(id, userDTO)
                     .subscribe().with(
                             updatedId -> rc.response()
                                     .setStatusCode(200)

@@ -52,8 +52,8 @@ public class ModuleRepository extends AsyncRepository {
                             .setAuthor(row.getLong("author"))
                             .setRegDate(row.getLocalDateTime("reg_date").atZone(ZoneId.systemDefault()))
                             .setOn(row.getBoolean("is_on"))
-                            .setLocalizedName(getLocalizedData(row.getJsonObject("loc_name")))
-                            .setLocalizedDescription(getLocalizedData(row.getJsonObject("loc_descr")))
+                            .setLocalizedName(getLocName(row))
+                            .setLocalizedDescription(getLocData(row, "loc_descr"))
                             .setIdentifier(row.getString("identifier"))
                             .build();
                 })
@@ -89,8 +89,8 @@ public class ModuleRepository extends AsyncRepository {
                     doc.setTheme(row.getString("theme"));
                     doc.setInvisible(row.getBoolean("invisible"));
                     doc.setIdentifier(row.getString("identifier"));
-                    doc.setLocalizedName(getLocalizedData(row.getJsonObject("loc_name")));
-                    doc.setLocalizedDescription(getLocalizedData(row.getJsonObject("loc_descr")));
+                    doc.setLocalizedName(getLocName(row));
+                    doc.setLocalizedDescription(getLocData(row, "loc_descr"));
                     return doc;
                 })
                 .collect().asList();
@@ -109,16 +109,15 @@ public class ModuleRepository extends AsyncRepository {
                 .execute()
                 .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
                 .onItem().transform(row -> {
-                    Optional<Module> module = Optional.ofNullable(new Module.Builder()
+                    return Optional.ofNullable(new Module.Builder()
                             .setId(row.getUUID("id"))
                             .setAuthor(row.getLong("author"))
                             .setRegDate(row.getLocalDateTime("reg_date").atZone(ZoneId.systemDefault()))
                             .setOn(row.getBoolean("is_on"))
-                            .setLocalizedName(getLocalizedData(row.getJsonObject("loc_name")))
-                            .setLocalizedDescription(getLocalizedData(row.getJsonObject("loc_descr")))
+                            .setLocalizedName(getLocName(row))
+                            .setLocalizedDescription(getLocData(row, "loc_descr"))
                             .setIdentifier(row.getString("identifier"))
                             .build());
-                    return module;
                 })
                 .collect().asList();
     }
@@ -134,7 +133,7 @@ public class ModuleRepository extends AsyncRepository {
         Module doc = new Module();
         setDefaultFields(doc, row);
         doc.setIdentifier(row.getString("identifier"));
-        doc.setLocalizedName(extractLanguageMap(row));
+        doc.setLocalizedName(getLocName(row));
         doc.setOn(row.getBoolean("is_on"));
         return doc;
     }

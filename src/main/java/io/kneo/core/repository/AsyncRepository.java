@@ -1,7 +1,5 @@
 package io.kneo.core.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kneo.core.localization.LanguageCode;
 import io.kneo.core.model.DataEntity;
@@ -17,15 +15,18 @@ import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Row;
+import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class AsyncRepository extends AbstractRepository{
 
@@ -124,6 +125,23 @@ public class AsyncRepository extends AbstractRepository{
                 }));
     }
 
+    public Uni<Integer> archive(UUID uuid, EntityData entityData, IUser user) {
+        return rlsRepository.findById(entityData.getRlsName(), user.getId(), uuid)
+                .onItem().transformToUni(permissions -> {
+                    if (!permissions[0]) {
+                        return Uni.createFrom().failure(new DocumentModificationAccessException("User does not have edit permission", user.getUserName(), uuid));
+                    }
+
+                    String sql = String.format("UPDATE %s SET archived = 1, last_mod_date = $1, last_mod_user = $2 WHERE id = $3",
+                            entityData.getTableName());
+
+                    return client.preparedQuery(sql)
+                            .execute(Tuple.of(ZonedDateTime.now().toLocalDateTime(), user.getId(), uuid))
+                            .onItem().transform(RowSet::rowCount);
+                });
+    }
+
+
     public Uni<Integer> delete(UUID id, EntityData entityData, IUser user) {
         return rlsRepository.findById(entityData.getRlsName(), user.getId(), id)
                 .onItem().transformToUni(permissions -> {
@@ -174,34 +192,6 @@ public class AsyncRepository extends AbstractRepository{
         }
     }
 
-    @Deprecated
-    protected EnumMap<LanguageCode, String> extractLanguageMap(Row row) {
-        EnumMap<LanguageCode, String> map;
-        try {
-            map = mapper.readValue(row.getJsonObject("loc_name").toString(), new TypeReference<>() {
-            });
-        } catch (JsonProcessingException e) {
-            LOGGER.error(e.getMessage());
-            throw new RuntimeException(e);
-        }
-        return map;
-    }
-
-    @Deprecated
-    protected static EnumMap<LanguageCode, String> getLocalizedData(JsonObject json) {
-        if (json != null) {
-            Map<LanguageCode, String> map = json.getMap().entrySet().stream()
-                    .collect(Collectors.toMap(
-                            entry -> LanguageCode.valueOf(entry.getKey()),
-                            entry -> String.valueOf(entry.getValue()),
-                            (existing, replacement) -> existing));
-            if (!map.isEmpty()) {
-                return new EnumMap<>(map);
-            }
-        }
-        return new EnumMap<>(LanguageCode.class);
-    }
-
     protected static String getBaseSelect(String baseRequest, final int limit, final int offset) {
         String sql = baseRequest;
         if (limit > 0) {
@@ -210,28 +200,25 @@ public class AsyncRepository extends AbstractRepository{
         return sql;
     }
 
-    @Deprecated
-    protected EnumMap<LanguageCode, String> getLocalizedNameFromDb(Row row) {
-        try {
-            JsonObject localizedNameJson = row.getJsonObject(COLUMN_LOCALIZED_NAME);
-            return convertToEnumMap(localizedNameJson.getMap());
-        } catch (Exception e) {
+    protected EnumMap<LanguageCode, String> getLocName(Row row) {
+        JsonObject localizedNameJson = row.getJsonObject(COLUMN_LOCALIZED_NAME);
+        if (localizedNameJson != null) {
+            EnumMap<LanguageCode, String> localizedName = new EnumMap<>(LanguageCode.class);
+            localizedNameJson.getMap().forEach((key, value) -> localizedName.put(LanguageCode.valueOf(key), (String) value));
+            return localizedName;
+        } else {
             return new EnumMap<>(LanguageCode.class);
         }
     }
 
-    private static EnumMap<LanguageCode, String> convertToEnumMap(Map<String, Object> linkedHashMap) {
-        EnumMap<LanguageCode, String> enumMap = new EnumMap<>(LanguageCode.class);
-
-        for (Map.Entry<String, Object> entry : linkedHashMap.entrySet()) {
-            try {
-                LanguageCode key = LanguageCode.valueOf(entry.getKey().toUpperCase());
-                enumMap.put(key, (String) entry.getValue());
-            } catch (IllegalArgumentException e) {
-                enumMap.put(LanguageCode.unknown, (String) entry.getValue());
-            }
+    protected EnumMap<LanguageCode, String> getLocData(Row row, final String name) {
+        JsonObject localizedNameJson = row.getJsonObject(name);
+        if (localizedNameJson != null) {
+            EnumMap<LanguageCode, String> locData = new EnumMap<>(LanguageCode.class);
+            localizedNameJson.getMap().forEach((key, value) -> locData.put(LanguageCode.valueOf(key), (String) value));
+            return locData;
+        } else {
+            return new EnumMap<>(LanguageCode.class);
         }
-
-        return enumMap;
     }
 }

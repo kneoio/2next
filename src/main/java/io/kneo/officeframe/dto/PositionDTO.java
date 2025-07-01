@@ -16,7 +16,5 @@ import java.util.EnumMap;
 @SuperBuilder
 @NoArgsConstructor
 public class PositionDTO extends AbstractReferenceDTO {
-    EnumMap<LanguageCode, String> localizedName = new EnumMap<>(LanguageCode.class);
-
 
 }

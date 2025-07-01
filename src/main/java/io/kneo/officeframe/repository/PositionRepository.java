@@ -48,11 +48,7 @@ public class PositionRepository extends AsyncRepository {
 
     private Position from(Row row) {
         Position doc = new Position();
-        doc.setId(row.getUUID("id"));
-        doc.setAuthor(row.getLong("author"));
-        doc.setRegDate(row.getLocalDateTime("reg_date").atZone(ZoneId.systemDefault()));
-        doc.setLastModifier(row.getLong("last_mod_user"));
-        doc.setRegDate(row.getLocalDateTime("last_mod_date").atZone(ZoneId.systemDefault()));
+        setDefaultFields(doc, row);
         doc.setIdentifier(row.getString("identifier"));
         setLocalizedNames(doc, row);
         return doc;

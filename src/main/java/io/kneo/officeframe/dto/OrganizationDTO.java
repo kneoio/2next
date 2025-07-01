@@ -20,5 +20,4 @@ public class OrganizationDTO extends AbstractReferenceDTO {
     private boolean isPrimary;
     private String bizID;
     private int rank;
-    EnumMap<LanguageCode, String> localizedName = new EnumMap<>(LanguageCode.class);
 }

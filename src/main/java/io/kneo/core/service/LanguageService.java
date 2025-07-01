@@ -5,7 +5,6 @@ import io.kneo.core.localization.LanguageCode;
 import io.kneo.core.model.Language;
 import io.kneo.core.model.user.IUser;
 import io.kneo.core.repository.LanguageRepository;
-import io.kneo.core.repository.UserRepository;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -17,8 +16,8 @@ import java.util.stream.Collectors;
 public class LanguageService extends AbstractService<Language, LanguageDTO> implements IRESTService<LanguageDTO> {
     private final LanguageRepository repository;
 
-    public LanguageService(UserRepository userRepository, UserService userService, LanguageRepository repository) {
-        super(userRepository, userService);
+    public LanguageService(UserService userService, LanguageRepository repository) {
+        super(userService);
         this.repository = repository;
     }
 

@@ -7,7 +7,6 @@ import io.kneo.core.model.user.AnonymousUser;
 import io.kneo.core.model.user.IUser;
 import io.kneo.core.model.user.Role;
 import io.kneo.core.repository.RoleRepository;
-import io.kneo.core.repository.UserRepository;
 import io.kneo.core.repository.exception.DocumentModificationAccessException;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -25,17 +24,18 @@ public class RoleService extends AbstractService<Role, RoleDTO> {
     private final RoleRepository repository;
 
     protected RoleService() {
-        super(null, null);
+        super( null);
         this.repository = null;
     }
 
     @Inject
-    public RoleService(UserRepository userRepository, UserService userService, RoleRepository repository) {
-        super(userRepository, userService);
+    public RoleService(UserService userService, RoleRepository repository) {
+        super(userService);
         this.repository = repository;
     }
 
     public Uni<List<RoleDTO>> getAll(final int limit, final int offset) {
+        assert repository != null;
         return repository.getAll(limit, offset)
                 .chain(list -> {
                     List<Uni<RoleDTO>> unis = list.stream()
@@ -46,11 +46,13 @@ public class RoleService extends AbstractService<Role, RoleDTO> {
     }
 
     public Uni<Integer> getAllCount() {
+        assert repository != null;
         return repository.getAllCount();
     }
 
     @Override
     public Uni<RoleDTO> getDTO(UUID id, IUser user, LanguageCode language) {
+        assert repository != null;
         return repository.findById(id).chain(this::mapToDTO);
     }
 
@@ -82,6 +84,7 @@ public class RoleService extends AbstractService<Role, RoleDTO> {
                 .setLocalizedName(dto.getLocalizedName())
                 .setLocalizedDescription(dto.getLocalizedDescription())
                 .build();
+        assert repository != null;
         return repository.insert(doc, AnonymousUser.ID);
     }
 
