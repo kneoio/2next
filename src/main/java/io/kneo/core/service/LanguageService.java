@@ -91,8 +91,8 @@ public class LanguageService extends AbstractService<Language, LanguageDTO> impl
 
     private Uni<LanguageDTO> mapToDTO(Language doc) {
         return Uni.combine().all().unis(
-                userRepository.getUserName(doc.getAuthor()),
-                userRepository.getUserName(doc.getLastModifier())
+                userService.getUserName(doc.getAuthor()),
+                userService.getUserName(doc.getLastModifier())
         ).asTuple().onItem().transform(tuple ->
                 LanguageDTO.builder()
                         .id(doc.getId())

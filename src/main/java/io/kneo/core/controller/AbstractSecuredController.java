@@ -51,4 +51,38 @@ public abstract class AbstractSecuredController<T, V> extends AbstractController
                 .end(errorResponse.encode());
     }
 
+    protected boolean validateJsonBody(RoutingContext rc) {
+        JsonObject json = rc.body().asJsonObject();
+        if (json == null) {
+            rc.response().setStatusCode(400).end("Request body must be a valid JSON object");
+            return false;
+        }
+        return true;
+    }
+
+    protected <D> boolean validateDTO(RoutingContext rc, D dto, jakarta.validation.Validator validator) {
+        Set<ConstraintViolation<D>> violations = validator.validate(dto);
+        if (!violations.isEmpty()) {
+            handleValidationErrors(rc, violations);
+            return false;
+        }
+        return true;
+    }
+
+    /*protected void handleUpsertFailure(RoutingContext rc, Throwable throwable) {
+        if (throwable instanceof io.kneo.core.repository.exception.DocumentModificationAccessException) {
+            rc.response().setStatusCode(403).end("Not enough rights to update");
+        } else if (throwable instanceof io.kneo.broadcaster.repository.exceptions.UploadAbsenceException) {
+            rc.response().setStatusCode(400).end(throwable.getMessage());
+        } else {
+            rc.fail(throwable);
+        }
+    }*/
+
+    protected void sendUpsertResponse(RoutingContext rc, Object doc, String id) {
+        rc.response()
+                .setStatusCode(id == null ? 201 : 200)
+                .end(JsonObject.mapFrom(doc).encode());
+    }
+
 }
