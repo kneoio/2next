@@ -77,12 +77,16 @@ public class UserService {
         return repository.getUserName(id);
     }
 
-    public Uni<Long> add(UserDTO dto) {
+    public Uni<Long> add(UserDTO dto, boolean allowAutoRegistration) {
         User user = new User();
         user.setLogin(dto.getLogin());
-        user.setEmail("place_holder@kneo.io");
+        user.setEmail(dto.getLogin() + "_place_holder@kneo.io");
         user.setDefaultLang(0);
-        user.setRegStatus(UserRegStatus.REGISTERED_AUTOMATICALLY);
+        if (allowAutoRegistration) {
+            user.setRegStatus(UserRegStatus.REGISTERED_AUTOMATICALLY);
+        } else {
+            user.setRegStatus(UserRegStatus.REGISTERED);
+        }
 
         Uni<List<Role>> rolesUni = roleRepository.getAll(0, 1000);
         Uni<List<Module>> moduleUni = moduleRepository.getAll(0, 1000);

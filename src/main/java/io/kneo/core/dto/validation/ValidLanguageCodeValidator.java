@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 
 public class ValidLanguageCodeValidator implements ConstraintValidator<ValidLanguageCode, LanguageCode> {
     private List<String> acceptedValues;
+
     @Override
     public void initialize(ValidLanguageCode annotation) {
         acceptedValues = Stream.of(annotation.enumClass().getEnumConstants())

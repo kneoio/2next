@@ -1,5 +1,6 @@
 package io.kneo.core.controller;
 
+import io.kneo.core.repository.exception.UploadAbsenceException;
 import io.kneo.core.service.UserService;
 import io.smallrye.jwt.auth.principal.DefaultJWTCallerPrincipal;
 import io.vertx.core.http.HttpMethod;
@@ -69,15 +70,15 @@ public abstract class AbstractSecuredController<T, V> extends AbstractController
         return true;
     }
 
-    /*protected void handleUpsertFailure(RoutingContext rc, Throwable throwable) {
+    protected void handleUpsertFailure(RoutingContext rc, Throwable throwable) {
         if (throwable instanceof io.kneo.core.repository.exception.DocumentModificationAccessException) {
             rc.response().setStatusCode(403).end("Not enough rights to update");
-        } else if (throwable instanceof io.kneo.broadcaster.repository.exceptions.UploadAbsenceException) {
+        } else if (throwable instanceof UploadAbsenceException) {
             rc.response().setStatusCode(400).end(throwable.getMessage());
         } else {
             rc.fail(throwable);
         }
-    }*/
+    }
 
     protected void sendUpsertResponse(RoutingContext rc, Object doc, String id) {
         rc.response()

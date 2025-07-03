@@ -3,6 +3,7 @@ package io.kneo.core.server.security;
 import io.kneo.core.repository.exception.DocumentHasNotFoundException;
 import io.kneo.core.repository.exception.DocumentModificationAccessException;
 import io.kneo.core.repository.exception.UserNotFoundException;
+import io.kneo.core.repository.exception.ext.UserAlreadyExistsException;
 import io.vertx.core.Handler;
 import io.vertx.core.json.Json;
 import io.vertx.ext.web.RoutingContext;
@@ -20,13 +21,13 @@ public class GlobalErrorHandler implements Handler<RoutingContext> {
     private static final String JSON_TYPE = "application/json";
 
     private final Map<Class<? extends Throwable>, ErrorResponse> errorMappings = Map.of(
-            IllegalArgumentException.class, new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "Unauthorized"),
-            DocumentHasNotFoundException.class, new ErrorResponse(ErrorResponse.ErrorCode.DOCUMENT_NOT_FOUND, "Unauthorized"),
-            UserNotFoundException.class, new ErrorResponse(ErrorResponse.ErrorCode.USER_NOT_FOUND, "Unauthorized"),
-            DocumentModificationAccessException.class, new ErrorResponse(ErrorResponse.ErrorCode.DOCUMENT_ACCESS_DENIED, "Unauthorized"),
-            ConnectException.class, new ErrorResponse(ErrorResponse.ErrorCode.CONNECTION_ERROR, "Unauthorized"),
-            PgException.class, new ErrorResponse(ErrorResponse.ErrorCode.DATABASE_ERROR, "Unauthorized"),
-            NoSuchElementException.class, new ErrorResponse(ErrorResponse.ErrorCode.RESOURCE_NOT_AVAILABLE, "Unauthorized")
+            DocumentHasNotFoundException.class, new ErrorResponse(ErrorResponse.ErrorCode.DOCUMENT_NOT_FOUND, "Document not found"),
+            UserNotFoundException.class, new ErrorResponse(ErrorResponse.ErrorCode.USER_NOT_FOUND, "User not found"),
+            UserAlreadyExistsException.class, new ErrorResponse(ErrorResponse.ErrorCode.USER_EXISTS, "User already exists"),
+            DocumentModificationAccessException.class, new ErrorResponse(ErrorResponse.ErrorCode.DOCUMENT_ACCESS_DENIED, "Access denied"),
+            ConnectException.class, new ErrorResponse(ErrorResponse.ErrorCode.CONNECTION_ERROR, "Connection error"),
+            PgException.class, new ErrorResponse(ErrorResponse.ErrorCode.DATABASE_ERROR, "Database error"),
+            NoSuchElementException.class, new ErrorResponse(ErrorResponse.ErrorCode.RESOURCE_NOT_AVAILABLE, "Resource not available")
     );
 
     public void handle(RoutingContext context) {
@@ -55,22 +56,20 @@ public class GlobalErrorHandler implements Handler<RoutingContext> {
                 }
             } else {
                 LOGGER.warn("Global error handler called with null failure and no status code for path: {} user: {}", requestPath, userName);
-                this.sendErrorResponse(context, new ErrorResponse(ErrorResponse.ErrorCode.UNKNOWN_ERROR, "Unauthorized"));
+                this.sendErrorResponse(context, new ErrorResponse(ErrorResponse.ErrorCode.UNKNOWN_ERROR, "Internal server error"));
             }
         } else {
             Throwable rootCause = this.getRootCause(failure);
 
             ErrorResponse response;
-            if (rootCause instanceof IllegalArgumentException &&
-                    rootCause.getMessage() != null &&
-                    rootCause.getMessage().contains("Username is null or empty")) {
-                response = new ErrorResponse(ErrorResponse.ErrorCode.UNAUTHORIZED, "Authentication required");
+            if (rootCause instanceof IllegalArgumentException) {
+                response = handleIllegalArgumentException(rootCause);
             } else {
                 response = (ErrorResponse)this.errorMappings.entrySet().stream()
                         .filter((entry) -> (entry.getKey()).isInstance(rootCause))
                         .map(Map.Entry::getValue)
                         .findFirst()
-                        .orElse(new ErrorResponse(ErrorResponse.ErrorCode.UNKNOWN_ERROR, "Unauthorized"));
+                        .orElse(new ErrorResponse(ErrorResponse.ErrorCode.UNKNOWN_ERROR, "Internal server error"));
             }
 
             if (response.isLogError()) {
@@ -87,6 +86,22 @@ public class GlobalErrorHandler implements Handler<RoutingContext> {
 
             this.sendErrorResponse(context, response);
         }
+    }
+
+    private ErrorResponse handleIllegalArgumentException(Throwable rootCause) {
+        String message = rootCause.getMessage();
+        if (message != null) {
+            if (message.contains("Username is null or empty")) {
+                return new ErrorResponse(ErrorResponse.ErrorCode.UNAUTHORIZED, "Authentication required");
+            } else if (message.contains("JSON") || message.contains("json")) {
+                return new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "Invalid request format");
+            } else if (message.contains("Request body")) {
+                return new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "Invalid request body");
+            } else if (message.contains("Invalid entity ID") || message.contains("Invalid filename")) {
+                return new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "Invalid input parameters");
+            }
+        }
+        return new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "Bad request");
     }
 
     private ErrorResponse createHttpStatusErrorResponse(int statusCode) {

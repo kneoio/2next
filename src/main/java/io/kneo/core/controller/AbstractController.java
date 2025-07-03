@@ -171,7 +171,7 @@ public abstract class AbstractController<T, V> extends BaseController {
                             if (autoRegisterUser) {
                                 UserDTO newUserDTO = new UserDTO();
                                 newUserDTO.setLogin(username);
-                                return userService.add(newUserDTO)
+                                return userService.add(newUserDTO, true)
                                         .onItem().transformToUni(userId -> userService.get(userId))
                                         .onItem().transform(Optional::get);
                             } else if (allowUndefinedUser) {
