@@ -2,9 +2,13 @@ package io.kneo.core.controller;
 
 import io.kneo.core.dto.cnst.PayloadType;
 import io.kneo.core.dto.document.UserDTO;
+import io.kneo.core.dto.view.View;
 import io.kneo.core.dto.view.ViewPage;
+import io.kneo.core.localization.LanguageCode;
 import io.kneo.core.model.user.User;
 import io.kneo.core.service.UserService;
+import io.kneo.core.util.RuntimeUtil;
+import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
@@ -36,24 +40,26 @@ public class UserController extends AbstractController<User, UserDTO> {
     }
 
     private void getAll(RoutingContext rc) {
-        Object org = rc.pathParam("org");
-        ViewPage viewPage = new ViewPage();
+        int page = Integer.parseInt(rc.request().getParam("page", "1"));
+        int size = Integer.parseInt(rc.request().getParam("size", "10"));
+        LanguageCode languageCode = resolveLanguage(rc);
 
-        service.getAll()
+        Uni.combine().all().unis(
+                        service.getAllCount(),
+                        service.getAll(size, (page - 1) * size)
+                ).asTuple().map(tuple -> {
+                    ViewPage viewPage = new ViewPage();
+                    viewPage.addPayload(PayloadType.CONTEXT_ACTIONS, languageCode);
+                    View<UserDTO> dtoEntries = new View<>(tuple.getItem2(),
+                            tuple.getItem1(), page,
+                            RuntimeUtil.countMaxPage(tuple.getItem1(), size),
+                            size);
+                    viewPage.addPayload(PayloadType.VIEW_DATA, dtoEntries);
+                    return viewPage;
+                })
                 .subscribe().with(
-                        userList -> {
-                            viewPage.addPayload(PayloadType.VIEW_DATA, userList);
-                            rc.response()
-                                    .setStatusCode(200)
-                                    .putHeader("Content-Type", "application/json")
-                                    .end(JsonObject.mapFrom(viewPage).encode());
-                        },
-                        failure -> {
-                            LOGGER.error(failure.getMessage(), failure);
-                            rc.response()
-                                    .setStatusCode(500)
-                                    .end(failure.getMessage());
-                        }
+                        viewPage -> rc.response().setStatusCode(200).end(JsonObject.mapFrom(viewPage).encode()),
+                        rc::fail
                 );
     }
 
@@ -123,4 +129,5 @@ public class UserController extends AbstractController<User, UserDTO> {
                         }
                 );
     }
+
 }

@@ -42,11 +42,11 @@ public class UserRepository extends AsyncRepository {
         super(client, mapper, null);
     }
 
-
     CompletionStage<Void> onStart(@Observes StartupEvent ev) {
         return getAll()
                 .onItem().transform(users -> users.stream()
                         .filter(u -> u.getId() != null)
+                        .map(v -> (IUser) v)
                         .collect(Collectors.toMap(IUser::getId, user -> user)))
                 .subscribeAsCompletionStage()
                 .thenAccept(cache -> {
@@ -58,8 +58,7 @@ public class UserRepository extends AsyncRepository {
                 });
     }
 
-
-    public Uni<List<IUser>> getAll() {
+    public Uni<List<User>> getAll() {
         return client.query(String.format("SELECT * FROM _users LIMIT %d OFFSET 0", 100))
                 .execute()
                 .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
@@ -67,7 +66,25 @@ public class UserRepository extends AsyncRepository {
                 .collect().asList();
     }
 
-    public Uni<List<IUser>> search(String keyword) {
+    public Uni<List<User>> getAll(final int limit, final int offset) {
+        String sql = "SELECT * FROM _users";
+        if (limit > 0) {
+            sql += String.format(" LIMIT %s OFFSET %s", limit, offset);
+        }
+        return client.query(sql)
+                .execute()
+                .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
+                .onItem().transform(this::from)
+                .collect().asList();
+    }
+
+    public Uni<Integer> getAllCount() {
+        return client.query("SELECT COUNT(*) FROM _users")
+                .execute()
+                .onItem().transform(rowSet -> rowSet.iterator().next().getInteger(0));
+    }
+
+    public Uni<List<User>> search(String keyword) {
         String query = String.format(
                 "SELECT * FROM _users WHERE textsearch @@ to_tsquery('english', '%s')",
                 keyword
@@ -153,7 +170,7 @@ public class UserRepository extends AsyncRepository {
                 .onItem().transform(iterator -> iterator.hasNext() ? Optional.of(from(iterator.next())) : Optional.empty());
     }
 
-    private IUser from(Row row) {
+    private User from(Row row) {
         User user = new User();
         user.setLogin(row.getString("login"));
         user.setEmail(row.getString("email"));

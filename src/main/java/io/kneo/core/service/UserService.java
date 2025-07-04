@@ -1,6 +1,7 @@
 package io.kneo.core.service;
 
 import io.kneo.core.dto.cnst.UserRegStatus;
+import io.kneo.core.dto.document.RoleDTO;
 import io.kneo.core.dto.document.UserDTO;
 import io.kneo.core.model.Module;
 import io.kneo.core.model.SimpleReferenceEntity;
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class UserService {
@@ -37,11 +39,27 @@ public class UserService {
     @Inject
     private ModuleRepository moduleRepository;
 
-    public Uni<List<IUser>> getAll() {
+    public Uni<List<User>> getAll() {
         return repository.getAll();
     }
 
-    public Uni<List<IUser>> search(String keyword) {
+    public Uni<List<UserDTO>> getAll(final int limit, final int offset) {
+        assert repository != null;
+        return repository.getAll(limit, offset)
+                .chain(list -> {
+                    List<Uni<UserDTO>> unis = list.stream()
+                            .map(this::mapToDTO)
+                            .collect(Collectors.toList());
+                    return Uni.join().all(unis).andFailFast();
+                });
+    }
+
+    public Uni<Integer> getAllCount() {
+        assert repository != null;
+        return repository.getAllCount("_users");
+    }
+
+    public Uni<List<User>> search(String keyword) {
         return repository.search(keyword);
     }
 
@@ -114,6 +132,12 @@ public class UserService {
         return repository.insert(user, SuperUser.build());
     }
 
+
+    public Uni<Long> delete(String id) {
+        assert repository != null;
+        return repository.delete(Long.valueOf(id));
+    }
+
     private <T extends SimpleReferenceEntity> List<T> getAllValidReferences(List<T> allAvailable, List<String> provided) {
         List<T> allValidRoles = new ArrayList<>();
         for (T e : allAvailable) {
@@ -124,8 +148,18 @@ public class UserService {
         return allValidRoles;
     }
 
-    public Uni<Long> delete(String id) {
-        assert repository != null;
-        return repository.delete(Long.valueOf(id));
+    private Uni<UserDTO> mapToDTO(User doc) {
+        return Uni.combine().all().unis(
+                getName(doc.getAuthor()),
+                getName(doc.getLastModifier())
+        ).asTuple().onItem().transform(tuple -> {
+                    UserDTO dto = new UserDTO();
+                    dto.setName(doc.getUserName());
+                    dto.setEmail(doc.getEmail());
+                    dto.setLogin(doc.getLogin());
+                    return dto;
+                }
+        );
     }
+
 }
