@@ -2,7 +2,6 @@ package io.kneo.core.repository;
 
 import io.kneo.core.repository.table.IRepository;
 import org.apache.tika.Tika;
-
 import java.io.IOException;
 import java.nio.file.Paths;
 import org.slf4j.Logger;

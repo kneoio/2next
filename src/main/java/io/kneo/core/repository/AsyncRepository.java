@@ -3,8 +3,8 @@ package io.kneo.core.repository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kneo.core.localization.LanguageCode;
 import io.kneo.core.model.DataEntity;
+import io.kneo.core.model.embedded.DocumentAccessInfo;
 import io.kneo.core.model.SimpleReferenceEntity;
-import io.kneo.core.model.embedded.RLS;
 import io.kneo.core.model.user.IUser;
 import io.kneo.core.repository.exception.DocumentHasNotFoundException;
 import io.kneo.core.repository.exception.DocumentModificationAccessException;
@@ -24,7 +24,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.EnumMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -93,18 +92,26 @@ public class AsyncRepository extends AbstractRepository{
                 });
     }
 
-    public Uni<List<RLS>> getAllReaders(UUID uuid, EntityData entityData) {
-        String sql = String.format("SELECT reader, reading_time, can_edit, can_delete FROM %s t, %s rls WHERE t.id = rls.entity_id AND t.id = $1", entityData.getTableName(), entityData.getRlsName());
+    public Uni<List<DocumentAccessInfo>> getDocumentAccessInfo(UUID documentId, EntityData entityData) {
+        String sql = "SELECT rls.reader, rls.reading_time, rls.can_edit, rls.can_delete, u.login, u.i_su " +
+                "FROM " + entityData.getRlsName() + " rls " +
+                "JOIN _users u ON rls.reader = u.id " +
+                "WHERE rls.entity_id = $1 " +
+                "ORDER BY u.i_su";
+
         return client.preparedQuery(sql)
-                .execute(Tuple.of(uuid))
+                .execute(Tuple.of(documentId))
                 .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
-                .onItem().transform(row -> new RLS(
-                        Optional.ofNullable(row.getLocalDateTime("reading_time"))
-                                .map(dateTime -> ZonedDateTime.from(dateTime.atZone(ZoneId.systemDefault())))
-                                .orElse(null),
-                        row.getLong("reader"),
-                        row.getLong("can_edit"),
-                        row.getLong("can_delete")))
+                .onItem().transform(row -> {
+                    DocumentAccessInfo doc = new DocumentAccessInfo();
+                    doc.setUserId(row.getLong("reader"));
+                    doc.setReadingTime(row.getLocalDateTime("reading_time"));
+                    doc.setCanEdit(row.getBoolean("can_edit"));
+                    doc.setCanDelete(row.getBoolean("can_delete"));
+                    doc.setUserLogin(row.getString("login"));
+                    doc.setIsSu(row.getBoolean("i_su"));
+                    return doc;
+                })
                 .collect().asList();
     }
 
