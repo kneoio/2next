@@ -35,6 +35,11 @@ public class AbstractApplicationInit {
         LOGGER.info("===== 2next {} =====", EnvConst.VERSION);
     }
 
+    public void onStop(@Observes ShutdownEvent ev) {
+        LOGGER.info("The application is stopping...");
+    }
+
+
     protected void setupRoutes(Router router) {
         router.route().failureHandler(new GlobalErrorHandler());
         userController.setupRoutes(router);
@@ -42,10 +47,6 @@ public class AbstractApplicationInit {
         moduleController.setupRoutes(router);
         roleController.setupRoutes(router);
         workspaceController.setupRoutes(router);
-    }
-
-    protected void onStop(@Observes ShutdownEvent ev) {
-        LOGGER.info("The application is stopping...");
     }
 
     protected void logRegisteredRoutes(Router router) {

@@ -1,7 +1,6 @@
 package io.kneo.core.service;
 
-import io.kneo.core.dto.cnst.UserRegStatus;
-import io.kneo.core.dto.document.RoleDTO;
+import io.kneo.core.repository.cnst.UserRegStatus;
 import io.kneo.core.dto.document.UserDTO;
 import io.kneo.core.model.Module;
 import io.kneo.core.model.SimpleReferenceEntity;
@@ -100,6 +99,11 @@ public class UserService {
         user.setLogin(dto.getLogin());
         user.setEmail(dto.getLogin() + "_place_holder@kneo.io");
         user.setDefaultLang(0);
+       return add(user, dto.getRoles(), dto.getModules(), allowAutoRegistration);
+    }
+
+    public Uni<Long> add(User user, List<String> newRoles, List<String> newModules, boolean allowAutoRegistration) {
+        user.setDefaultLang(0);
         if (allowAutoRegistration) {
             user.setRegStatus(UserRegStatus.REGISTERED_AUTOMATICALLY);
         } else {
@@ -110,13 +114,13 @@ public class UserService {
         Uni<List<Module>> moduleUni = moduleRepository.getAll(0, 1000);
 
         return rolesUni.onItem().transformToUni(roles -> {
-            user.setRoles(getAllValidReferences(roles, dto.getRoles()));
+            user.setRoles(getAllValidReferences(roles, newRoles));
             return moduleUni;
         }).onFailure().recoverWithUni(failure -> {
             throw new ServiceException(failure);
         }).onItem().transformToUni(modules -> {
             try {
-                user.setModules(getAllValidReferences(modules, dto.getModules()));
+                user.setModules(getAllValidReferences(modules, newModules));
                 return repository.insert(user, SuperUser.build());
             } catch (Exception e) {
                 return Uni.createFrom().failure(e);

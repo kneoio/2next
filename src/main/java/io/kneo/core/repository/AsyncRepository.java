@@ -6,6 +6,7 @@ import io.kneo.core.model.DataEntity;
 import io.kneo.core.model.embedded.DocumentAccessInfo;
 import io.kneo.core.model.SimpleReferenceEntity;
 import io.kneo.core.model.user.IUser;
+import io.kneo.core.model.user.User;
 import io.kneo.core.repository.exception.DocumentHasNotFoundException;
 import io.kneo.core.repository.exception.DocumentModificationAccessException;
 import io.kneo.core.repository.rls.RLSRepository;
@@ -17,6 +18,7 @@ import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
+import org.eclipse.microprofile.openapi.models.parameters.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,6 +134,21 @@ public class AsyncRepository extends AbstractRepository{
                 }));
     }
 
+    protected Uni<Void> insertRLSPermissions(io.vertx.mutiny.sqlclient.SqlClient tx, UUID entityId, EntityData entityData, IUser user) {
+        String rlsSql = String.format(
+                "INSERT INTO %s (reader, entity_id, can_edit, can_delete) VALUES ($1, $2, $3, $4)",
+                entityData.getRlsName()
+        );
+
+        return tx.preparedQuery(rlsSql)
+                .execute(Tuple.of(user.getId(), entityId, true, true))
+                .onItem().transformToUni(ignored ->
+                        tx.preparedQuery(rlsSql)
+                                .execute(Tuple.of(1L, entityId, true, true))
+                                .onItem().ignore().andContinueWithNull()
+                );
+    }
+
     public Uni<Integer> archive(UUID uuid, EntityData entityData, IUser user) {
         return rlsRepository.findById(entityData.getRlsName(), user.getId(), uuid)
                 .onItem().transformToUni(permissions -> {
@@ -174,6 +191,15 @@ public class AsyncRepository extends AbstractRepository{
 
     protected static void setDefaultFields(DataEntity<UUID> entity, Row row) {
         entity.setId(row.getUUID("id"));
+        entity.setAuthor(row.getLong(COLUMN_AUTHOR));
+        entity.setRegDate(row.getLocalDateTime(COLUMN_REG_DATE).atZone(ZoneId.systemDefault()));
+        entity.setLastModifier(row.getLong(COLUMN_LAST_MOD_USER));
+        entity.setLastModifiedDate(row.getLocalDateTime(COLUMN_LAST_MOD_DATE).atZone(ZoneId.systemDefault()));
+    }
+
+
+    protected static void setDefaultFields(User entity, Row row) {
+        entity.setId(row.getLong("id"));
         entity.setAuthor(row.getLong(COLUMN_AUTHOR));
         entity.setRegDate(row.getLocalDateTime(COLUMN_REG_DATE).atZone(ZoneId.systemDefault()));
         entity.setLastModifier(row.getLong(COLUMN_LAST_MOD_USER));

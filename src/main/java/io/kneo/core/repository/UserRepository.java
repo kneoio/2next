@@ -3,6 +3,7 @@ package io.kneo.core.repository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kneo.core.model.Module;
 import io.kneo.core.model.user.*;
+import io.kneo.core.repository.cnst.UserRegStatus;
 import io.kneo.core.server.EnvConst;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
@@ -172,13 +173,14 @@ public class UserRepository extends AsyncRepository {
 
     private User from(Row row) {
         User user = new User();
+        setDefaultFields(user, row);
         user.setLogin(row.getString("login"));
         user.setEmail(row.getString("email"));
         user.setDefaultLang(row.getInteger("default_lang"));
         user.setRoles(List.of());
+        user.setModules(List.of());
         user.setTimeZone(TimeZone.getDefault());
-        user.setId(row.getLong("id"));
-        user.setRegDate(row.getLocalDateTime("reg_date").atZone(ZoneId.systemDefault()));
+        user.setRegStatus(UserRegStatus.getType(row.getInteger("status")));
         userCache.put(row.getLong("id"), user);
         return user;
     }
@@ -187,8 +189,8 @@ public class UserRepository extends AsyncRepository {
         ZonedDateTime nowZonedTime = ZonedDateTime.now();
         LocalDateTime nowLocalDateTime = nowZonedTime.toLocalDateTime();
         String sql = "INSERT INTO _users (author, default_lang, email, i_su, login, reg_date, status, confirmation_code, last_mod_user) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id";
-        String modulesSQL = "INSERT INTO _user_modules (module_id, user_id, is_on) VALUES($1, $2, $3)";
-        String rolesSQL = "INSERT INTO _user_roles (role_id, user_id, is_on) VALUES($1, $2, $3)";
+        String modulesSQL = "INSERT INTO _modules (module_id, user_id, is_on) VALUES($1, $2, $3)";
+        String rolesSQL = "INSERT INTO _roles (role_id, user_id, is_on) VALUES($1, $2, $3)";
         Tuple params = Tuple.of(user.getId(), doc.getDefaultLang(), doc.getEmail(), doc.isSupervisor(), doc.getLogin(), nowLocalDateTime);
         Tuple finalParams = params.addValue(doc.getRegStatus()).addInteger(doc.getConfirmationCode()).addLong(user.getId());
         return client.withTransaction(tx -> tx.preparedQuery(sql)

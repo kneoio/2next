@@ -65,8 +65,4 @@ public abstract class DataEntity<K> implements IDataEntity<K> {
         this.lastModifier = lastModifier;
     }
 
-    @Override
-    public boolean isEditable() {
-        return true;
-    }
 }

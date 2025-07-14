@@ -16,7 +16,6 @@ public interface IDataEntity<K> {
     void setRegDate(ZonedDateTime regDate);
     @JsonFormat(pattern="dd.MM.yyyy HH:mm")
     ZonedDateTime getRegDate();
-    boolean isEditable();
     void setLastModifiedDate(ZonedDateTime lastModifiedDate);
     @JsonFormat(pattern="dd.MM.yyyy HH:mm")
     ZonedDateTime getLastModifiedDate();

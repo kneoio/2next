@@ -1,4 +1,4 @@
-package io.kneo.core.dto.cnst;
+package io.kneo.core.repository.cnst;
 
 import lombok.Getter;
 

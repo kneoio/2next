@@ -1,7 +1,7 @@
 package io.kneo.core.model.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.kneo.core.dto.cnst.UserRegStatus;
+import io.kneo.core.repository.cnst.UserRegStatus;
 import io.kneo.core.localization.LanguageCode;
 import io.kneo.core.model.DataEntity;
 import io.kneo.core.model.Module;

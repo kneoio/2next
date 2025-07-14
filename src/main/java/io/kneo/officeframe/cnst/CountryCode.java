@@ -4,40 +4,74 @@ import lombok.Getter;
 
 /**
  * ISO 3166-1 alpha-2 country codes
- * <a href="https://en.wikipedia.org/wiki/ISO_3166-2">...</a>
+ * ...
  *
  * @author Kayra created 27-12-2015
  */
 @Getter
 public enum CountryCode {
-    UNKNOWN(0),
+    UNKNOWN(0, "Unknown"),
 
-    KZ(777), RU(778), BY(779), UA(780), DE(781), FR(782), TR(783),
-    US(784), CN(785), BG(786), GB(787), JP(788), ES(789), PT(790),
+    KZ(777, "Kazakhstan"), RU(778, "Russia"), BY(779, "Belarus"), UA(780, "Ukraine"),
+    DE(781, "Germany"), FR(782, "France"), TR(783, "Turkey"), US(784, "United States"),
+    CN(785, "China"), BG(786, "Bulgaria"), GB(787, "United Kingdom"), JP(788, "Japan"),
+    ES(789, "Spain"), PT(790, "Portugal"),
 
-    AF(791), AL(792), DZ(793), AD(794), AO(795), AG(796), AR(797), AM(798), AU(799), AT(800),
-    AZ(801), BS(802), BH(803), BD(804), BB(805), BE(806), BZ(807), BJ(808), BT(809), BO(810),
-    BA(811), BW(812), BR(813), BN(814), BF(815), BI(816), CV(817), KH(818), CM(819), CA(820),
-    CF(821), TD(822), CL(823), CO(824), KM(825), CG(826), CR(827), HR(828), CU(829), CY(830),
-    CZ(831), DK(832), DJ(833), DM(834), DO(835), EC(836), EG(837), SV(838), GQ(839), ER(840),
-    EE(841), ET(842), FJ(843), FI(844), GA(845), GM(846), GE(847), GH(848), GR(849), GD(850),
-    GT(851), GN(852), GW(853), GY(854), HT(855), HN(856), HU(857), IS(858), IN(859), ID(860),
-    IR(861), IQ(862), IE(863), IL(864), IT(865), JM(866), JO(867), KE(868), KI(869), KR(870),
-    KW(871), KG(872), LA(873), LV(874), LB(875), LS(876), LR(877), LY(878), LI(879), LT(880),
-    LU(881), MG(882), MW(883), MY(884), MV(885), ML(886), MT(887), MR(888), MU(889), MX(890),
-    MD(891), MC(892), MN(893), ME(894), MA(895), MZ(896), MM(897), NA(898), NR(899), NP(900),
-    NL(901), NZ(902), NI(903), NE(904), NG(905), NO(906), OM(907), PK(908), PW(909), PA(910),
-    PG(911), PY(912), PE(913), PH(914), PL(915), QA(916), RO(917), RW(918), KN(919), LC(920),
-    VC(921), WS(922), SM(923), ST(924), SA(925), SN(926), RS(927), SC(928), SL(929), SG(930),
-    SK(931), SI(932), SB(933), ZA(934), LK(935), SD(936), SR(937), SE(938), CH(939), SY(940),
-    TW(941), TJ(942), TZ(943), TH(944), TL(945), TG(946), TO(947), TT(948), TN(949), TM(950),
-    UG(951), AE(952), UY(953), UZ(954), VU(955), VA(956), VE(957), VN(958), YE(959), ZM(960),
-    ZW(961);
+    AF(791, "Afghanistan"), AL(792, "Albania"), DZ(793, "Algeria"), AD(794, "Andorra"),
+    AO(795, "Angola"), AG(796, "Antigua and Barbuda"), AR(797, "Argentina"),
+    AM(798, "Armenia"), AU(799, "Australia"), AT(800, "Austria"), AZ(801, "Azerbaijan"),
+    BS(802, "Bahamas"), BH(803, "Bahrain"), BD(804, "Bangladesh"), BB(805, "Barbados"),
+    BE(806, "Belgium"), BZ(807, "Belize"), BJ(808, "Benin"), BT(809, "Bhutan"),
+    BO(810, "Bolivia"), BA(811, "Bosnia and Herzegovina"), BW(812, "Botswana"),
+    BR(813, "Brazil"), BN(814, "Brunei Darussalam"), BF(815, "Burkina Faso"),
+    BI(816, "Burundi"), CV(817, "Cabo Verde"), KH(818, "Cambodia"), CM(819, "Cameroon"),
+    CA(820, "Canada"), CF(821, "Central African Republic"), TD(822, "Chad"),
+    CL(823, "Chile"), CO(824, "Colombia"), KM(825, "Comoros"), CG(826, "Congo"),
+    CR(827, "Costa Rica"), HR(828, "Croatia"), CU(829, "Cuba"), CY(830, "Cyprus"),
+    CZ(831, "Czech Republic"), DK(832, "Denmark"), DJ(833, "Djibouti"),
+    DM(834, "Dominica"), DO(835, "Dominican Republic"), EC(836, "Ecuador"),
+    EG(837, "Egypt"), SV(838, "El Salvador"), GQ(839, "Equatorial Guinea"),
+    ER(840, "Eritrea"), EE(841, "Estonia"), ET(842, "Ethiopia"), FJ(843, "Fiji"),
+    FI(844, "Finland"), GA(845, "Gabon"), GM(846, "Gambia"), GE(847, "Georgia"),
+    GH(848, "Ghana"), GR(849, "Greece"), GD(850, "Grenada"), GT(851, "Guatemala"),
+    GN(852, "Guinea"), GW(853, "Guinea-Bissau"), GY(854, "Guyana"), HT(855, "Haiti"),
+    HN(856, "Honduras"), HU(857, "Hungary"), IS(858, "Iceland"), IN(859, "India"),
+    ID(860, "Indonesia"), IR(861, "Iran"), IQ(862, "Iraq"), IE(863, "Ireland"),
+    IL(864, "Israel"), IT(865, "Italy"), JM(866, "Jamaica"), JO(867, "Jordan"),
+    KE(868, "Kenya"), KI(869, "Kiribati"), KR(870, "South Korea"), KW(871, "Kuwait"),
+    KG(872, "Kyrgyzstan"), LA(873, "Laos"), LV(874, "Latvia"), LB(875, "Lebanon"),
+    LS(876, "Lesotho"), LR(877, "Liberia"), LY(878, "Libya"), LI(879, "Liechtenstein"),
+    LT(880, "Lithuania"), LU(881, "Luxembourg"), MG(882, "Madagascar"),
+    MW(883, "Malawi"), MY(884, "Malaysia"), MV(885, "Maldives"), ML(886, "Mali"),
+    MT(887, "Malta"), MR(888, "Mauritania"), MU(889, "Mauritius"), MX(890, "Mexico"),
+    MD(891, "Moldova"), MC(892, "Monaco"), MN(893, "Mongolia"), ME(894, "Montenegro"),
+    MA(895, "Morocco"), MZ(896, "Mozambique"), MM(897, "Myanmar"), NA(898, "Namibia"),
+    NR(899, "Nauru"), NP(900, "Nepal"), NL(901, "Netherlands"), NZ(902, "New Zealand"),
+    NI(903, "Nicaragua"), NE(904, "Niger"), NG(905, "Nigeria"), NO(906, "Norway"),
+    OM(907, "Oman"), PK(908, "Pakistan"), PW(909, "Palau"), PA(910, "Panama"),
+    PG(911, "Papua New Guinea"), PY(912, "Paraguay"), PE(913, "Peru"),
+    PH(914, "Philippines"), PL(915, "Poland"), QA(916, "Qatar"), RO(917, "Romania"),
+    RW(918, "Rwanda"), KN(919, "Saint Kitts and Nevis"), LC(920, "Saint Lucia"),
+    VC(921, "Saint Vincent and the Grenadines"), WS(922, "Samoa"), SM(923, "San Marino"),
+    ST(924, "Sao Tome and Principe"), SA(925, "Saudi Arabia"), SN(926, "Senegal"),
+    RS(927, "Serbia"), SC(928, "Seychelles"), SL(929, "Sierra Leone"),
+    SG(930, "Singapore"), SK(931, "Slovakia"), SI(932, "Slovenia"),
+    SB(933, "Solomon Islands"), ZA(934, "South Africa"), LK(935, "Sri Lanka"),
+    SD(936, "Sudan"), SR(937, "Suriname"), SE(938, "Sweden"), CH(939, "Switzerland"),
+    SY(940, "Syria"), TW(941, "Taiwan"), TJ(942, "Tajikistan"), TZ(943, "Tanzania"),
+    TH(944, "Thailand"), TL(945, "Timor-Leste"), TG(946, "Togo"), TO(947, "Tonga"),
+    TT(948, "Trinidad and Tobago"), TN(949, "Tunisia"), TM(950, "Turkmenistan"),
+    UG(951, "Uganda"), AE(952, "United Arab Emirates"), UY(953, "Uruguay"),
+    UZ(954, "Uzbekistan"), VU(955, "Vanuatu"), VA(956, "Vatican City"),
+    VE(957, "Venezuela"), VN(958, "Vietnam"), YE(959, "Yemen"), ZM(960, "Zambia"),
+    ZW(961, "Zimbabwe");
 
     private final int code;
+    private final String countryName;
 
-    CountryCode(int code) {
+    CountryCode(int code, String countryName) {
         this.code = code;
+        this.countryName = countryName;
     }
 
     public static CountryCode fromString(String code) {

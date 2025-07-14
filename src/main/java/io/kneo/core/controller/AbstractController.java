@@ -42,6 +42,7 @@ import static io.kneo.core.util.RuntimeUtil.countMaxPage;
 public abstract class AbstractController<T, V> extends BaseController {
     private static final Duration TIMEOUT = Duration.ofSeconds(5);
     protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass().getSimpleName());
+    private static final String EMAIL_PATTERN = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
 
     @Deprecated
     protected static final String USER_NAME_CLAIM = "preferred_username";
@@ -169,15 +170,11 @@ public abstract class AbstractController<T, V> extends BaseController {
                     .onItem().transformToUni(user -> {
                         if (user == null || user instanceof UndefinedUser) {
                             if (autoRegisterUser) {
-                                UserDTO newUserDTO = new UserDTO();
-                                newUserDTO.setLogin(username);
-                                return userService.add(newUserDTO, true)
+                                return userService.add(buildUser(username), List.of(), List.of(), true)
                                         .onItem().transformToUni(userId -> userService.get(userId))
                                         .onItem().transform(Optional::get);
                             } else if (allowUndefinedUser) {
-                                io.kneo.core.model.user.User newUser = new io.kneo.core.model.user.User();
-                                newUser.setLogin(username);
-                                return Uni.createFrom().item(newUser);
+                                return Uni.createFrom().item(buildUser(username));
                             } else {
                                 return Uni.createFrom().failure(new UserNotFoundException(username));
                             }
@@ -185,6 +182,15 @@ public abstract class AbstractController<T, V> extends BaseController {
                         return Uni.createFrom().item(user);
                     });
         }
+    }
+
+    private io.kneo.core.model.user.User buildUser(String userName) {
+        io.kneo.core.model.user.User newUser = new io.kneo.core.model.user.User();
+        newUser.setLogin(userName);
+        if (userName.matches(EMAIL_PATTERN)) {
+            newUser.setEmail(userName);
+        }
+        return newUser;
     }
 
     public Uni<Response> delete(String uuid, AbstractService<T, V> service, @Context ContainerRequestContext requestContext) throws DocumentModificationAccessException, UserNotFoundException {
