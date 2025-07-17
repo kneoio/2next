@@ -26,7 +26,10 @@ public class ValidLocalizedNameValidator implements ConstraintValidator<ValidLoc
     @Override
     public boolean isValid(EnumMap<LanguageCode, String> localizedNameMap, ConstraintValidatorContext context) {
         if (localizedNameMap == null) {
-            return true;
+            context.disableDefaultConstraintViolation();
+            context.buildConstraintViolationWithTemplate("Localized name cannot be null")
+                    .addConstraintViolation();
+            return false;
         }
 
         if (localizedNameMap.isEmpty()) {
@@ -39,18 +42,20 @@ public class ValidLocalizedNameValidator implements ConstraintValidator<ValidLoc
             return true;
         }
 
+
         if (requireDefaultLanguage) {
             if (!localizedNameMap.containsKey(defaultLanguage) ||
                     localizedNameMap.get(defaultLanguage) == null ||
                     localizedNameMap.get(defaultLanguage).trim().isEmpty()) {
                 context.disableDefaultConstraintViolation();
-                context.buildConstraintViolationWithTemplate("Default language (" + defaultLanguage + ") name is required")
+                context.buildConstraintViolationWithTemplate("At least default language (" + defaultLanguage + ") name is required")
                         .addConstraintViolation();
                 return false;
             }
         }
 
-        for (Map.Entry<LanguageCode, String> entry : localizedNameMap.entrySet()) {
+        for (
+                Map.Entry<LanguageCode, String> entry : localizedNameMap.entrySet()) {
             String name = entry.getValue();
             LanguageCode language = entry.getKey();
 

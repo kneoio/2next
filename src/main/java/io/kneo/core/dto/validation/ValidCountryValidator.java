@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ValidCountryValidator implements ConstraintValidator<ValidCountry, CountryCode> {
+public class ValidCountryValidator implements ConstraintValidator<ValidCountry, String> {
     private Set<String> validCountryCodes;
 
     @Override
@@ -19,10 +19,15 @@ public class ValidCountryValidator implements ConstraintValidator<ValidCountry, 
     }
 
     @Override
-    public boolean isValid(CountryCode value, ConstraintValidatorContext context) {
+    public boolean isValid(String value, ConstraintValidatorContext context) {
         if (value == null) {
             return true;
         }
-        return validCountryCodes.contains(value.name());
+
+        if (value.trim().isEmpty()) {
+            return false;
+        }
+
+        return validCountryCodes.contains(value);
     }
 }

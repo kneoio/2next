@@ -181,6 +181,7 @@ public class UserRepository extends AsyncRepository {
         user.setModules(List.of());
         user.setTimeZone(TimeZone.getDefault());
         user.setRegStatus(UserRegStatus.getType(row.getInteger("status")));
+        user.setSupervisor(row.getBoolean("i_su"));
         userCache.put(row.getLong("id"), user);
         return user;
     }

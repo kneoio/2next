@@ -94,12 +94,45 @@ public class AsyncRepository extends AbstractRepository{
                 });
     }
 
+    @Deprecated
     public Uni<List<DocumentAccessInfo>> getDocumentAccessInfo(UUID documentId, EntityData entityData) {
         String sql = "SELECT rls.reader, rls.reading_time, rls.can_edit, rls.can_delete, u.login, u.i_su " +
                 "FROM " + entityData.getRlsName() + " rls " +
                 "JOIN _users u ON rls.reader = u.id " +
                 "WHERE rls.entity_id = $1 " +
                 "ORDER BY u.i_su";
+
+        return client.preparedQuery(sql)
+                .execute(Tuple.of(documentId))
+                .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
+                .onItem().transform(row -> {
+                    DocumentAccessInfo doc = new DocumentAccessInfo();
+                    doc.setUserId(row.getLong("reader"));
+                    doc.setReadingTime(row.getLocalDateTime("reading_time"));
+                    doc.setCanEdit(row.getBoolean("can_edit"));
+                    doc.setCanDelete(row.getBoolean("can_delete"));
+                    doc.setUserLogin(row.getString("login"));
+                    doc.setIsSu(row.getBoolean("i_su"));
+                    return doc;
+                })
+                .collect().asList();
+    }
+
+    public Uni<List<DocumentAccessInfo>> getDocumentAccessInfo(UUID documentId, EntityData entityData, IUser user) {
+        String sql;
+        if (user.isSupervisor()) {
+            sql = "SELECT rls.reader, rls.reading_time, rls.can_edit, rls.can_delete, u.login, u.i_su " +
+                    "FROM " + entityData.getRlsName() + " rls " +
+                    "JOIN _users u ON rls.reader = u.id " +
+                    "WHERE rls.entity_id = $1 " +
+                    "ORDER BY u.i_su";
+        } else {
+            sql = "SELECT rls.reader, rls.reading_time, rls.can_edit, rls.can_delete, u.login, u.i_su " +
+                    "FROM " + entityData.getRlsName() + " rls " +
+                    "JOIN _users u ON rls.reader = u.id " +
+                    "WHERE rls.entity_id = $1 AND u.i_su = false " +
+                    "ORDER BY u.i_su";
+        }
 
         return client.preparedQuery(sql)
                 .execute(Tuple.of(documentId))
@@ -136,17 +169,36 @@ public class AsyncRepository extends AbstractRepository{
 
     protected Uni<Void> insertRLSPermissions(io.vertx.mutiny.sqlclient.SqlClient tx, UUID entityId, EntityData entityData, IUser user) {
         String rlsSql = String.format(
-                "INSERT INTO %s (reader, entity_id, can_edit, can_delete) VALUES ($1, $2, $3, $4)",
+                "INSERT INTO %s (reader, entity_id, can_edit, can_delete) VALUES ($1, $2, $3, $4) " +
+                        "ON CONFLICT (reader, entity_id) DO UPDATE SET " +
+                        "can_edit = EXCLUDED.can_edit, " +
+                        "can_delete = EXCLUDED.can_delete, " +
+                        "reading_time = now()",
                 entityData.getRlsName()
         );
 
         return tx.preparedQuery(rlsSql)
                 .execute(Tuple.of(user.getId(), entityId, true, true))
-                .onItem().transformToUni(ignored ->
-                        tx.preparedQuery(rlsSql)
-                                .execute(Tuple.of(1L, entityId, true, true))
-                                .onItem().ignore().andContinueWithNull()
-                );
+                .onFailure().invoke(throwable ->
+                        LOGGER.error("Failed to insert/update RLS permissions for entity: {} by user: {}",
+                                entityId, user.getId(), throwable))
+                .onItem().transformToUni(ignored -> {
+                    String selectSuUsersSql = "SELECT id FROM _users WHERE i_su = true";
+                    return tx.preparedQuery(selectSuUsersSql)
+                            .execute()
+                            .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
+                            .onItem().transformToUniAndConcatenate(row -> {
+                                long suUserId = row.getLong("id");
+                                return tx.preparedQuery(rlsSql)
+                                        .execute(Tuple.of(suUserId, entityId, true, true))
+                                        .onFailure().invoke(throwable ->
+                                                LOGGER.error("Failed to insert/update RLS permissions for entity: {} by super user: {}",
+                                                        entityId, suUserId, throwable))
+                                        .onItem().ignore().andContinueWithNull();
+                            })
+                            .collect().asList()
+                            .onItem().ignore().andContinueWithNull();
+                });
     }
 
     public Uni<Integer> archive(UUID uuid, EntityData entityData, IUser user) {

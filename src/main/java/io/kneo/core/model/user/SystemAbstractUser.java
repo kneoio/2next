@@ -19,4 +19,16 @@ public abstract class SystemAbstractUser implements IUser{
         return null;
     }
 
+
+    @Override
+    public boolean isSupervisor() {
+        return false;
+    }
+
+    @Override
+    public void setSupervisor(boolean supervisor) {
+
+    }
+
+
 }
