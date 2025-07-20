@@ -91,8 +91,8 @@ public class LabelService extends AbstractService<Label, LabelDTO> implements IR
 
     private Uni<LabelDTO> mapToDTO(Label label) {
         return Uni.combine().all().unis(
-                userRepository.getUserName(label.getAuthor()),
-                userRepository.getUserName(label.getLastModifier())
+                userService.getName(label.getAuthor()),
+                userService.getName(label.getLastModifier())
         ).asTuple().onItem().transform(tuple ->
                 LabelDTO.builder()
                         .id(label.getId())

@@ -2,6 +2,7 @@ package io.kneo.core.server;
 
 import io.kneo.core.controller.*;
 import io.kneo.core.server.security.GlobalErrorHandler;
+import io.kneo.officeframe.controller.LabelController;
 import io.quarkus.runtime.ShutdownEvent;
 import io.smallrye.mutiny.Uni;
 import io.vertx.ext.web.Router;
@@ -27,6 +28,12 @@ public class AbstractApplicationInit {
     RoleController roleController;
     @Inject
     WorkspaceController workspaceController;
+    //OF
+
+    @Inject
+    LabelController labelController;
+
+
 
     public AbstractApplicationInit(
             PgPool client
@@ -47,6 +54,7 @@ public class AbstractApplicationInit {
         moduleController.setupRoutes(router);
         roleController.setupRoutes(router);
         workspaceController.setupRoutes(router);
+        labelController.setupRoutes(router);
     }
 
     protected void logRegisteredRoutes(Router router) {
