@@ -14,6 +14,7 @@ import io.kneo.core.repository.UserRepository;
 import io.kneo.core.service.exception.ServiceException;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import io.vertx.pgclient.PgException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
@@ -99,10 +100,10 @@ public class UserService {
         user.setLogin(dto.getLogin());
         user.setEmail(dto.getLogin() + "_place_holder@kneo.io");
         user.setDefaultLang(0);
-       return add(user, dto.getRoles(), dto.getModules(), allowAutoRegistration);
+       return addOrGet(user, dto.getRoles(), dto.getModules(), allowAutoRegistration);
     }
 
-    public Uni<Long> add(User user, List<String> newRoles, List<String> newModules, boolean allowAutoRegistration) {
+    public Uni<Long> addOrGet(User user, List<String> newRoles, List<String> newModules, boolean allowAutoRegistration) {
         user.setDefaultLang(0);
         if (allowAutoRegistration) {
             user.setRegStatus(UserRegStatus.REGISTERED_AUTOMATICALLY);
@@ -125,6 +126,15 @@ public class UserService {
             } catch (Exception e) {
                 return Uni.createFrom().failure(e);
             }
+        }).onFailure().recoverWithUni(throwable -> {
+            if (allowAutoRegistration && throwable instanceof RuntimeException
+                    && throwable.getCause() instanceof PgException pgException) {
+                if ("23505".equals(pgException.getSqlState()) && pgException.getMessage().contains("_users_login_key")) {
+                    return repository.findByLogin(user.getLogin())
+                            .onItem().transform(IUser::getId);
+                }
+            }
+            return Uni.createFrom().failure(throwable);
         });
     }
 

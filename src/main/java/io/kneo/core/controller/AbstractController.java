@@ -170,7 +170,7 @@ public abstract class AbstractController<T, V> extends BaseController {
                     .onItem().transformToUni(user -> {
                         if (user == null || user instanceof UndefinedUser) {
                             if (autoRegisterUser) {
-                                return userService.add(buildUser(username), List.of(), List.of(), true)
+                                return userService.addOrGet(buildUser(username), List.of(), List.of(), true)
                                         .onItem().transformToUni(userId -> userService.get(userId))
                                         .onItem().transform(Optional::get);
                             } else if (allowUndefinedUser) {
