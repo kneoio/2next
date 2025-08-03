@@ -42,7 +42,6 @@ public class ValidLocalizedNameValidator implements ConstraintValidator<ValidLoc
             return true;
         }
 
-
         if (requireDefaultLanguage) {
             if (!localizedNameMap.containsKey(defaultLanguage) ||
                     localizedNameMap.get(defaultLanguage) == null ||
@@ -54,8 +53,7 @@ public class ValidLocalizedNameValidator implements ConstraintValidator<ValidLoc
             }
         }
 
-        for (
-                Map.Entry<LanguageCode, String> entry : localizedNameMap.entrySet()) {
+        for (Map.Entry<LanguageCode, String> entry : localizedNameMap.entrySet()) {
             String name = entry.getValue();
             LanguageCode language = entry.getKey();
 
@@ -75,10 +73,10 @@ public class ValidLocalizedNameValidator implements ConstraintValidator<ValidLoc
                 return false;
             }
 
-            if (!trimmedName.matches("^[a-zA-Z0-9\\s\\-_.,!?()&]+$")) {
+            if (containsControlCharacters(trimmedName)) {
                 context.disableDefaultConstraintViolation();
                 context.buildConstraintViolationWithTemplate(
-                                "Name for language " + language + " contains invalid characters")
+                                "Name for language " + language + " contains invalid control characters")
                         .addConstraintViolation();
                 return false;
             }
@@ -86,5 +84,14 @@ public class ValidLocalizedNameValidator implements ConstraintValidator<ValidLoc
 
         return true;
     }
-}
 
+    private boolean containsControlCharacters(String text) {
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (Character.isISOControl(c) && c != '\n' && c != '\r' && c != '\t') {
+                return true;
+            }
+        }
+        return false;
+    }
+}
