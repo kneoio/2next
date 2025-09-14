@@ -1,5 +1,6 @@
 package io.kneo.core.server.security;
 
+import io.kneo.core.model.user.AnonymousUser;
 import io.kneo.core.repository.exception.DocumentHasNotFoundException;
 import io.kneo.core.repository.exception.DocumentModificationAccessException;
 import io.kneo.core.repository.exception.UserNotFoundException;
@@ -36,6 +37,9 @@ public class GlobalErrorHandler implements Handler<RoutingContext> {
         String userName = "undefined";
         if (context.user() != null && context.user().containsKey("username")) {
             userName = context.user().attributes().getMap().get("username").toString();
+            if (userName.isEmpty()) {
+                userName = AnonymousUser.USER_NAME;
+            }
         }
 
         String contentLength = context.request().getHeader("Content-Length");
@@ -49,7 +53,20 @@ public class GlobalErrorHandler implements Handler<RoutingContext> {
                 LOGGER.warn("HTTP error detected - Status: {}, Path: {}, Content-Length: {}", new Object[]{statusCode, requestPath, contentLength});
                 if (statusCode == 413) {
                     LOGGER.error("File upload rejected - Payload too large. Status: 413, Path: {}, Content-Length: {}", requestPath, contentLength);
-                    this.sendErrorResponse(context, new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "File size exceeds server limits"));
+                    //this.sendErrorResponse(context, new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "File size exceeds server limits"));
+                    context.response()
+                            .setStatusCode(413)
+                            .putHeader(CONTENT_TYPE, JSON_TYPE)
+                            .putHeader("Connection", "close")
+                            .end(Json.encode(Map.of(
+                                    "status", 413,
+                                    "error", Map.of(
+                                            "code", "PAYLOAD_TOO_LARGE",
+                                            "message", "File size exceeds server limits",
+                                            "actualSize", contentLength != null ? contentLength : "unknown"
+                                    )
+                            )));
+                    return;
                 } else {
                     ErrorResponse response = this.createHttpStatusErrorResponse(statusCode);
                     this.sendErrorResponse(context, response);

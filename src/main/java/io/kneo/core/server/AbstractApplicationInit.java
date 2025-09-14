@@ -58,7 +58,7 @@ public class AbstractApplicationInit {
     }
 
     protected void logRegisteredRoutes(Router router) {
-        LOGGER.info("Registered routes:");
+        LOGGER.info("Registered routes 2next:");
         router.getRoutes().stream()
                 .filter(route -> route.getPath() != null && route.methods() != null)
                 .filter(route -> !route.getPath().startsWith("/q/"))

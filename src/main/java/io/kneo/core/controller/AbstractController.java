@@ -189,6 +189,8 @@ public abstract class AbstractController<T, V> extends BaseController {
         newUser.setLogin(userName);
         if (userName.matches(EMAIL_PATTERN)) {
             newUser.setEmail(userName);
+        } else {
+            newUser.setEmail(userName + "@fake.local");
         }
         return newUser;
     }
