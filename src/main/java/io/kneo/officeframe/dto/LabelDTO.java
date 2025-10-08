@@ -19,6 +19,7 @@ import java.util.UUID;
 public class LabelDTO extends AbstractReferenceDTO {
     @JsonView(Views.DetailView.class)
     private String color;
+    private String fontColor;
     @JsonView(Views.DetailView.class)
     private UUID parent;
     @JsonView(Views.DetailView.class)

@@ -3,7 +3,6 @@ package io.kneo.core.controller;
 
 import io.kneo.core.dto.actions.ActionsFactory;
 import io.kneo.core.dto.cnst.PayloadType;
-import io.kneo.core.dto.document.UserDTO;
 import io.kneo.core.dto.form.FormPage;
 import io.kneo.core.dto.view.View;
 import io.kneo.core.dto.view.ViewPage;
@@ -220,6 +219,16 @@ public abstract class AbstractController<T, V> extends BaseController {
             case "flac" -> "audio/flac";
             default -> "application/octet-stream";
         };
+    }
+
+    protected void handleFailure(RoutingContext rc, Throwable throwable) {
+        if (throwable instanceof IllegalStateException
+                || throwable instanceof IllegalArgumentException
+                || throwable instanceof UserNotFoundException) {
+            rc.fail(401, throwable);
+        } else {
+            rc.fail(throwable); // default bubbling
+        }
     }
 
 }

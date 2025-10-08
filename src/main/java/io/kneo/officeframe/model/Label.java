@@ -14,6 +14,7 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Label extends SimpleReferenceEntity {
     private String color;
+    private String fontColor;
     private UUID parent;
     private boolean hidden;
     private String category;

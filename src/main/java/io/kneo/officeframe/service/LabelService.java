@@ -81,6 +81,7 @@ public class LabelService extends AbstractService<Label, LabelDTO> implements IR
         doc.setLocalizedName(dto.getLocalizedName());
         doc.setHidden(dto.isHidden());
         doc.setColor(dto.getColor());
+        doc.setFontColor(dto.getFontColor());
 
         if (id == null) {
             return repository.insert(doc, user).chain(this::mapToDTO);
@@ -105,6 +106,7 @@ public class LabelService extends AbstractService<Label, LabelDTO> implements IR
                         .category(label.getCategory())
                         .parent(label.getParent())
                         .color(label.getColor())
+                        .fontColor(label.getFontColor())
                         .hidden(label.isHidden())
                         .build()
         );

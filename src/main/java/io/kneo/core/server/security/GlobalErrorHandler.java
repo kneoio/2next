@@ -1,165 +1,53 @@
 package io.kneo.core.server.security;
 
-import io.kneo.core.model.user.AnonymousUser;
-import io.kneo.core.repository.exception.DocumentHasNotFoundException;
-import io.kneo.core.repository.exception.DocumentModificationAccessException;
-import io.kneo.core.repository.exception.UserNotFoundException;
-import io.kneo.core.repository.exception.ext.UserAlreadyExistsException;
 import io.vertx.core.Handler;
 import io.vertx.core.json.Json;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.pgclient.PgException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.ConnectException;
 import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.UUID;
 
 public class GlobalErrorHandler implements Handler<RoutingContext> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalErrorHandler.class);
-    private static final String CONTENT_TYPE = "Content-Type";
-    private static final String JSON_TYPE = "application/json";
 
-    private final Map<Class<? extends Throwable>, ErrorResponse> errorMappings = Map.of(
-            DocumentHasNotFoundException.class, new ErrorResponse(ErrorResponse.ErrorCode.DOCUMENT_NOT_FOUND, "Document not found"),
-            UserNotFoundException.class, new ErrorResponse(ErrorResponse.ErrorCode.USER_NOT_FOUND, "User not found"),
-            UserAlreadyExistsException.class, new ErrorResponse(ErrorResponse.ErrorCode.USER_EXISTS, "User already exists"),
-            DocumentModificationAccessException.class, new ErrorResponse(ErrorResponse.ErrorCode.DOCUMENT_ACCESS_DENIED, "Access denied"),
-            ConnectException.class, new ErrorResponse(ErrorResponse.ErrorCode.CONNECTION_ERROR, "Connection error"),
-            PgException.class, new ErrorResponse(ErrorResponse.ErrorCode.DATABASE_ERROR, "Database error"),
-            NoSuchElementException.class, new ErrorResponse(ErrorResponse.ErrorCode.RESOURCE_NOT_AVAILABLE, "Resource not available")
-    );
+    @Override
+    public void handle(RoutingContext ctx) {
+        Throwable failure = ctx.failure();
+        int status = ctx.statusCode();
 
-    public void handle(RoutingContext context) {
-        Throwable failure = context.failure();
-        int statusCode = context.statusCode();
-        String userName = "undefined";
-        if (context.user() != null && context.user().containsKey("username")) {
-            userName = context.user().attributes().getMap().get("username").toString();
-            if (userName.isEmpty()) {
-                userName = AnonymousUser.USER_NAME;
-            }
+        if (status <= 0) {
+            status = failure != null ? 500 : 404;
         }
 
-        String contentLength = context.request().getHeader("Content-Length");
-        String contentType = context.request().getHeader("Content-Type");
-        String requestPath = context.request().uri();
-        String method = context.request().method().toString();
-        LOGGER.info("GlobalErrorHandler triggered - Method: {}, Path: {}, Status: {}, Content-Length: {}, Content-Type: {}, User: {}", new Object[]{method, requestPath, statusCode, contentLength, contentType, userName});
+        String errorId = UUID.randomUUID().toString();
 
-        if (failure == null) {
-            if (statusCode != -1) {
-                LOGGER.warn("HTTP error detected - Status: {}, Path: {}, Content-Length: {}", new Object[]{statusCode, requestPath, contentLength});
-                if (statusCode == 413) {
-                    LOGGER.error("File upload rejected - Payload too large. Status: 413, Path: {}, Content-Length: {}", requestPath, contentLength);
-                    //this.sendErrorResponse(context, new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "File size exceeds server limits"));
-                    context.response()
-                            .setStatusCode(413)
-                            .putHeader(CONTENT_TYPE, JSON_TYPE)
-                            .putHeader("Connection", "close")
-                            .end(Json.encode(Map.of(
-                                    "status", 413,
-                                    "error", Map.of(
-                                            "code", "PAYLOAD_TOO_LARGE",
-                                            "message", "File size exceeds server limits",
-                                            "actualSize", contentLength != null ? contentLength : "unknown"
-                                    )
-                            )));
-                    return;
-                } else {
-                    ErrorResponse response = this.createHttpStatusErrorResponse(statusCode);
-                    this.sendErrorResponse(context, response);
-                }
-            } else {
-                LOGGER.warn("Global error handler called with null failure and no status code for path: {} user: {}", requestPath, userName);
-                this.sendErrorResponse(context, new ErrorResponse(ErrorResponse.ErrorCode.UNKNOWN_ERROR, "Internal server error"));
-            }
+        if (failure != null) {
+            LOGGER.error("ErrorId {} | Path {} | Status {}", errorId, ctx.normalizedPath(), status, failure);
         } else {
-            Throwable rootCause = this.getRootCause(failure);
-
-            ErrorResponse response;
-            if (rootCause instanceof IllegalArgumentException) {
-                response = handleIllegalArgumentException(rootCause);
-            } else {
-                response = (ErrorResponse)this.errorMappings.entrySet().stream()
-                        .filter((entry) -> (entry.getKey()).isInstance(rootCause))
-                        .map(Map.Entry::getValue)
-                        .findFirst()
-                        .orElse(new ErrorResponse(ErrorResponse.ErrorCode.UNKNOWN_ERROR, "Internal server error"));
-            }
-
-            if (response.isLogError()) {
-                LOGGER.error("Global error handler - Critical error: ", failure);
-            } else if (response.getStatus() >= 400 && response.getStatus() < 500) {
-                LOGGER.warn("Global error handler - Client error: {} - {}, user: {}, path: {}", new Object[]{response.getCode(), failure.getMessage(), userName, requestPath, failure});
-            } else {
-                Object[] errBody = new Object[]{response.getCode(), failure.getMessage(), requestPath, null, null};
-                String simpleName = rootCause.getClass().getSimpleName();
-                errBody[3] = simpleName + ": " + rootCause.getMessage();
-                errBody[4] = failure;
-                LOGGER.error("Global error handler - Server error: {} - {}, path: {}, rootCause: {}", errBody);
-            }
-
-            this.sendErrorResponse(context, response);
+            LOGGER.warn("ErrorId {} | Path {} | Status {}", errorId, ctx.normalizedPath(), status);
         }
+
+        ctx.response()
+                .setStatusCode(status)
+                .putHeader("Content-Type", "application/json")
+                .end(Json.encode(Map.of(
+                        "status", status,
+                        "error", failure != null ? failure.getMessage() : defaultMessage(status),
+                        "path", ctx.normalizedPath(),
+                        "errorId", errorId
+                )));
     }
 
-    private ErrorResponse handleIllegalArgumentException(Throwable rootCause) {
-        String message = rootCause.getMessage();
-        if (message != null) {
-            if (message.contains("Username is null or empty")) {
-                return new ErrorResponse(ErrorResponse.ErrorCode.UNAUTHORIZED, "Authentication required");
-            } else if (message.contains("JSON") || message.contains("json")) {
-                return new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "Invalid request format");
-            } else if (message.contains("Request body")) {
-                return new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "Invalid request body");
-            } else if (message.contains("Invalid entity ID") || message.contains("Invalid filename")) {
-                return new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "Invalid input parameters");
-            }
-        }
-        return new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "Bad request");
-    }
-
-    private ErrorResponse createHttpStatusErrorResponse(int statusCode) {
-        return switch (statusCode) {
-            case 400 -> new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "Bad Request");
-            case 401 -> new ErrorResponse(ErrorResponse.ErrorCode.UNAUTHORIZED, "Unauthorized");
-            case 403 -> new ErrorResponse(ErrorResponse.ErrorCode.FORBIDDEN, "Forbidden");
-            case 404 -> new ErrorResponse(ErrorResponse.ErrorCode.DOCUMENT_NOT_FOUND, "Not Found");
-            case 413 -> new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "Payload Too Large");
-            case 415 -> new ErrorResponse(ErrorResponse.ErrorCode.INVALID_REQUEST, "Unsupported Media Type");
-            case 500 -> new ErrorResponse(ErrorResponse.ErrorCode.INTERNAL_SERVER_ERROR, "Internal Server Error");
-            case 502 -> new ErrorResponse(ErrorResponse.ErrorCode.CONNECTION_ERROR, "Bad Gateway");
-            case 503 -> new ErrorResponse(ErrorResponse.ErrorCode.SERVICE_UNAVAILABLE, "Service Unavailable");
-            default -> new ErrorResponse(ErrorResponse.ErrorCode.UNKNOWN_ERROR, "HTTP Error " + statusCode);
+    private String defaultMessage(int status) {
+        return switch (status) {
+            case 404 -> "Resource not found";
+            case 403 -> "Access denied";
+            case 405 -> "Method not allowed";
+            case 413 -> "Payload too large";
+            default -> "Unexpected server error";
         };
     }
 
-    private Throwable getRootCause(Throwable throwable) {
-        if (throwable == null) {
-            return null;
-        }
-        return throwable.getCause() != null ? getRootCause(throwable.getCause()) : throwable;
-    }
-
-    private void sendErrorResponse(RoutingContext context, ErrorResponse response) {
-        var errorResponse = Map.of(
-                "status", response.getStatus(),
-                "error", Map.of(
-                        "code", response.getCode(),
-                        "message", response.getMessage(),
-                        "details", response.getDetails(),
-                        "timestamp", System.currentTimeMillis(),
-                        "path", context.request().uri(),
-                        "method", context.request().method().toString(),
-                        "trace", context.failure() != null ? context.failure().getMessage() : "No error trace available"
-                )
-        );
-
-        context.response()
-                .setStatusCode(response.getStatus())
-                .putHeader(CONTENT_TYPE, JSON_TYPE)
-                .end(Json.encode(errorResponse));
-    }
 }

@@ -92,6 +92,7 @@ public class LabelRepository extends AsyncRepository {
         setDefaultFields(doc, row);
         doc.setIdentifier(row.getString("identifier"));
         doc.setColor(row.getString("color"));
+        doc.setFontColor(row.getString("font_color"));
         doc.setCategory(row.getString("category"));
         doc.setHidden(row.getBoolean("hidden"));
         doc.setParent(row.getUUID("parent"));
@@ -100,8 +101,8 @@ public class LabelRepository extends AsyncRepository {
     }
 
     public Uni<Label> insert(Label doc, IUser user) {
-        String sql = String.format("INSERT INTO %s (id, author, reg_date, last_mod_user, last_mod_date, identifier, color, category, parent, hidden, loc_name) " +
-                        "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id",
+        String sql = String.format("INSERT INTO %s (id, author, reg_date, last_mod_user, last_mod_date, identifier, color, font_color, category, parent, hidden, loc_name) " +
+                        "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id",
                 entityData.getTableName());
 
         JsonObject localizedNameJson = JsonObject.mapFrom(doc.getLocalizedName());
@@ -115,6 +116,7 @@ public class LabelRepository extends AsyncRepository {
                 .addLocalDateTime(now)
                 .addString(doc.getIdentifier())
                 .addString(doc.getColor())
+                .addString(doc.getFontColor())
                 .addString(doc.getCategory())
                 .addUUID(doc.getParent())
                 .addBoolean(doc.isHidden())
@@ -129,12 +131,13 @@ public class LabelRepository extends AsyncRepository {
     }
 
     public Uni<Label> update(UUID id, Label doc, IUser user) {
-        String sql = String.format("UPDATE %s SET %s=$1, %s=$2, %s=$3, %s=$4, %s=$5, %s=$6, %s=$7, %s=$8 WHERE id=$9",
+        String sql = String.format("UPDATE %s SET %s=$1, %s=$2, %s=$3, %s=$4, %s=$5, %s=$6, %s=$7, %s=$8, %s=$9 WHERE id=$10",
                 entityData.getTableName(),
                 COLUMN_LAST_MOD_USER,
                 COLUMN_LAST_MOD_DATE,
                 COLUMN_IDENTIFIER,
                 "color",
+                "font_color",
                 "category",
                 "parent",
                 "hidden",
@@ -147,6 +150,7 @@ public class LabelRepository extends AsyncRepository {
                 .addLocalDateTime(now)
                 .addString(doc.getIdentifier())
                 .addString(doc.getColor())
+                .addString(doc.getFontColor())
                 .addString(doc.getCategory())
                 .addUUID(doc.getParent())
                 .addBoolean(doc.isHidden())

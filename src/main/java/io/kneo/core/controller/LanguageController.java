@@ -40,12 +40,10 @@ public class LanguageController extends AbstractSecuredController<Language, Lang
     public void setupRoutes(Router router) {
         String path = "/api/languages";
 
-        BodyHandler jsonBodyHandler = BodyHandler.create().setHandleFileUploads(false);
-
         router.route(path + "*").handler(this::addHeaders);
         router.route(HttpMethod.GET, path).handler(this::get);
         router.route(HttpMethod.GET, path + "/:id").handler(this::getById);
-        router.route(HttpMethod.POST, path + "/:id?").handler(jsonBodyHandler).handler(this::upsert);
+        router.route(HttpMethod.POST, path + "/:id?").handler(this::upsert);
         router.route(HttpMethod.DELETE, path + "/:id").handler(this::delete);
     }
 
