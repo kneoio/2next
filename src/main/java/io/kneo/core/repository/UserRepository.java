@@ -113,6 +113,13 @@ public class UserRepository extends AsyncRepository {
                 .onItem().transform(iterator -> iterator.hasNext() ? from(iterator.next()) : UndefinedUser.Build());
     }
 
+    public Uni<IUser> findByTelegramId(String id) {
+        return client.preparedQuery("SELECT * FROM _users WHERE telegram_name = $1")
+                .execute(Tuple.of(id))
+                .onItem().transform(RowSet::iterator)
+                .onItem().transform(iterator -> iterator.hasNext() ? from(iterator.next()) : UndefinedUser.Build());
+    }
+
     public Uni<Long> findByIdentifier(String userName) {
         if (userName == null) {
             return Uni.createFrom().item(AnonymousUser.ID);

@@ -83,6 +83,10 @@ public class UserService {
         return repository.findByLogin(login);
     }
 
+    public Uni<IUser> findByTelegramIdLogin(String id) {
+        return repository.findByTelegramId(id);
+    }
+
     public Uni<Optional<IUser>> findById(long id) {
         return repository.findById(id);
     }
