@@ -83,7 +83,7 @@ public class UserService {
         return repository.findByLogin(login);
     }
 
-    public Uni<IUser> findByTelegramIdLogin(String id) {
+    public Uni<IUser> findByTelegramId(String id) {
         return repository.findByTelegramId(id);
     }
 
