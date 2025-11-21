@@ -7,8 +7,10 @@ import io.kneo.core.repository.exception.DocumentModificationAccessException;
 import io.kneo.core.service.AbstractService;
 import io.kneo.core.service.IRESTService;
 import io.kneo.core.service.UserService;
+import io.kneo.core.util.WebHelper;
 import io.kneo.officeframe.dto.LabelDTO;
 import io.kneo.officeframe.model.Label;
+import io.kneo.officeframe.dto.LabelFilterDTO;
 import io.kneo.officeframe.repository.LabelRepository;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -37,8 +39,21 @@ public class LabelService extends AbstractService<Label, LabelDTO> implements IR
                 ).andFailFast());
     }
 
+    public Uni<List<LabelDTO>> getAll(final int limit, final int offset, LabelFilterDTO filter, LanguageCode languageCode) {
+        return repository.getAll(limit, offset, filter)
+                .chain(labels -> Uni.join().all(
+                        labels.stream()
+                                .map(this::mapToDTO)
+                                .collect(Collectors.toList())
+                ).andFailFast());
+    }
+
     public Uni<Integer> getAllCount(IUser user) {
         return repository.getAllCount();
+    }
+
+    public Uni<Integer> getAllCount(IUser user, LabelFilterDTO filter) {
+        return repository.getAllCount(filter);
     }
 
     public Uni<List<LabelDTO>> getOfCategory(String categoryName, LanguageCode languageCode) {
@@ -82,8 +97,9 @@ public class LabelService extends AbstractService<Label, LabelDTO> implements IR
         doc.setHidden(dto.isHidden());
         doc.setColor(dto.getColor());
         doc.setFontColor(dto.getFontColor());
+        doc.setIdentifier(WebHelper.generateSlug(dto.getLocalizedName()));
 
-        if (id == null) {
+        if ("new".equalsIgnoreCase(id) || id == null) {
             return repository.insert(doc, user).chain(this::mapToDTO);
         } else {
             return repository.update(UUID.fromString(id), doc, user).chain(this::mapToDTO);
@@ -114,6 +130,6 @@ public class LabelService extends AbstractService<Label, LabelDTO> implements IR
 
     @Override
     public Uni<Integer> delete(String id, IUser user) {
-        return null;
+        return repository.delete(UUID.fromString(id));
     }
 }

@@ -9,9 +9,9 @@ import io.kneo.core.dto.view.ViewPage;
 import io.kneo.core.localization.LanguageCode;
 import io.kneo.core.service.UserService;
 import io.kneo.core.util.RuntimeUtil;
-import io.kneo.officeframe.dto.PositionDTO;
-import io.kneo.officeframe.model.Position;
-import io.kneo.officeframe.service.PositionService;
+import io.kneo.officeframe.dto.GenreDTO;
+import io.kneo.officeframe.model.Genre;
+import io.kneo.officeframe.service.GenreService;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
@@ -24,34 +24,34 @@ import jakarta.inject.Inject;
 import java.util.UUID;
 
 @ApplicationScoped
-public class PositionController extends AbstractSecuredController<Position, PositionDTO> {
+public class GenreController extends AbstractSecuredController<Genre, GenreDTO> {
 
     @Inject
-    PositionService service;
+    GenreService service;
 
-    public PositionController() {
+    public GenreController() {
         super(null);
     }
 
     @Inject
-    public PositionController(UserService userService, PositionService service) {
+    public GenreController(UserService userService, GenreService service) {
         super(userService);
         this.service = service;
     }
 
     public void setupRoutes(Router router) {
-        String path = "/api/positions";
+        String path = "/api/genres";
 
         BodyHandler jsonBodyHandler = BodyHandler.create().setHandleFileUploads(false);
 
         router.route(path + "*").handler(this::addHeaders);
-        router.route(HttpMethod.GET, path).handler(this::get);
-        router.route(HttpMethod.GET, path + "/:id").handler(this::getById);
+        router.route(HttpMethod.GET, path).handler(this::getAll);
+        router.route(HttpMethod.GET, path + "/:id").handler(this::get);
         router.route(HttpMethod.POST, path + "/:id?").handler(jsonBodyHandler).handler(this::upsert);
         router.route(HttpMethod.DELETE, path + "/:id").handler(this::delete);
     }
 
-    private void get(RoutingContext rc) {
+    private void getAll(RoutingContext rc) {
         int page = Integer.parseInt(rc.request().getParam("page", "1"));
         int size = Integer.parseInt(rc.request().getParam("size", "10"));
         LanguageCode languageCode = resolveLanguage(rc);
@@ -62,7 +62,8 @@ public class PositionController extends AbstractSecuredController<Position, Posi
                         service.getAll(size, (page - 1) * size, languageCode)
                 ).asTuple().map(tuple -> {
                     ViewPage viewPage = new ViewPage();
-                    View<PositionDTO> dtoEntries = new View<>(tuple.getItem2(),
+                    viewPage.addPayload(PayloadType.CONTEXT_ACTIONS, new ActionBox());
+                    View<GenreDTO> dtoEntries = new View<>(tuple.getItem2(),
                             tuple.getItem1(), page,
                             RuntimeUtil.countMaxPage(tuple.getItem1(), size),
                             size);
@@ -75,14 +76,14 @@ public class PositionController extends AbstractSecuredController<Position, Posi
                 );
     }
 
-    private void getById(RoutingContext rc) {
+    private void get(RoutingContext rc) {
         String id = rc.pathParam("id");
         LanguageCode languageCode = resolveLanguage(rc);
 
         getContextUser(rc)
                 .chain(user -> {
                     if ("new".equals(id)) {
-                        PositionDTO dto = new PositionDTO();
+                        GenreDTO dto = new GenreDTO();
                         dto.setAuthor(user.getUserName());
                         dto.setLastModifier(user.getUserName());
                         return Uni.createFrom().item(dto);
@@ -108,16 +109,16 @@ public class PositionController extends AbstractSecuredController<Position, Posi
                 return;
             }
 
-            PositionDTO dto = json.mapTo(PositionDTO.class);
+            GenreDTO dto = json.mapTo(GenreDTO.class);
             String id = rc.pathParam("id");
             LanguageCode languageCode = resolveLanguage(rc);
 
-            getContextUser(rc)
+            getContextUser(rc, false, false)
                     .chain(user -> service.upsert(id, dto, user, languageCode))
                     .subscribe().with(
-                            doc -> rc.response()
+                            genre -> rc.response()
                                     .setStatusCode(id == null ? 201 : 200)
-                                    .end(JsonObject.mapFrom(doc).encode()),
+                                    .end(JsonObject.mapFrom(genre).encode()),
                             throwable -> handleFailure(rc, throwable)
                     );
 
@@ -129,7 +130,7 @@ public class PositionController extends AbstractSecuredController<Position, Posi
     private void delete(RoutingContext rc) {
         String id = rc.pathParam("id");
 
-        getContextUser(rc)
+        getContextUser(rc, false, false)
                 .chain(user -> service.delete(id, user))
                 .subscribe().with(
                         count -> rc.response().setStatusCode(count > 0 ? 204 : 404).end(),

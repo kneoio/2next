@@ -1,5 +1,6 @@
 package io.kneo.core.dto.document;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -15,6 +17,13 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 public class UserDTO {
+    long id;
+    String author;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm")
+    ZonedDateTime regDate;
+    String lastModifier;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm")
+    protected ZonedDateTime lastModifiedDate;
     @NotNull
     String identifier;
     @NotNull

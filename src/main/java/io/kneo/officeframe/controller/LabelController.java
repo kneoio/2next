@@ -10,6 +10,7 @@ import io.kneo.core.localization.LanguageCode;
 import io.kneo.core.service.UserService;
 import io.kneo.core.util.RuntimeUtil;
 import io.kneo.officeframe.dto.LabelDTO;
+import io.kneo.officeframe.dto.LabelFilterDTO;
 import io.kneo.officeframe.model.Label;
 import io.kneo.officeframe.service.LabelService;
 import io.smallrye.mutiny.Uni;
@@ -57,11 +58,21 @@ public class LabelController extends AbstractSecuredController<Label, LabelDTO> 
         int page = Integer.parseInt(rc.request().getParam("page", "1"));
         int size = Integer.parseInt(rc.request().getParam("size", "10"));
         LanguageCode languageCode = resolveLanguage(rc);
+        String category = rc.request().getParam("category");
+        String identifier = rc.request().getParam("identifier");
+
+        LabelFilterDTO filter = new LabelFilterDTO();
+        if (category != null && !category.isBlank()) {
+            filter.setCategory(category);
+        }
+        if (identifier != null && !identifier.isBlank()) {
+            filter.setIdentifier(identifier);
+        }
 
         getContextUser(rc)
                 .chain(user -> Uni.combine().all().unis(
-                        service.getAllCount(user),
-                        service.getAll(size, (page - 1) * size, languageCode)
+                        service.getAllCount(user, filter),
+                        service.getAll(size, (page - 1) * size, filter, languageCode)
                 ).asTuple().map(tuple -> {
                     ViewPage viewPage = new ViewPage();
                     viewPage.addPayload(PayloadType.CONTEXT_ACTIONS, new ActionBox());
@@ -151,13 +162,13 @@ public class LabelController extends AbstractSecuredController<Label, LabelDTO> 
             String id = rc.pathParam("id");
             LanguageCode languageCode = resolveLanguage(rc);
 
-            getContextUser(rc)
+            getContextUser(rc, false, false)
                     .chain(user -> service.upsert(id, dto, user, languageCode))
                     .subscribe().with(
                             label -> rc.response()
                                     .setStatusCode(id == null ? 201 : 200)
                                     .end(JsonObject.mapFrom(label).encode()),
-                            rc::fail
+                            throwable -> handleFailure(rc, throwable)
                     );
 
         } catch (Exception e) {
@@ -168,11 +179,11 @@ public class LabelController extends AbstractSecuredController<Label, LabelDTO> 
     private void delete(RoutingContext rc) {
         String id = rc.pathParam("id");
 
-        getContextUser(rc)
+        getContextUser(rc, false, false)
                 .chain(user -> service.delete(id, user))
                 .subscribe().with(
                         count -> rc.response().setStatusCode(count > 0 ? 204 : 404).end(),
-                        rc::fail
+                        throwable -> handleFailure(rc, throwable)
                 );
     }
 }

@@ -11,6 +11,7 @@ public class OfficeFrameNameResolver extends TableNameResolver {
     public static final String POSITION = "position";
     public static final String TASK_TYPE = "task_type";
     public static final String ORG_CATEGORY = "org_category";
+    public static final String GENRE = "genre";
 
     private static final String ORGANIZATION_TABLE_NAME = "__organizations";
     private static final String EMPLOYEE_TABLE_NAME = "__employees";
@@ -19,6 +20,7 @@ public class OfficeFrameNameResolver extends TableNameResolver {
     private static final String POSITION_TABLE_NAME = "__positions";
     private static final String TASK_TYPE_TABLE_NAME = "__task_types";
     private static final String ORG_CATEGORY_TABLE_NAME = "__org_categories";
+    private static final String GENRE_TABLE_NAME = "__genres";
 
     public EntityData getEntityNames(String type) {
         return switch (type) {
@@ -29,6 +31,7 @@ public class OfficeFrameNameResolver extends TableNameResolver {
             case POSITION -> new EntityData(String.join(".", DEFAULT_SCHEMA, POSITION_TABLE_NAME));
             case TASK_TYPE -> new EntityData(String.join(".", DEFAULT_SCHEMA, TASK_TYPE_TABLE_NAME));
             case ORG_CATEGORY -> new EntityData(String.join(".", DEFAULT_SCHEMA, ORG_CATEGORY_TABLE_NAME));
+            case GENRE -> new EntityData(String.join(".", DEFAULT_SCHEMA, GENRE_TABLE_NAME));
             default -> super.getEntityNames(type);
         };
     }

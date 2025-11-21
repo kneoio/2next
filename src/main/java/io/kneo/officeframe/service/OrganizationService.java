@@ -85,8 +85,8 @@ public class OrganizationService extends AbstractService<Organization, Organizat
         doc.setPrimary(dto.isPrimary());
         doc.setLocalizedName(dto.getLocalizedName());
 
-        if (id == null) {
-            return repository.insert(doc, AnonymousUser.build()).chain(this::mapToDTO);
+        if ("new".equalsIgnoreCase(id) || id == null) {
+            return repository.insert(doc, user).chain(this::mapToDTO);
         } else {
             return repository.update(UUID.fromString(id), doc, user).chain(this::mapToDTO);
         }

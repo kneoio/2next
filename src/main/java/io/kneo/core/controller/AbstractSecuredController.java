@@ -52,6 +52,7 @@ public abstract class AbstractSecuredController<T, V> extends AbstractController
                 .end(errorResponse.encode());
     }
 
+    //used
     protected boolean validateJsonBody(RoutingContext rc) {
         JsonObject json = rc.body().asJsonObject();
         if (json == null) {

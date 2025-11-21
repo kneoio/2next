@@ -133,7 +133,7 @@ public class EmployeeService extends AbstractService<Employee, EmployeeDTO> impl
         doc.setBirthDate(dto.getBirthDate());
 
         assert repository != null;
-        if (id == null) {
+        if ("new".equalsIgnoreCase(id) || id == null) {
             return repository.insert(doc, user).chain(this::mapToDTO);
         } else {
             return repository.update(UUID.fromString(id), doc, user).chain(this::mapToDTO);

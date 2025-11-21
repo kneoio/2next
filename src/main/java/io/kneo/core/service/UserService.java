@@ -142,18 +142,51 @@ public class UserService {
         });
     }
 
-    public Uni<Long> upsert(String id, UserDTO userDTO) {
+    public Uni<Long> upsert(String id, UserDTO userDTO, IUser actor) {
         User user = new User();
         user.setLogin(userDTO.getLogin());
-        user.setEmail(userDTO.getEmail());
+        user.setEmail(userDTO.getEmail() != null ? userDTO.getEmail() : userDTO.getLogin() + "_place_holder@kneo.io");
 
-        return repository.insert(user, SuperUser.build());
+        if (id == null || "new".equalsIgnoreCase(id)) {
+            return repository.insert(user, actor);
+        } else {
+            try {
+                user.setId(Long.parseLong(id));
+            } catch (NumberFormatException e) {
+                return Uni.createFrom().failure(e);
+            }
+            return repository.update(user, actor);
+        }
     }
 
 
     public Uni<Long> delete(String id) {
         assert repository != null;
         return repository.delete(Long.valueOf(id));
+    }
+
+    public Uni<UserDTO> getDTO(long id, IUser requester, io.kneo.core.localization.LanguageCode languageCode) {
+        return repository.get(id).chain(opt -> {
+            if (opt.isEmpty()) {
+                return Uni.createFrom().failure(new IllegalArgumentException("User not found"));
+            }
+            IUser iu = opt.get();
+            if (iu instanceof User) {
+                return mapToDTO((User) iu);
+            } else {
+                UserDTO dto = new UserDTO();
+                try {
+                    dto.setName(iu.getUserName());
+                } catch (Exception ignored) {}
+                try {
+                    dto.setLogin(iu.getLogin());
+                } catch (Exception ignored) {}
+                try {
+                    dto.setEmail(iu.getEmail());
+                } catch (Exception ignored) {}
+                return Uni.createFrom().item(dto);
+            }
+        });
     }
 
     private <T extends SimpleReferenceEntity> List<T> getAllValidReferences(List<T> allAvailable, List<String> provided) {

@@ -122,7 +122,7 @@ public class OrgCategoryController extends AbstractSecuredController<OrgCategory
                             doc -> rc.response()
                                     .setStatusCode(id == null ? 201 : 200)
                                     .end(JsonObject.mapFrom(doc).encode()),
-                            rc::fail
+                            throwable -> handleFailure(rc, throwable)
                     );
 
         } catch (Exception e) {
@@ -137,10 +137,7 @@ public class OrgCategoryController extends AbstractSecuredController<OrgCategory
                 .chain(user -> service.delete(id, user))
                 .subscribe().with(
                         count -> rc.response().setStatusCode(count > 0 ? 204 : 404).end(),
-                        failure -> {
-                            LOGGER.error("Error processing delete request: ", failure);
-                            rc.fail(500, failure);
-                        }
+                        throwable -> handleFailure(rc, throwable)
                 );
     }
 }

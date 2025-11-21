@@ -1,17 +1,15 @@
-package io.kneo.officeframe.controller;
+package io.kneo.core.controller;
 
-import io.kneo.core.controller.AbstractSecuredController;
-import io.kneo.core.dto.actions.ActionBox;
 import io.kneo.core.dto.cnst.PayloadType;
+import io.kneo.core.dto.document.AgreementDTO;
 import io.kneo.core.dto.form.FormPage;
 import io.kneo.core.dto.view.View;
 import io.kneo.core.dto.view.ViewPage;
 import io.kneo.core.localization.LanguageCode;
+import io.kneo.core.model.Agreement;
+import io.kneo.core.service.AgreementService;
 import io.kneo.core.service.UserService;
 import io.kneo.core.util.RuntimeUtil;
-import io.kneo.officeframe.dto.PositionDTO;
-import io.kneo.officeframe.model.Position;
-import io.kneo.officeframe.service.PositionService;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
@@ -24,45 +22,44 @@ import jakarta.inject.Inject;
 import java.util.UUID;
 
 @ApplicationScoped
-public class PositionController extends AbstractSecuredController<Position, PositionDTO> {
+public class AgreementController extends AbstractSecuredController<Agreement, AgreementDTO> {
 
     @Inject
-    PositionService service;
+    AgreementService service;
 
-    public PositionController() {
+    public AgreementController() {
         super(null);
     }
 
     @Inject
-    public PositionController(UserService userService, PositionService service) {
+    public AgreementController(UserService userService, AgreementService service) {
         super(userService);
         this.service = service;
     }
 
     public void setupRoutes(Router router) {
-        String path = "/api/positions";
+        String path = "/api/agreements";
 
         BodyHandler jsonBodyHandler = BodyHandler.create().setHandleFileUploads(false);
 
         router.route(path + "*").handler(this::addHeaders);
-        router.route(HttpMethod.GET, path).handler(this::get);
-        router.route(HttpMethod.GET, path + "/:id").handler(this::getById);
+        router.route(HttpMethod.GET, path).handler(this::getAll);
+        router.route(HttpMethod.GET, path + "/:id").handler(this::get);
         router.route(HttpMethod.POST, path + "/:id?").handler(jsonBodyHandler).handler(this::upsert);
         router.route(HttpMethod.DELETE, path + "/:id").handler(this::delete);
     }
 
-    private void get(RoutingContext rc) {
+    private void getAll(RoutingContext rc) {
         int page = Integer.parseInt(rc.request().getParam("page", "1"));
         int size = Integer.parseInt(rc.request().getParam("size", "10"));
-        LanguageCode languageCode = resolveLanguage(rc);
 
         getContextUser(rc)
                 .chain(user -> Uni.combine().all().unis(
                         service.getAllCount(user),
-                        service.getAll(size, (page - 1) * size, languageCode)
+                        service.getAll(size, (page - 1) * size, LanguageCode.en)
                 ).asTuple().map(tuple -> {
                     ViewPage viewPage = new ViewPage();
-                    View<PositionDTO> dtoEntries = new View<>(tuple.getItem2(),
+                    View<AgreementDTO> dtoEntries = new View<>(tuple.getItem2(),
                             tuple.getItem1(), page,
                             RuntimeUtil.countMaxPage(tuple.getItem1(), size),
                             size);
@@ -75,24 +72,22 @@ public class PositionController extends AbstractSecuredController<Position, Posi
                 );
     }
 
-    private void getById(RoutingContext rc) {
+    private void get(RoutingContext rc) {
         String id = rc.pathParam("id");
-        LanguageCode languageCode = resolveLanguage(rc);
 
         getContextUser(rc)
                 .chain(user -> {
                     if ("new".equals(id)) {
-                        PositionDTO dto = new PositionDTO();
+                        AgreementDTO dto = new AgreementDTO();
                         dto.setAuthor(user.getUserName());
                         dto.setLastModifier(user.getUserName());
                         return Uni.createFrom().item(dto);
                     }
-                    return service.getDTO(UUID.fromString(id), user, languageCode);
+                    return service.getDTO(UUID.fromString(id), user, LanguageCode.en);
                 })
                 .subscribe().with(
                         dto -> {
                             FormPage page = new FormPage();
-                            page.addPayload(PayloadType.CONTEXT_ACTIONS, new ActionBox());
                             page.addPayload(PayloadType.DOC_DATA, dto);
                             rc.response().setStatusCode(200).end(JsonObject.mapFrom(page).encode());
                         },
@@ -108,12 +103,11 @@ public class PositionController extends AbstractSecuredController<Position, Posi
                 return;
             }
 
-            PositionDTO dto = json.mapTo(PositionDTO.class);
+            AgreementDTO dto = json.mapTo(AgreementDTO.class);
             String id = rc.pathParam("id");
-            LanguageCode languageCode = resolveLanguage(rc);
 
-            getContextUser(rc)
-                    .chain(user -> service.upsert(id, dto, user, languageCode))
+            getContextUser(rc, false, false)
+                    .chain(user -> service.upsert(id, dto, user, LanguageCode.en))
                     .subscribe().with(
                             doc -> rc.response()
                                     .setStatusCode(id == null ? 201 : 200)
@@ -129,7 +123,7 @@ public class PositionController extends AbstractSecuredController<Position, Posi
     private void delete(RoutingContext rc) {
         String id = rc.pathParam("id");
 
-        getContextUser(rc)
+        getContextUser(rc, false, false)
                 .chain(user -> service.delete(id, user))
                 .subscribe().with(
                         count -> rc.response().setStatusCode(count > 0 ? 204 : 404).end(),

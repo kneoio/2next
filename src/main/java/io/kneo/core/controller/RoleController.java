@@ -121,7 +121,7 @@ public class RoleController extends AbstractSecuredController<Role, RoleDTO> {
                             result -> rc.response()
                                     .setStatusCode(id == null || "new".equals(id) ? 201 : 200)
                                     .end(),
-                            rc::fail
+                            throwable -> handleFailure(rc, throwable)
                     );
 
         } catch (Exception e) {
@@ -136,7 +136,7 @@ public class RoleController extends AbstractSecuredController<Role, RoleDTO> {
                 .chain(user -> service.delete(id))
                 .subscribe().with(
                         count -> rc.response().setStatusCode(count > 0 ? 204 : 404).end(),
-                        rc::fail
+                        throwable -> handleFailure(rc, throwable)
                 );
     }
 }

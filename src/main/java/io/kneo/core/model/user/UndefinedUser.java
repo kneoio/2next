@@ -12,6 +12,11 @@ public class UndefinedUser extends SystemAbstractUser {
         return USER_NAME;
     }
 
+    @Override
+    public String getLogin() {
+        return getUserName();
+    }
+
     public static IUser Build() {
         return new UndefinedUser();
     }

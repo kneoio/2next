@@ -18,12 +18,19 @@ public class SuperUser extends SystemAbstractUser {
     public String getUserName() {
         return USER_NAME;
     }
+
     @Override
     public List<IRole> getActivatedRoles() {
         return  Collections.singletonList(new Role.Builder()
                 .setIdentifier(SystemRoleType.SUPERVISOR.getName())
                 .build()) ;
     }
+
+    @Override
+    public String getLogin() {
+        return getUserName();
+    }
+
 
     public static SuperUser build() {
         return new SuperUser();

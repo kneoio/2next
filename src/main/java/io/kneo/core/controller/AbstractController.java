@@ -79,8 +79,6 @@ public abstract class AbstractController<T, V> extends BaseController {
 
     }
 
-
-
     @Deprecated
     protected Uni<Response> getAll(IRESTService<V> service, ContainerRequestContext requestContext, int page, int size) throws UserNotFoundException {
         IUser user = getUserId(requestContext);

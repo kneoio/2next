@@ -140,7 +140,7 @@ public class OrganizationController extends AbstractSecuredController<Organizati
                             organization -> rc.response()
                                     .setStatusCode(id == null ? 201 : 200)
                                     .end(JsonObject.mapFrom(organization).encode()),
-                            rc::fail
+                            throwable -> handleFailure(rc, throwable)
                     );
 
         } catch (Exception e) {
@@ -155,7 +155,7 @@ public class OrganizationController extends AbstractSecuredController<Organizati
                 .chain(user -> service.delete(id, user))
                 .subscribe().with(
                         count -> rc.response().setStatusCode(count > 0 ? 204 : 404).end(),
-                        rc::fail
+                        throwable -> handleFailure(rc, throwable)
                 );
     }
 }

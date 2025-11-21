@@ -3,6 +3,9 @@ package io.kneo.core.server;
 import io.kneo.core.controller.*;
 import io.kneo.core.server.security.GlobalErrorHandler;
 import io.kneo.officeframe.controller.LabelController;
+import io.kneo.core.controller.AgreementController;
+import io.kneo.core.controller.UserConsentController;
+import io.kneo.officeframe.controller.GenreController;
 import io.quarkus.runtime.ShutdownEvent;
 import io.smallrye.mutiny.Uni;
 import io.vertx.ext.web.Router;
@@ -33,6 +36,15 @@ public class AbstractApplicationInit {
     @Inject
     LabelController labelController;
 
+    @Inject
+    GenreController genreController;
+
+    @Inject
+    AgreementController agreementController;
+
+    @Inject
+    UserConsentController userConsentController;
+
 
 
     public AbstractApplicationInit(
@@ -55,6 +67,9 @@ public class AbstractApplicationInit {
         roleController.setupRoutes(router);
         workspaceController.setupRoutes(router);
         labelController.setupRoutes(router);
+        genreController.setupRoutes(router);
+        agreementController.setupRoutes(router);
+        userConsentController.setupRoutes(router);
     }
 
     protected void logRegisteredRoutes(Router router) {

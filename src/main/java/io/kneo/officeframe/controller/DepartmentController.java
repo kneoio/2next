@@ -140,7 +140,7 @@ public class DepartmentController extends AbstractSecuredController<Department, 
                             doc -> rc.response()
                                     .setStatusCode(id == null ? 201 : 200)
                                     .end(JsonObject.mapFrom(doc).encode()),
-                            rc::fail
+                            throwable -> handleFailure(rc, throwable)
                     );
 
         } catch (Exception e) {
@@ -161,7 +161,7 @@ public class DepartmentController extends AbstractSecuredController<Department, 
                 })
                 .subscribe().with(
                         count -> rc.response().setStatusCode(count > 0 ? 204 : 404).end(),
-                        rc::fail
+                        throwable -> handleFailure(rc, throwable)
                 );
     }
 }

@@ -1,6 +1,8 @@
 package io.kneo.core.model.user;
 
 import io.kneo.core.server.EnvConst;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.List;
 
 public interface IUser {
@@ -23,4 +25,6 @@ public interface IUser {
     default boolean isActive(){
         return true;
     }
+
+    @NotNull String getLogin();
 }

@@ -5,10 +5,14 @@ public class TableNameResolver implements ITableResolver{
     public static final String ROLE_ENTITY_NAME = "role";
     public static final String LANGUAGE_ENTITY_NAME = "lang";
     public static final String MODULE_ENTITY_NAME = "module";
+    public static final String AGREEMENT_ENTITY_NAME = "agreement";
+    public static final String USER_CONSENT_ENTITY_NAME = "user_consent";
     private static final String USER_TABLE_NAME = "_users";
     private static final String ROLE_TABLE_NAME = "_roles";
     private static final String LANGUAGES_TABLE_NAME = "_langs";
     private static final String MODULES_TABLE_NAME = "_modules";
+    private static final String AGREEMENTS_TABLE_NAME = "_agreements";
+    private static final String USER_CONSENTS_TABLE_NAME = "_user_consents";
     protected static final String DEFAULT_SCHEMA = "public";
 
     public EntityData getEntityNames(String type) {
@@ -17,6 +21,8 @@ public class TableNameResolver implements ITableResolver{
             case ROLE_ENTITY_NAME ->new EntityData(DEFAULT_SCHEMA + "." + ROLE_TABLE_NAME, null);
             case LANGUAGE_ENTITY_NAME -> new EntityData(DEFAULT_SCHEMA + "." + LANGUAGES_TABLE_NAME, null);
             case MODULE_ENTITY_NAME -> new EntityData(DEFAULT_SCHEMA + "." + MODULES_TABLE_NAME, null);
+            case AGREEMENT_ENTITY_NAME -> new EntityData(DEFAULT_SCHEMA + "." + AGREEMENTS_TABLE_NAME, null);
+            case USER_CONSENT_ENTITY_NAME -> new EntityData(DEFAULT_SCHEMA + "." + USER_CONSENTS_TABLE_NAME, null);
             default -> throw new IllegalStateException("Unexpected value: " + type);
         };
     }

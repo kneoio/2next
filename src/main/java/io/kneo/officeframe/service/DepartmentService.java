@@ -74,7 +74,7 @@ public class DepartmentService extends AbstractService<Department, DepartmentDTO
 
     public Uni<DepartmentDTO> upsert(String id, DepartmentDTO dto, IUser user, LanguageCode code) {
         Department doc = buildEntity(dto);
-        if (id == null) {
+        if ("new".equalsIgnoreCase(id) || id == null) {
             return map(repository.insert(doc, AnonymousUser.build()));
         } else {
             return map(repository.update(UUID.fromString(id), doc, user));

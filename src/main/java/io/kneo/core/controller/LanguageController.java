@@ -15,7 +15,6 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.handler.BodyHandler;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -111,7 +110,7 @@ public class LanguageController extends AbstractSecuredController<Language, Lang
                             doc -> rc.response()
                                     .setStatusCode(id == null ? 201 : 200)
                                     .end(JsonObject.mapFrom(doc).encode()),
-                            rc::fail
+                            throwable -> handleFailure(rc, throwable)
                     );
 
         } catch (Exception e) {
@@ -126,7 +125,7 @@ public class LanguageController extends AbstractSecuredController<Language, Lang
                 .chain(user -> service.delete(id, user))
                 .subscribe().with(
                         count -> rc.response().setStatusCode(count > 0 ? 204 : 404).end(),
-                        rc::fail
+                        throwable -> handleFailure(rc, throwable)
                 );
     }
 }

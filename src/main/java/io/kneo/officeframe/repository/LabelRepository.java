@@ -6,6 +6,7 @@ import io.kneo.core.repository.AsyncRepository;
 import io.kneo.core.repository.exception.DocumentHasNotFoundException;
 import io.kneo.core.repository.table.EntityData;
 import io.kneo.officeframe.model.Label;
+import io.kneo.officeframe.dto.LabelFilterDTO;
 import io.kneo.officeframe.repository.table.OfficeFrameNameResolver;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -46,8 +47,82 @@ public class LabelRepository extends AsyncRepository {
                 .collect().asList();
     }
 
+    public Uni<List<Label>> getAll(final int limit, final int offset, LabelFilterDTO filter) {
+        StringBuilder sql = new StringBuilder(BASE_REQUEST);
+        Tuple params = null;
+        boolean whereAdded = false;
+        int index = 0;
+
+        if (filter != null) {
+            if (filter.getCategory() != null && !filter.getCategory().isBlank()) {
+                index++;
+                sql.append(whereAdded ? " AND" : " WHERE").append(" category = $").append(index);
+                params = params == null ? Tuple.of(filter.getCategory()) : params.addString(filter.getCategory());
+                whereAdded = true;
+            }
+            if (filter.getIdentifier() != null && !filter.getIdentifier().isBlank()) {
+                String likeParam = "%" + filter.getIdentifier() + "%";
+                index++;
+                sql.append(whereAdded ? " AND" : " WHERE").append(" identifier ILIKE $").append(index);
+                params = params == null ? Tuple.of(likeParam) : params.addString(likeParam);
+                whereAdded = true;
+            }
+        }
+
+        if (limit > 0) {
+            sql.append(String.format(" LIMIT %s OFFSET %s", limit, offset));
+        }
+
+        if (params == null) {
+            return client.query(sql.toString())
+                    .execute()
+                    .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
+                    .onItem().transform(this::from)
+                    .collect().asList();
+        } else {
+            return client.preparedQuery(sql.toString())
+                    .execute(params)
+                    .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
+                    .onItem().transform(this::from)
+                    .collect().asList();
+        }
+    }
+
     public Uni<Integer> getAllCount() {
         return getAllCount(entityData.getTableName());
+    }
+
+    public Uni<Integer> getAllCount(LabelFilterDTO filter) {
+        StringBuilder sql = new StringBuilder(String.format("SELECT count(m.id) FROM %s as m", entityData.getTableName()));
+        Tuple params = null;
+        boolean whereAdded = false;
+        int index = 0;
+
+        if (filter != null) {
+            if (filter.getCategory() != null && !filter.getCategory().isBlank()) {
+                index++;
+                sql.append(whereAdded ? " AND" : " WHERE").append(" m.category = $").append(index);
+                params = params == null ? Tuple.of(filter.getCategory()) : params.addString(filter.getCategory());
+                whereAdded = true;
+            }
+            if (filter.getIdentifier() != null && !filter.getIdentifier().isBlank()) {
+                String likeParam = "%" + filter.getIdentifier() + "%";
+                index++;
+                sql.append(whereAdded ? " AND" : " WHERE").append(" m.identifier ILIKE $").append(index);
+                params = params == null ? Tuple.of(likeParam) : params.addString(likeParam);
+                whereAdded = true;
+            }
+        }
+
+        if (params == null) {
+            return client.preparedQuery(sql.toString())
+                    .execute()
+                    .onItem().transform(rows -> rows.iterator().next().getInteger(0));
+        } else {
+            return client.preparedQuery(sql.toString())
+                    .execute(params)
+                    .onItem().transform(rows -> rows.iterator().next().getInteger(0));
+        }
     }
 
     public Uni<List<Label>> getOfCategory(String categoryName) {
@@ -167,7 +242,10 @@ public class LabelRepository extends AsyncRepository {
                 });
     }
 
-    public int delete(Long id) {
-        return 1;
+    public Uni<Integer> delete(UUID id) {
+        String sql = String.format("DELETE FROM %s WHERE id=$1", entityData.getTableName());
+        return client.preparedQuery(sql)
+                .execute(Tuple.of(id))
+                .onItem().transform(rowSet -> rowSet.rowCount());
     }
 }

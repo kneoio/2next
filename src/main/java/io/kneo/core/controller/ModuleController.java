@@ -89,7 +89,7 @@ public class ModuleController extends AbstractSecuredController<Module, ModuleDT
                 .chain(user -> service.upsert(id, dto, user, languageCode))
                 .subscribe().with(
                         updated -> rc.response().setStatusCode(200).end(),
-                        rc::fail
+                        throwable -> handleFailure(rc, throwable)
                 );
     }
 
@@ -106,7 +106,7 @@ public class ModuleController extends AbstractSecuredController<Module, ModuleDT
                                 rc.fail(404);
                             }
                         },
-                        rc::fail
+                        throwable -> handleFailure(rc, throwable)
                 );
     }
 }

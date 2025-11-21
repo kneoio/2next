@@ -14,6 +14,11 @@ public class AnonymousUser extends SystemAbstractUser {
         return USER_NAME;
     }
 
+    @Override
+    public String getLogin() {
+        return getUserName();
+    }
+
     public static AnonymousUser build() {
         return new AnonymousUser();
     }

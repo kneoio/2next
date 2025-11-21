@@ -4,26 +4,59 @@ import io.kneo.core.dto.cnst.PayloadType;
 import io.kneo.core.dto.document.UserDTO;
 import io.kneo.core.dto.view.View;
 import io.kneo.core.dto.view.ViewPage;
+import io.kneo.core.dto.form.FormPage;
 import io.kneo.core.localization.LanguageCode;
 import io.kneo.core.model.user.User;
 import io.kneo.core.service.UserService;
 import io.kneo.core.util.RuntimeUtil;
 import io.smallrye.mutiny.Uni;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.BodyHandler;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
-public class UserController extends AbstractController<User, UserDTO> {
+public class UserController extends AbstractSecuredController<User, UserDTO> {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private UserService service;
 
     public UserController() {
         super(null);
+    }
+
+    private void getById(RoutingContext rc) {
+        String id = rc.pathParam("id");
+        LanguageCode languageCode = resolveLanguage(rc);
+
+        getContextUser(rc)
+                .chain(user -> {
+                    if ("new".equals(id)) {
+                        UserDTO dto = new UserDTO();
+                        dto.setAuthor(user.getUserName());
+                        dto.setLastModifier(user.getUserName());
+                        return Uni.createFrom().item(dto);
+                    }
+                    try {
+                        long userId = Long.parseLong(id);
+                        return service.getDTO(userId, user, languageCode);
+                    } catch (NumberFormatException e) {
+                        return Uni.createFrom().failure(new IllegalArgumentException("Invalid user id"));
+                    }
+                })
+                .subscribe().with(
+                        dto -> {
+                            FormPage page = new FormPage();
+                            page.addPayload(PayloadType.DOC_DATA, dto);
+                            rc.response().setStatusCode(200).end(JsonObject.mapFrom(page).encode());
+                        },
+                        rc::fail
+                );
     }
 
     @Inject
@@ -33,10 +66,14 @@ public class UserController extends AbstractController<User, UserDTO> {
     }
 
     public void setupRoutes(Router router) {
-        router.get("/api/users").handler(this::getAll);
-        router.post("/api/users").handler(this::create);
-        router.put("/api/users/:id").handler(this::update);
-        router.delete("/api/users/:id").handler(this::delete);
+        String path = "/api/users";
+        BodyHandler jsonBodyHandler = BodyHandler.create().setHandleFileUploads(false);
+
+        router.route(path + "*").handler(this::addHeaders);
+        router.route(HttpMethod.GET, path).handler(this::getAll);
+        router.route(HttpMethod.GET, path + "/:id").handler(this::getById);
+        router.route(HttpMethod.POST, path + "/:id?").handler(jsonBodyHandler).handler(this::upsert);
+        router.route(HttpMethod.DELETE, path + "/:id").handler(this::delete);
     }
 
     private void getAll(RoutingContext rc) {
@@ -63,54 +100,29 @@ public class UserController extends AbstractController<User, UserDTO> {
                 );
     }
 
-    private void create(RoutingContext rc) {
+    private void upsert(RoutingContext rc) {
         try {
-            JsonObject jsonObject = rc.getBodyAsJson();
-            UserDTO userDTO = jsonObject.mapTo(UserDTO.class);
+            JsonObject json = rc.body().asJsonObject();
+            if (json == null) {
+                rc.response().setStatusCode(400).end("Request body must be a valid JSON object");
+                return;
+            }
 
-            service.add(userDTO, false)
+            UserDTO dto = json.mapTo(UserDTO.class);
+            String id = rc.pathParam("id");
+
+            getContextUser(rc, false, false)
+                    .chain(u -> service.upsert(id, dto, u))
                     .subscribe().with(
-                            id -> rc.response()
-                                    .setStatusCode(201)
+                            ignored -> rc.response()
+                                    .setStatusCode(id == null ? 201 : 200)
                                     .end(),
-                            failure -> {
-                                LOGGER.error(failure.getMessage(), failure);
-                                rc.response()
-                                        .setStatusCode(500)
-                                        .end(failure.getMessage());
-                            }
+                            throwable -> handleFailure(rc, throwable)
                     );
+
         } catch (Exception e) {
             LOGGER.error("Error processing request: {}", e.getMessage());
-            rc.response()
-                    .setStatusCode(400)
-                    .end("Invalid request body");
-        }
-    }
-
-    private void update(RoutingContext rc) {
-        String id = rc.pathParam("id");
-        try {
-            JsonObject jsonObject = rc.getBodyAsJson();
-            UserDTO userDTO = jsonObject.mapTo(UserDTO.class);
-
-            service.upsert(id, userDTO)
-                    .subscribe().with(
-                            updatedId -> rc.response()
-                                    .setStatusCode(200)
-                                    .end(),
-                            failure -> {
-                                LOGGER.error(failure.getMessage(), failure);
-                                rc.response()
-                                        .setStatusCode(500)
-                                        .end(failure.getMessage());
-                            }
-                    );
-        } catch (Exception e) {
-            LOGGER.error("Error processing request: {}", e.getMessage());
-            rc.response()
-                    .setStatusCode(400)
-                    .end("Invalid request body");
+            rc.response().setStatusCode(400).end("Invalid request body");
         }
     }
 
@@ -118,14 +130,10 @@ public class UserController extends AbstractController<User, UserDTO> {
         String id = rc.pathParam("id");
         service.delete(id)
                 .subscribe().with(
-                        success -> rc.response()
-                                .setStatusCode(204)
-                                .end(),
+                        success -> rc.response().setStatusCode(204).end(),
                         failure -> {
                             LOGGER.error(failure.getMessage(), failure);
-                            rc.response()
-                                    .setStatusCode(500)
-                                    .end(failure.getMessage());
+                            rc.response().setStatusCode(500).end(failure.getMessage());
                         }
                 );
     }
