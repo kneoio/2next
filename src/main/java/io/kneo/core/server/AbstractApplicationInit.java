@@ -45,6 +45,14 @@ public class AbstractApplicationInit {
     @Inject
     UserConsentController userConsentController;
 
+    @Inject
+    UserBillingController userBillingController;
+
+    @Inject
+    UserSubscriptionController userSubscriptionController;
+
+    @Inject
+    SubscriptionProductController subscriptionProductController;
 
 
     public AbstractApplicationInit(
@@ -70,6 +78,9 @@ public class AbstractApplicationInit {
         genreController.setupRoutes(router);
         agreementController.setupRoutes(router);
         userConsentController.setupRoutes(router);
+        userBillingController.setupRoutes(router);
+        userSubscriptionController.setupRoutes(router);
+        subscriptionProductController.setupRoutes(router);
     }
 
     protected void logRegisteredRoutes(Router router) {
