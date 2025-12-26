@@ -7,7 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class LabelFilterDTO {
-    private String category;
+public class GenreFilterDTO {
     private String search;
 }

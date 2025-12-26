@@ -36,21 +36,12 @@ public class TaskTypeService extends AbstractService<TaskType, TaskTypeDTO> impl
                 ).andFailFast());
     }
 
-    @Override
-    public Uni<TaskTypeDTO> getDTOByIdentifier(String identifier) {
-        return repository.findByIdentifier(identifier).chain(this::mapToDTO);
-    }
-
     public Uni<Integer> getAllCount(IUser user) {
         return repository.getAllCount();
     }
 
     public Uni<TaskType> getById(UUID uuid) {
         return repository.findById(uuid);
-    }
-
-    public Uni<TaskType> getByIdentifier(String uuid) {
-        return repository.findByIdentifier(uuid);
     }
 
     @Override

@@ -14,6 +14,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowSet;
+import io.vertx.mutiny.sqlclient.SqlResult;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -60,8 +61,8 @@ public class LabelRepository extends AsyncRepository {
                 params = params == null ? Tuple.of(filter.getCategory()) : params.addString(filter.getCategory());
                 whereAdded = true;
             }
-            if (filter.getIdentifier() != null && !filter.getIdentifier().isBlank()) {
-                String likeParam = "%" + filter.getIdentifier() + "%";
+            if (filter.getSearch() != null && !filter.getSearch().isBlank()) {
+                String likeParam = "%" + filter.getSearch() + "%";
                 index++;
                 sql.append(whereAdded ? " AND" : " WHERE").append(" identifier ILIKE $").append(index);
                 params = params == null ? Tuple.of(likeParam) : params.addString(likeParam);
@@ -105,8 +106,8 @@ public class LabelRepository extends AsyncRepository {
                 params = params == null ? Tuple.of(filter.getCategory()) : params.addString(filter.getCategory());
                 whereAdded = true;
             }
-            if (filter.getIdentifier() != null && !filter.getIdentifier().isBlank()) {
-                String likeParam = "%" + filter.getIdentifier() + "%";
+            if (filter.getSearch() != null && !filter.getSearch().isBlank()) {
+                String likeParam = "%" + filter.getSearch() + "%";
                 index++;
                 sql.append(whereAdded ? " AND" : " WHERE").append(" m.identifier ILIKE $").append(index);
                 params = params == null ? Tuple.of(likeParam) : params.addString(likeParam);
@@ -246,6 +247,6 @@ public class LabelRepository extends AsyncRepository {
         String sql = String.format("DELETE FROM %s WHERE id=$1", entityData.getTableName());
         return client.preparedQuery(sql)
                 .execute(Tuple.of(id))
-                .onItem().transform(rowSet -> rowSet.rowCount());
+                .onItem().transform(SqlResult::rowCount);
     }
 }

@@ -10,6 +10,7 @@ import io.kneo.core.localization.LanguageCode;
 import io.kneo.core.service.UserService;
 import io.kneo.core.util.RuntimeUtil;
 import io.kneo.officeframe.dto.GenreDTO;
+import io.kneo.officeframe.dto.GenreFilterDTO;
 import io.kneo.officeframe.model.Genre;
 import io.kneo.officeframe.service.GenreService;
 import io.smallrye.mutiny.Uni;
@@ -55,11 +56,17 @@ public class GenreController extends AbstractSecuredController<Genre, GenreDTO> 
         int page = Integer.parseInt(rc.request().getParam("page", "1"));
         int size = Integer.parseInt(rc.request().getParam("size", "10"));
         LanguageCode languageCode = resolveLanguage(rc);
+        String search = rc.request().getParam("search");
+
+        GenreFilterDTO filter = new GenreFilterDTO();
+        if (search != null && !search.isBlank()) {
+            filter.setSearch(search);
+        }
 
         getContextUser(rc)
                 .chain(user -> Uni.combine().all().unis(
-                        service.getAllCount(user),
-                        service.getAll(size, (page - 1) * size, languageCode)
+                        service.getAllCount(user, filter),
+                        service.getAll(size, (page - 1) * size, filter, languageCode)
                 ).asTuple().map(tuple -> {
                     ViewPage viewPage = new ViewPage();
                     viewPage.addPayload(PayloadType.CONTEXT_ACTIONS, new ActionBox());

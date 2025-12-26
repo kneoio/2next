@@ -57,11 +57,6 @@ public class OrganizationService extends AbstractService<Organization, Organizat
                 ).andFailFast());
     }
 
-    @Override
-    public Uni<OrganizationDTO> getDTOByIdentifier(String identifier) {
-        return null;
-    }
-
     public Uni<Organization> get(String id) {
         return repository.findById(UUID.fromString(id));
     }

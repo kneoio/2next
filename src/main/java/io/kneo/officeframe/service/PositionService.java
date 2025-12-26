@@ -40,10 +40,6 @@ public class PositionService extends AbstractService<Position, PositionDTO> impl
         return repository.getAllCount();
     }
 
-    @Override
-    public Uni<PositionDTO> getDTOByIdentifier(String identifier) {
-        return null;
-    }
 
     public Uni<PositionDTO> getDTO(UUID uuid, IUser user, LanguageCode language) {
         return getDTO(uuid);

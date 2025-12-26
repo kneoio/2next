@@ -49,7 +49,6 @@ public class LabelController extends AbstractSecuredController<Label, LabelDTO> 
         router.route(HttpMethod.GET, path).handler(this::getAll);
         router.route(HttpMethod.GET, path + "/only/category/:category_name").handler(this::getLabelsOfCategory);
         router.route(HttpMethod.GET, path + "/:id").handler(this::get);
-        router.route(HttpMethod.GET, path + "/identifier/:id").handler(this::getByIdentifier);
         router.route(HttpMethod.POST, path + "/:id?").handler(jsonBodyHandler).handler(this::upsert);
         router.route(HttpMethod.DELETE, path + "/:id").handler(this::delete);
     }
@@ -59,14 +58,14 @@ public class LabelController extends AbstractSecuredController<Label, LabelDTO> 
         int size = Integer.parseInt(rc.request().getParam("size", "10"));
         LanguageCode languageCode = resolveLanguage(rc);
         String category = rc.request().getParam("category");
-        String identifier = rc.request().getParam("identifier");
+        String search = rc.request().getParam("search");
 
         LabelFilterDTO filter = new LabelFilterDTO();
         if (category != null && !category.isBlank()) {
             filter.setCategory(category);
         }
-        if (identifier != null && !identifier.isBlank()) {
-            filter.setIdentifier(identifier);
+        if (search != null && !search.isBlank()) {
+            filter.setSearch(search);
         }
 
         getContextUser(rc)
@@ -134,21 +133,6 @@ public class LabelController extends AbstractSecuredController<Label, LabelDTO> 
                 );
     }
 
-    private void getByIdentifier(RoutingContext rc) {
-        String identifier = rc.pathParam("id");
-
-        getContextUser(rc)
-                .chain(user -> service.getDTOByIdentifier(identifier))
-                .subscribe().with(
-                        dto -> {
-                            FormPage page = new FormPage();
-                            page.addPayload(PayloadType.CONTEXT_ACTIONS, new ActionBox());
-                            page.addPayload(PayloadType.DOC_DATA, dto);
-                            rc.response().setStatusCode(200).end(JsonObject.mapFrom(page).encode());
-                        },
-                        rc::fail
-                );
-    }
 
     private void upsert(RoutingContext rc) {
         try {

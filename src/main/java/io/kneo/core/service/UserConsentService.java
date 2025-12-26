@@ -38,11 +38,6 @@ public class UserConsentService extends AbstractService<UserConsent, UserConsent
     }
 
     @Override
-    public Uni<UserConsentDTO> getDTOByIdentifier(String identifier) {
-        return null;
-    }
-
-    @Override
     public Uni<UserConsentDTO> getDTO(UUID uuid, IUser user, LanguageCode language) {
         return repository.findById(uuid).chain(this::mapToDTO);
     }

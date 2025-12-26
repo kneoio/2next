@@ -7,6 +7,7 @@ import io.kneo.core.service.IRESTService;
 import io.kneo.core.service.UserService;
 import io.kneo.core.util.WebHelper;
 import io.kneo.officeframe.dto.GenreDTO;
+import io.kneo.officeframe.dto.GenreFilterDTO;
 import io.kneo.officeframe.model.Genre;
 import io.kneo.officeframe.repository.GenreRepository;
 import io.smallrye.mutiny.Uni;
@@ -36,14 +37,22 @@ public class GenreService extends AbstractService<Genre, GenreDTO> implements IR
                 ).andFailFast());
     }
 
+    public Uni<List<GenreDTO>> getAll(final int limit, final int offset, GenreFilterDTO filter, LanguageCode languageCode) {
+        return repository.getAll(limit, offset, filter)
+                .chain(list -> Uni.join().all(
+                        list.stream()
+                                .map(this::mapToDTO)
+                                .collect(Collectors.toList())
+                ).andFailFast());
+    }
+
     @Override
     public Uni<Integer> getAllCount(IUser user) {
         return repository.getAllCount();
     }
 
-    @Override
-    public Uni<GenreDTO> getDTOByIdentifier(String identifier) {
-        return null;
+    public Uni<Integer> getAllCount(IUser user, GenreFilterDTO filter) {
+        return repository.getAllCount(filter);
     }
 
     @Override

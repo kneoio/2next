@@ -37,10 +37,6 @@ public class AgreementService extends AbstractService<Agreement, AgreementDTO> i
         return repository.getAllCount();
     }
 
-    @Override
-    public Uni<AgreementDTO> getDTOByIdentifier(String identifier) {
-        return null;
-    }
 
     @Override
     public Uni<AgreementDTO> getDTO(UUID uuid, IUser user, LanguageCode language) {

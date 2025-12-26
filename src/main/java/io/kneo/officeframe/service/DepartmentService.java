@@ -63,11 +63,6 @@ public class DepartmentService extends AbstractService<Department, DepartmentDTO
     }
 
     @Override
-    public Uni<DepartmentDTO> getDTOByIdentifier(String identifier) {
-        return null;
-    }
-
-    @Override
     public Uni<DepartmentDTO> getDTO(UUID id, IUser user, LanguageCode language) {
         return repository.findById(id).chain(this::mapToDTO);
     }

@@ -38,11 +38,6 @@ public class UserBillingService extends AbstractService<UserBilling, UserBilling
     }
 
     @Override
-    public Uni<UserBillingDTO> getDTOByIdentifier(String identifier) {
-        return null;
-    }
-
-    @Override
     public Uni<UserBillingDTO> getDTO(UUID uuid, IUser user, LanguageCode language) {
         return repository.findById(uuid).chain(this::mapToDTO);
     }

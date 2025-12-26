@@ -6,6 +6,7 @@ import io.kneo.core.repository.AsyncRepository;
 import io.kneo.core.repository.exception.DocumentHasNotFoundException;
 import io.kneo.core.repository.table.EntityData;
 import io.kneo.officeframe.model.Genre;
+import io.kneo.officeframe.dto.GenreFilterDTO;
 import io.kneo.officeframe.repository.table.OfficeFrameNameResolver;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -46,8 +47,70 @@ public class GenreRepository extends AsyncRepository {
                 .collect().asList();
     }
 
+    public Uni<List<Genre>> getAll(final int limit, final int offset, GenreFilterDTO filter) {
+        StringBuilder sql = new StringBuilder(BASE_REQUEST);
+        Tuple params = null;
+        boolean whereAdded = false;
+        int index = 0;
+
+        if (filter != null) {
+            if (filter.getSearch() != null && !filter.getSearch().isBlank()) {
+                String likeParam = "%" + filter.getSearch() + "%";
+                index++;
+                sql.append(whereAdded ? " AND" : " WHERE").append(" identifier ILIKE $").append(index);
+                params = params == null ? Tuple.of(likeParam) : params.addString(likeParam);
+                whereAdded = true;
+            }
+        }
+
+        if (limit > 0) {
+            sql.append(String.format(" LIMIT %s OFFSET %s", limit, offset));
+        }
+
+        if (params == null) {
+            return client.query(sql.toString())
+                    .execute()
+                    .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
+                    .onItem().transform(this::from)
+                    .collect().asList();
+        } else {
+            return client.preparedQuery(sql.toString())
+                    .execute(params)
+                    .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
+                    .onItem().transform(this::from)
+                    .collect().asList();
+        }
+    }
+
     public Uni<Integer> getAllCount() {
         return getAllCount(entityData.getTableName());
+    }
+
+    public Uni<Integer> getAllCount(GenreFilterDTO filter) {
+        StringBuilder sql = new StringBuilder(String.format("SELECT count(m.id) FROM %s as m", entityData.getTableName()));
+        Tuple params = null;
+        boolean whereAdded = false;
+        int index = 0;
+
+        if (filter != null) {
+            if (filter.getSearch() != null && !filter.getSearch().isBlank()) {
+                String likeParam = "%" + filter.getSearch() + "%";
+                index++;
+                sql.append(whereAdded ? " AND" : " WHERE").append(" m.identifier ILIKE $").append(index);
+                params = params == null ? Tuple.of(likeParam) : params.addString(likeParam);
+                whereAdded = true;
+            }
+        }
+
+        if (params == null) {
+            return client.preparedQuery(sql.toString())
+                    .execute()
+                    .onItem().transform(rows -> rows.iterator().next().getInteger(0));
+        } else {
+            return client.preparedQuery(sql.toString())
+                    .execute(params)
+                    .onItem().transform(rows -> rows.iterator().next().getInteger(0));
+        }
     }
 
     public Uni<Genre> findById(UUID uuid) {

@@ -82,11 +82,7 @@ public class LabelService extends AbstractService<Label, LabelDTO> implements IR
         return repository.findById(uuid);
     }
 
-    @Override
-    public Uni<LabelDTO> getDTOByIdentifier(String identifier) {
-        return null;
-    }
-
+    
     @Override
     public Uni<LabelDTO> upsert(String id, LabelDTO dto, IUser user, LanguageCode code) {
         Label doc = new Label();

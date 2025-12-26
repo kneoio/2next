@@ -37,10 +37,6 @@ public class UserSubscriptionService extends AbstractService<UserSubscription, U
         return repository.getAllCount();
     }
 
-    @Override
-    public Uni<UserSubscriptionDTO> getDTOByIdentifier(String identifier) {
-        return null;
-    }
 
     @Override
     public Uni<UserSubscriptionDTO> getDTO(UUID uuid, IUser user, LanguageCode language) {

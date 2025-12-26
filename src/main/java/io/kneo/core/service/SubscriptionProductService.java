@@ -37,7 +37,7 @@ public class SubscriptionProductService extends AbstractService<SubscriptionProd
         return repository.getAllCount();
     }
 
-    @Override
+
     public Uni<SubscriptionProductDTO> getDTOByIdentifier(String identifier) {
         return null;
     }

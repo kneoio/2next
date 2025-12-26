@@ -90,12 +90,6 @@ public class EmployeeService extends AbstractService<Employee, EmployeeDTO> impl
         return repository.getAllCount();
     }
 
-    @Override
-    public Uni<EmployeeDTO> getDTOByIdentifier(String identifier) {
-        assert repository != null;
-        return repository.getByIdentifier(identifier).chain(this::mapToDTO);
-    }
-
     public Uni<Employee> getByUserId(long id) {
         assert repository != null;
         return repository.getByUserId(id);
@@ -104,13 +98,8 @@ public class EmployeeService extends AbstractService<Employee, EmployeeDTO> impl
     @Override
     public Uni<EmployeeDTO> getDTO(UUID id, IUser user, LanguageCode language) {
         Uni<Employee> uni;
-        if ("current".equals(id)) {
-            assert repository != null;
-            uni = repository.getByUserId(user.getId());
-        } else {
-            assert repository != null;
-            uni = repository.getById(id);
-        }
+        assert repository != null;
+        uni = repository.getById(id);
         return uni.chain(this::mapToDTO);
     }
 
@@ -146,9 +135,13 @@ public class EmployeeService extends AbstractService<Employee, EmployeeDTO> impl
     }
 
     private Uni<EmployeeDTO> mapToDTO(Employee doc) {
-        Uni<PositionDTO> positionDTOUni = doc.getPosition() == null ?
-                Uni.createFrom().nullItem() :
-                positionService.getDTO(doc.getPosition()).onFailure().recoverWithNull();
+        Uni<PositionDTO> positionDTOUni;
+        if (doc.getPosition() == null) {
+            positionDTOUni = Uni.createFrom().nullItem();
+        } else {
+            assert positionService != null;
+            positionDTOUni = positionService.getDTO(doc.getPosition()).onFailure().recoverWithNull();
+        }
 
         return Uni.combine().all().unis(
                 userRepository.getUserName(doc.getAuthor()),
@@ -172,6 +165,7 @@ public class EmployeeService extends AbstractService<Employee, EmployeeDTO> impl
             List<Uni<?>> unis = new ArrayList<>();
 
             if (doc.getDepartment() != null) {
+                assert departmentService != null;
                 unis.add(departmentService.get(doc.getDepartment())
                         .chain(department -> {
                             dto.setDep(DepartmentDTO.builder()
@@ -184,6 +178,7 @@ public class EmployeeService extends AbstractService<Employee, EmployeeDTO> impl
             }
 
             if (doc.getOrganization() != null) {
+                assert organizationService != null;
                 unis.add(organizationService.get(doc.getOrganization())
                         .chain(organization -> {
                             dto.setOrg(OrganizationDTO.builder()

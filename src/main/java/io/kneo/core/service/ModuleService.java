@@ -40,7 +40,7 @@ public class ModuleService extends AbstractService<Module, ModuleDTO> implements
                 });
     }
 
-    @Override
+
     public Uni<ModuleDTO> getDTOByIdentifier(String identifier) {
         return null;
     }

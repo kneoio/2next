@@ -45,11 +45,6 @@ public class OrgCategoryService extends AbstractService<OrgCategory, OrgCategory
     }
 
     @Override
-    public Uni<OrgCategoryDTO> getDTOByIdentifier(String identifier) {
-        return Uni.createFrom().item(null);
-    }
-
-    @Override
     public Uni<OrgCategoryDTO> getDTO(UUID uuid, IUser user, LanguageCode language) {
         return repository.findById(uuid).chain(this::mapToDTO);
     }
