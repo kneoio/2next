@@ -36,7 +36,11 @@ public class GenreService extends AbstractService<Genre, GenreDTO> implements IR
                     }
                     return Uni.join().all(
                             list.stream()
-                                    .map(this::mapToDTO)
+                                    .map(parent -> repository.getChildrenByParentId(parent.getId())
+                                            .chain(children -> {
+                                                parent.setChildren(children);
+                                                return mapToDTO(parent);
+                                            }))
                                     .collect(Collectors.toList())
                     ).andFailFast();
                 });
@@ -50,7 +54,11 @@ public class GenreService extends AbstractService<Genre, GenreDTO> implements IR
                     }
                     return Uni.join().all(
                             list.stream()
-                                    .map(this::mapToDTO)
+                                    .map(parent -> repository.getChildrenByParentId(parent.getId())
+                                            .chain(children -> {
+                                                parent.setChildren(children);
+                                                return mapToDTO(parent);
+                                            }))
                                     .collect(Collectors.toList())
                     ).andFailFast();
                 });
@@ -88,6 +96,52 @@ public class GenreService extends AbstractService<Genre, GenreDTO> implements IR
     }
 
     private Uni<GenreDTO> mapToDTO(Genre doc) {
+        return Uni.combine().all().unis(
+                userService.getName(doc.getAuthor()),
+                userService.getName(doc.getLastModifier())
+        ).asTuple().chain(tuple -> {
+            if (doc.getChildren() != null && !doc.getChildren().isEmpty()) {
+                return Uni.join().all(
+                        doc.getChildren().stream()
+                                .map(this::mapChildToDTO)
+                                .collect(Collectors.toList())
+                ).andFailFast().map(childrenDTOs ->
+                        GenreDTO.builder()
+                                .id(doc.getId())
+                                .author(tuple.getItem1())
+                                .regDate(doc.getRegDate())
+                                .lastModifier(tuple.getItem2())
+                                .lastModifiedDate(doc.getLastModifiedDate())
+                                .identifier(doc.getIdentifier())
+                                .localizedName(doc.getLocalizedName())
+                                .rank(doc.getRank())
+                                .color(doc.getColor())
+                                .fontColor(doc.getFontColor())
+                                .parent(doc.getParent())
+                                .children(childrenDTOs)
+                                .build()
+                );
+            } else {
+                return Uni.createFrom().item(
+                        GenreDTO.builder()
+                                .id(doc.getId())
+                                .author(tuple.getItem1())
+                                .regDate(doc.getRegDate())
+                                .lastModifier(tuple.getItem2())
+                                .lastModifiedDate(doc.getLastModifiedDate())
+                                .identifier(doc.getIdentifier())
+                                .localizedName(doc.getLocalizedName())
+                                .rank(doc.getRank())
+                                .color(doc.getColor())
+                                .fontColor(doc.getFontColor())
+                                .parent(doc.getParent())
+                                .build()
+                );
+            }
+        });
+    }
+
+    private Uni<GenreDTO> mapChildToDTO(Genre doc) {
         return Uni.combine().all().unis(
                 userService.getName(doc.getAuthor()),
                 userService.getName(doc.getLastModifier())

@@ -36,7 +36,7 @@ public class GenreRepository extends AsyncRepository {
     }
 
     public Uni<List<Genre>> getAll(final int limit, final int offset) {
-        String sql = BASE_REQUEST;
+        String sql = BASE_REQUEST + " WHERE parent IS NULL";
         if (limit > 0) {
             sql += String.format(" LIMIT %s OFFSET %s", limit, offset);
         }
@@ -52,6 +52,9 @@ public class GenreRepository extends AsyncRepository {
         Tuple params = null;
         boolean whereAdded = false;
         int index = 0;
+
+        sql.append(" WHERE parent IS NULL");
+        whereAdded = true;
 
         if (filter != null) {
             if (filter.getSearch() != null && !filter.getSearch().isBlank()) {
@@ -83,7 +86,10 @@ public class GenreRepository extends AsyncRepository {
     }
 
     public Uni<Integer> getAllCount() {
-        return getAllCount(entityData.getTableName());
+        String sql = String.format("SELECT count(id) FROM %s WHERE parent IS NULL", entityData.getTableName());
+        return client.preparedQuery(sql)
+                .execute()
+                .onItem().transform(rows -> rows.iterator().next().getInteger(0));
     }
 
     public Uni<Integer> getAllCount(GenreFilterDTO filter) {
@@ -91,6 +97,9 @@ public class GenreRepository extends AsyncRepository {
         Tuple params = null;
         boolean whereAdded = false;
         int index = 0;
+
+        sql.append(" WHERE m.parent IS NULL");
+        whereAdded = true;
 
         if (filter != null) {
             if (filter.getSearch() != null && !filter.getSearch().isBlank()) {
@@ -115,6 +124,15 @@ public class GenreRepository extends AsyncRepository {
 
     public Uni<Genre> findById(UUID uuid) {
         return findById(uuid, entityData, this::from);
+    }
+
+    public Uni<List<Genre>> getChildrenByParentId(UUID parentId) {
+        String sql = BASE_REQUEST + " WHERE parent = $1";
+        return client.preparedQuery(sql)
+                .execute(Tuple.of(parentId))
+                .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
+                .onItem().transform(this::from)
+                .collect().asList();
     }
 
     private Genre from(Row row) {
