@@ -30,20 +30,30 @@ public class GenreService extends AbstractService<Genre, GenreDTO> implements IR
 
     public Uni<List<GenreDTO>> getAll(final int limit, final int offset, LanguageCode languageCode) {
         return repository.getAll(limit, offset)
-                .chain(list -> Uni.join().all(
-                        list.stream()
-                                .map(this::mapToDTO)
-                                .collect(Collectors.toList())
-                ).andFailFast());
+                .chain(list -> {
+                    if (list.isEmpty()) {
+                        return Uni.createFrom().item(List.of());
+                    }
+                    return Uni.join().all(
+                            list.stream()
+                                    .map(this::mapToDTO)
+                                    .collect(Collectors.toList())
+                    ).andFailFast();
+                });
     }
 
     public Uni<List<GenreDTO>> getAll(final int limit, final int offset, GenreFilterDTO filter, LanguageCode languageCode) {
         return repository.getAll(limit, offset, filter)
-                .chain(list -> Uni.join().all(
-                        list.stream()
-                                .map(this::mapToDTO)
-                                .collect(Collectors.toList())
-                ).andFailFast());
+                .chain(list -> {
+                    if (list.isEmpty()) {
+                        return Uni.createFrom().item(List.of());
+                    }
+                    return Uni.join().all(
+                            list.stream()
+                                    .map(this::mapToDTO)
+                                    .collect(Collectors.toList())
+                    ).andFailFast();
+                });
     }
 
     @Override

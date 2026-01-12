@@ -6,11 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Setter
 @Getter
-@NoArgsConstructor
-public class UserBilling extends DataEntity<java.util.UUID> {
+public class UserBilling extends DataEntity<UUID> {
     private long userId;
     private String stripeCustomerId;
     private JsonObject meta;
