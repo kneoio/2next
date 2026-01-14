@@ -52,6 +52,32 @@ public class WebHelper {
                 .collect(Collectors.joining("/"));
     }
 
+    public static String generatePersonSlug(String input) {
+        if (input == null || input.trim().isEmpty()) {
+            return "";
+        }
+
+        int atIndex = input.indexOf('@');
+        if (atIndex > 0) {
+            input = input.substring(0, atIndex);
+        }
+
+        String extension = "";
+        int lastDotIndex = input.lastIndexOf('.');
+        if (lastDotIndex > 0 && lastDotIndex < input.length() - 1) {
+            extension = input.substring(lastDotIndex).toLowerCase();
+            input = input.substring(0, lastDotIndex);
+        }
+
+        String slug = java.text.Normalizer.normalize(input, java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .toLowerCase()
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("^-+|-+$", "");
+
+        return slug + extension;
+    }
+
     public static String generateSlug(EnumMap<LanguageCode, String> localizedName) {
         if (localizedName == null || localizedName.isEmpty()) {
             return "";

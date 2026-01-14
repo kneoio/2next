@@ -78,6 +78,14 @@ public class GenreService extends AbstractService<Genre, GenreDTO> implements IR
         return repository.findById(uuid).chain(this::mapToDTO);
     }
 
+    public Uni<Genre> getById(UUID uuid) {
+        return repository.findById(uuid);
+    }
+
+    public Uni<List<Genre>> getByFuzzyIdentifier(String name) {
+        return repository.findByFuzzyIdentifier(name);
+    }
+
     @Override
     public Uni<GenreDTO> upsert(String id, GenreDTO dto, IUser user, LanguageCode code) {
         Genre doc = new Genre();

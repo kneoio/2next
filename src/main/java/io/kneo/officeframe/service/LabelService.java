@@ -2,15 +2,13 @@ package io.kneo.officeframe.service;
 
 import io.kneo.core.localization.LanguageCode;
 import io.kneo.core.model.user.IUser;
-import io.kneo.core.repository.UserRepository;
-import io.kneo.core.repository.exception.DocumentModificationAccessException;
 import io.kneo.core.service.AbstractService;
 import io.kneo.core.service.IRESTService;
 import io.kneo.core.service.UserService;
 import io.kneo.core.util.WebHelper;
 import io.kneo.officeframe.dto.LabelDTO;
-import io.kneo.officeframe.model.Label;
 import io.kneo.officeframe.dto.LabelFilterDTO;
+import io.kneo.officeframe.model.Label;
 import io.kneo.officeframe.repository.LabelRepository;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;

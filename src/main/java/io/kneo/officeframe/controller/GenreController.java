@@ -9,6 +9,7 @@ import io.kneo.core.dto.view.ViewPage;
 import io.kneo.core.localization.LanguageCode;
 import io.kneo.core.service.UserService;
 import io.kneo.core.util.RuntimeUtil;
+import io.kneo.core.util.WebHelper;
 import io.kneo.officeframe.dto.GenreDTO;
 import io.kneo.officeframe.dto.GenreFilterDTO;
 import io.kneo.officeframe.model.Genre;
@@ -93,6 +94,7 @@ public class GenreController extends AbstractSecuredController<Genre, GenreDTO> 
                         GenreDTO dto = new GenreDTO();
                         dto.setAuthor(user.getUserName());
                         dto.setLastModifier(user.getUserName());
+                        dto.setColor(WebHelper.generateRandomBrightColor());
                         return Uni.createFrom().item(dto);
                     }
                     return service.getDTO(UUID.fromString(id), user, languageCode);
