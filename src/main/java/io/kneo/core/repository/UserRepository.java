@@ -120,6 +120,14 @@ public class UserRepository extends AsyncRepository {
                 .onItem().transform(iterator -> iterator.hasNext() ? from(iterator.next()) : UndefinedUser.Build());
     }
 
+
+    public Uni<IUser> findByEmail(String email) {
+        return client.preparedQuery("SELECT * FROM _users WHERE email = $1")
+                .execute(Tuple.of(email))
+                .onItem().transform(RowSet::iterator)
+                .onItem().transform(iterator -> iterator.hasNext() ? from(iterator.next()) : UndefinedUser.Build());
+    }
+
     public Uni<Long> findByIdentifier(String userName) {
         if (userName == null) {
             return Uni.createFrom().item(AnonymousUser.ID);
@@ -237,4 +245,5 @@ public class UserRepository extends AsyncRepository {
                 .execute(Tuple.of(id))
                 .onItem().transform(result -> (long) result.rowCount());
     }
+
 }
