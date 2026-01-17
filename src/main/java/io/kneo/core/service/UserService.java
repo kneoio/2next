@@ -106,7 +106,7 @@ public class UserService {
     public Uni<Long> add(UserDTO dto, boolean allowAutoRegistration) {
         User user = new User();
         user.setLogin(dto.getLogin());
-        user.setEmail(dto.getLogin() + "_place_holder@kneo.io");
+        user.setEmail(dto.getEmail());
         user.setDefaultLang(0);
        return addOrGet(user, dto.getRoles(), dto.getModules(), allowAutoRegistration);
     }
@@ -163,6 +163,10 @@ public class UserService {
         }
     }
 
+    public Uni<Void> updateEmail(long userId, String email, IUser actor) {
+        return repository.updateEmail(userId, email, actor)
+                .onItem().transform(count -> null);
+    }
 
     public Uni<Long> delete(String id) {
         assert repository != null;
