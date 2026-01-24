@@ -101,7 +101,8 @@ public enum LanguageCode {
     av(403, "av"),
     lez(404, "lez"),
     kbd(405, "kbd"),
-    ady(406, "ady");
+    ady(406, "ady"),
+    fil(406, "fil");
 
     @Getter
     private final int code;
