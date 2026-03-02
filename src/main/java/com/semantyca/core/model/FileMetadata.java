@@ -80,7 +80,7 @@ public class FileMetadata {
                 });
     }
 
-    private String getFileExtension(String mimeType) {
+    public String getFileExtension(String mimeType) {
         if (mimeType == null) {
             return ".tmp";
         }
