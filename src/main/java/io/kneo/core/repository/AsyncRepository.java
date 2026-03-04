@@ -3,8 +3,8 @@ package io.kneo.core.repository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kneo.core.localization.LanguageCode;
 import io.kneo.core.model.DataEntity;
-import io.kneo.core.model.embedded.DocumentAccessInfo;
 import io.kneo.core.model.SimpleReferenceEntity;
+import io.kneo.core.model.embedded.DocumentAccessInfo;
 import io.kneo.core.model.user.IUser;
 import io.kneo.core.model.user.User;
 import io.kneo.core.repository.exception.DocumentHasNotFoundException;
@@ -18,7 +18,6 @@ import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
-import org.eclipse.microprofile.openapi.models.parameters.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +53,7 @@ public class AsyncRepository extends AbstractRepository{
         this.rlsRepository = rlsRepository;
     }
 
-    protected Uni<Integer> getAllCount(long userID, String mainTable, String aclTable) {
+    public Uni<Integer> getAllCount(long userID, String mainTable, String aclTable) {
         String sql = String.format("SELECT count(m.id) FROM %s as m, %s as acl WHERE m.id = acl.entity_id AND acl.reader = $1", mainTable, aclTable);
         return client.preparedQuery(sql)
                 .execute(Tuple.of(userID))
@@ -92,30 +91,6 @@ public class AsyncRepository extends AbstractRepository{
                         return Uni.createFrom().failure(new DocumentHasNotFoundException(entityData.getTableName() + " " + identifier));
                     }
                 });
-    }
-
-    @Deprecated
-    public Uni<List<DocumentAccessInfo>> getDocumentAccessInfo(UUID documentId, EntityData entityData) {
-        String sql = "SELECT rls.reader, rls.reading_time, rls.can_edit, rls.can_delete, u.login, u.i_su " +
-                "FROM " + entityData.getRlsName() + " rls " +
-                "JOIN _users u ON rls.reader = u.id " +
-                "WHERE rls.entity_id = $1 " +
-                "ORDER BY u.i_su";
-
-        return client.preparedQuery(sql)
-                .execute(Tuple.of(documentId))
-                .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
-                .onItem().transform(row -> {
-                    DocumentAccessInfo doc = new DocumentAccessInfo();
-                    doc.setUserId(row.getLong("reader"));
-                    doc.setReadingTime(row.getLocalDateTime("reading_time"));
-                    doc.setCanEdit(row.getBoolean("can_edit"));
-                    doc.setCanDelete(row.getBoolean("can_delete"));
-                    doc.setUserLogin(row.getString("login"));
-                    doc.setIsSu(row.getBoolean("i_su"));
-                    return doc;
-                })
-                .collect().asList();
     }
 
     public Uni<List<DocumentAccessInfo>> getDocumentAccessInfo(UUID documentId, EntityData entityData, IUser user) {
@@ -167,7 +142,7 @@ public class AsyncRepository extends AbstractRepository{
                 }));
     }
 
-    protected Uni<Void> insertRLSPermissions(io.vertx.mutiny.sqlclient.SqlClient tx, UUID entityId, EntityData entityData, IUser user) {
+    public Uni<Void> insertRLSPermissions(io.vertx.mutiny.sqlclient.SqlClient tx, UUID entityId, EntityData entityData, IUser user) {
         String rlsSql = String.format(
                 "INSERT INTO %s (reader, entity_id, can_edit, can_delete) VALUES ($1, $2, $3, $4) " +
                         "ON CONFLICT (reader, entity_id) DO UPDATE SET " +
@@ -241,7 +216,7 @@ public class AsyncRepository extends AbstractRepository{
                 });
     }
 
-    protected static void setDefaultFields(DataEntity<UUID> entity, Row row) {
+    public static void setDefaultFields(DataEntity<UUID> entity, Row row) {
         entity.setId(row.getUUID("id"));
         entity.setAuthor(row.getLong(COLUMN_AUTHOR));
         entity.setRegDate(row.getLocalDateTime(COLUMN_REG_DATE).atZone(ZoneId.systemDefault()));
@@ -250,7 +225,7 @@ public class AsyncRepository extends AbstractRepository{
     }
 
 
-    protected static void setDefaultFields(User entity, Row row) {
+    public static void setDefaultFields(User entity, Row row) {
         entity.setId(row.getLong("id"));
         entity.setAuthor(row.getLong(COLUMN_AUTHOR));
         entity.setRegDate(row.getLocalDateTime(COLUMN_REG_DATE).atZone(ZoneId.systemDefault()));
@@ -258,7 +233,7 @@ public class AsyncRepository extends AbstractRepository{
         entity.setLastModifiedDate(row.getLocalDateTime(COLUMN_LAST_MOD_DATE).atZone(ZoneId.systemDefault()));
     }
 
-    protected static void setLocalizedNames(SimpleReferenceEntity entity, Row row) {
+    public static void setLocalizedNames(SimpleReferenceEntity entity, Row row) {
         setLocalizedNames(entity, row, COLUMN_LOCALIZED_NAME);
         JsonObject localizedNameJson = row.getJsonObject(COLUMN_LOCALIZED_NAME);
         if (localizedNameJson != null) {
@@ -268,7 +243,7 @@ public class AsyncRepository extends AbstractRepository{
         }
     }
 
-    protected static void setLocalizedNames(SimpleReferenceEntity entity, Row row, String fieldName) {
+    public static void setLocalizedNames(SimpleReferenceEntity entity, Row row, String fieldName) {
         JsonObject localizedNameJson = row.getJsonObject(COLUMN_LOCALIZED_NAME);
         if (localizedNameJson != null) {
             EnumMap<LanguageCode, String> localizedName = new EnumMap<>(LanguageCode.class);
@@ -277,7 +252,7 @@ public class AsyncRepository extends AbstractRepository{
         }
     }
 
-    protected static String getBaseSelect(String baseRequest, final int limit, final int offset) {
+    public static String getBaseSelect(String baseRequest, final int limit, final int offset) {
         String sql = baseRequest;
         if (limit > 0) {
             sql += String.format(" LIMIT %s OFFSET %s", limit, offset);
@@ -285,7 +260,7 @@ public class AsyncRepository extends AbstractRepository{
         return sql;
     }
 
-    protected EnumMap<LanguageCode, String> getLocName(Row row) {
+    public EnumMap<LanguageCode, String> getLocName(Row row) {
         JsonObject localizedNameJson = row.getJsonObject(COLUMN_LOCALIZED_NAME);
         if (localizedNameJson != null) {
             EnumMap<LanguageCode, String> localizedName = new EnumMap<>(LanguageCode.class);
@@ -296,7 +271,7 @@ public class AsyncRepository extends AbstractRepository{
         }
     }
 
-    protected EnumMap<LanguageCode, String> getLocData(Row row, final String name) {
+    public EnumMap<LanguageCode, String> getLocData(Row row, final String name) {
         JsonObject localizedNameJson = row.getJsonObject(name);
         if (localizedNameJson != null) {
             EnumMap<LanguageCode, String> locData = new EnumMap<>(LanguageCode.class);

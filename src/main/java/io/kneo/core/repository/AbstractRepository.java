@@ -8,9 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AbstractRepository implements IRepository {
-    protected final Logger LOGGER = LoggerFactory.getLogger(AbstractRepository.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(AbstractRepository.class);
 
-    protected String detectMimeType(String filePath) {
+    public String detectMimeType(String filePath) {
         Tika tika = new Tika();
         try {
             String detectedMimeType = tika.detect(Paths.get(filePath));

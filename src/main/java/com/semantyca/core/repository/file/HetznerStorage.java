@@ -3,7 +3,7 @@ package com.semantyca.core.repository.file;
 import com.semantyca.core.model.FileMetadata;
 import com.semantyca.core.model.cnst.AccessType;
 import com.semantyca.core.model.cnst.FileStorageType;
-import com.semantyca.core.service.exceptions.external.hetzner.HetznerStorageService;
+import com.semantyca.core.service.external.hetzner.HetznerStorageService;
 import com.semantyca.core.service.maintenance.LocalFileCleanupService;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.Vertx;

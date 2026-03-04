@@ -1,0 +1,83 @@
+package com.semantyca.officeframe.service;
+
+import com.semantyca.officeframe.dto.TaskTypeDTO;
+import com.semantyca.officeframe.model.TaskType;
+import com.semantyca.officeframe.repository.TaskTypeRepository;
+import io.kneo.core.localization.LanguageCode;
+import io.kneo.core.model.user.IUser;
+import io.kneo.core.service.AbstractService;
+import io.kneo.core.service.IRESTService;
+import io.kneo.core.service.UserService;
+import io.smallrye.mutiny.Uni;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@ApplicationScoped
+public class TaskTypeService extends AbstractService<TaskType, TaskTypeDTO> implements IRESTService<TaskTypeDTO> {
+    private final TaskTypeRepository repository;
+
+    @Inject
+    public TaskTypeService(UserService userService, TaskTypeRepository repository) {
+        super(userService);
+        this.repository = repository;
+    }
+
+    public Uni<List<TaskTypeDTO>> getAll(final int limit, final int offset, LanguageCode languageCode) {
+        return repository.getAll(limit, offset)
+                .chain(list -> Uni.join().all(
+                        list.stream()
+                                .map(this::mapToDTO)
+                                .collect(Collectors.toList())
+                ).andFailFast());
+    }
+
+    public Uni<Integer> getAllCount(IUser user) {
+        return repository.getAllCount();
+    }
+
+    public Uni<TaskType> getById(UUID uuid) {
+        return repository.findById(uuid);
+    }
+
+    @Override
+    public Uni<TaskTypeDTO> getDTO(UUID uuid, IUser user, LanguageCode language) {
+        return repository.findById(uuid).chain(this::mapToDTO);
+    }
+
+    private Uni<TaskTypeDTO> mapToDTO(TaskType doc) {
+        return Uni.combine().all().unis(
+                userRepository.getUserName(doc.getAuthor()),
+                userRepository.getUserName(doc.getLastModifier())
+        ).asTuple().onItem().transform(tuple ->
+                TaskTypeDTO.builder()
+                        .id(doc.getId())
+                        .author(tuple.getItem1())
+                        .regDate(doc.getRegDate())
+                        .lastModifier(tuple.getItem2())
+                        .lastModifiedDate(doc.getLastModifiedDate())
+                        .identifier(doc.getIdentifier())
+                        .localizedName(doc.getLocalizedName())
+                        .build()
+        );
+    }
+
+    @Override
+    public Uni<TaskTypeDTO> upsert(String id, TaskTypeDTO dto, IUser user, LanguageCode code) {
+        return null;
+    }
+
+    @Override
+    public Uni<Integer> delete(String id, IUser user){
+        return null;
+    }
+
+    @Deprecated
+    public Uni<? extends Optional<TaskType>> findById(UUID taskType) {
+        return null;
+    }
+}

@@ -1,4 +1,4 @@
-package com.semantyca.core.service.exceptions.external.hetzner;
+package com.semantyca.core.service.external.hetzner;
 
 import com.semantyca.core.config.HetznerConfig;
 import com.semantyca.core.model.FileMetadata;
