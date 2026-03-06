@@ -1,4 +1,4 @@
-package com.semantyca.mixpla.model;
+package com.semantyca.core.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

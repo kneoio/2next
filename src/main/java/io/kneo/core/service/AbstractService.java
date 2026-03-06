@@ -29,24 +29,17 @@ public abstract class AbstractService<T, V> {
         this.userService = userService;
     }
 
-    @Deprecated
-    public AbstractService(UserRepository userRepository, UserService userService) {
-        this.userRepository = userRepository;
-        this.userService = userService;
-    }
-
-    //TODO keep temporarily until all migrate to Uni<Integer> getAllCount(IUser user)
-    Uni<Integer> getAllCount(){
-        return Uni.createFrom().item(0);
-    }
-
-    public abstract Uni<V> getDTO(UUID id, IUser user, LanguageCode language);
-
-    public Uni<V> upsert(String id, V dto, IUser user, LanguageCode code) throws DocumentModificationAccessException {
-         return Uni.createFrom().failure(new RuntimeException("The upsert is not implemented"));
+    public Uni<V> getDTO(UUID id, IUser user, LanguageCode language){
+        return Uni.createFrom().failure(new RuntimeException("not implemented"));
     };
 
-    public abstract Uni<Integer> delete(String id, IUser user) throws DocumentModificationAccessException;
+    public Uni<V> upsert(String id, V dto, IUser user, LanguageCode code) throws DocumentModificationAccessException {
+         return Uni.createFrom().failure(new RuntimeException("not implemented"));
+    };
+
+    public Uni<Integer> delete(String id, IUser user) throws DocumentModificationAccessException{
+        return Uni.createFrom().failure(new RuntimeException("not implemented"));
+    }
 
     protected void setDefaultFields(AbstractDTO dto, DataEntity<UUID> doc) {
         dto.setId(doc.getId());

@@ -7,5 +7,6 @@ public class EnvConst {
     public static boolean DEV_MODE = true;
 
     public static String DEFAULT_COUNTRY_OF_NUMBER_FORMAT = "pt";
+    public static String VALIDATION_ERROR_PAGE = "https://semantyca.com/problems/validation-error";
 
 }

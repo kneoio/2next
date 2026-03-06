@@ -3,43 +3,33 @@ package io.kneo.core.controller;
 
 import io.kneo.core.dto.actions.ActionsFactory;
 import io.kneo.core.dto.cnst.PayloadType;
-import io.kneo.core.dto.form.FormPage;
 import io.kneo.core.dto.view.View;
 import io.kneo.core.dto.view.ViewPage;
 import io.kneo.core.localization.LanguageCode;
 import io.kneo.core.model.user.AnonymousUser;
 import io.kneo.core.model.user.IUser;
 import io.kneo.core.model.user.UndefinedUser;
-import io.kneo.core.repository.exception.DocumentModificationAccessException;
 import io.kneo.core.repository.exception.UserNotFoundException;
-import io.kneo.core.service.AbstractService;
 import io.kneo.core.service.IRESTService;
 import io.kneo.core.service.UserService;
 import io.kneo.core.util.RuntimeUtil;
-import io.quarkus.security.UnauthorizedException;
-import io.smallrye.jwt.auth.principal.DefaultJWTCallerPrincipal;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.web.RoutingContext;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.UUID;
 
 import static io.kneo.core.util.RuntimeUtil.countMaxPage;
 
 public abstract class AbstractController<T, V> extends BaseController {
-    private static final Duration TIMEOUT = Duration.ofSeconds(5);
     protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass().getSimpleName());
     private static final String EMAIL_PATTERN = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
 
@@ -77,72 +67,6 @@ public abstract class AbstractController<T, V> extends BaseController {
                         rc::fail
                 );
 
-    }
-
-    @Deprecated
-    protected Uni<Response> getAll(IRESTService<V> service, ContainerRequestContext requestContext, int page, int size) throws UserNotFoundException {
-        IUser user = getUserId(requestContext);
-        String languageHeader = requestContext.getHeaderString("Accept-Language");
-        Uni<Integer> countUni = service.getAllCount(AnonymousUser.build());
-        Uni<Integer> maxPageUni = countUni.onItem().transform(c -> countMaxPage(c, size));
-        Uni<Integer> pageNumUni = Uni.createFrom().item(page);
-        Uni<Integer> offsetUni = Uni.combine().all()
-                .unis(pageNumUni, Uni.createFrom().item(user.getPageSize()))
-                .asTuple()
-                .map(tuple -> RuntimeUtil.calcStartEntry(tuple.getItem1(), tuple.getItem2()));
-        Uni<List<V>> unis = offsetUni.onItem().transformToUni(offset -> service.getAll(size, offset, LanguageCode.en));
-        return Uni.combine().all()
-                .unis(unis, offsetUni, pageNumUni, countUni, maxPageUni)
-                .asTuple()
-                .map(tuple -> {
-                    List<V> dtoList = tuple.getItem1();
-                    int offset = tuple.getItem2();
-                    int pageNum = tuple.getItem3();
-                    int count = tuple.getItem4();
-                    int maxPage = tuple.getItem5();
-
-                    ViewPage viewPage = new ViewPage();
-                    viewPage.addPayload(PayloadType.CONTEXT_ACTIONS, ActionsFactory.getDefaultViewActions(LanguageCode.en));
-                    if (pageNum == 0) pageNum = 1;
-                    View<V> dtoEntries = new View<>(dtoList, count, pageNum, maxPage, size);
-                    viewPage.addPayload(PayloadType.VIEW_DATA, dtoEntries);
-                    return Response.ok(viewPage).build();
-                });
-
-    }
-
-    @Deprecated
-    protected Uni<Response> getById(IRESTService<V> service, String id, ContainerRequestContext requestContext) throws UserNotFoundException {
-        IUser user = getUserId(requestContext);
-        if (user != null) {
-            FormPage page = new FormPage();
-            page.addPayload(PayloadType.CONTEXT_ACTIONS, ActionsFactory.getDefaultFormActions(LanguageCode.en));
-            return service.getDTO(UUID.fromString(id), user, LanguageCode.en)
-                    .onItem().transform(p -> {
-                        page.addPayload(PayloadType.DOC_DATA, p);
-                        return Response.ok(page).build();
-                    })
-                    .onFailure().recoverWithItem(t -> {
-                        LOGGER.error(t.getMessage(), t);
-                        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-                    });
-        } else {
-            throw new UnauthorizedException("User not authorized");
-        }
-    }
-
-    @Deprecated
-    protected IUser getUserId(ContainerRequestContext requestContext) throws UserNotFoundException {
-        try {
-            DefaultJWTCallerPrincipal securityIdentity = (DefaultJWTCallerPrincipal) requestContext.getSecurityContext().getUserPrincipal();
-            return userService.findByLogin(securityIdentity.getClaim(USER_NAME_CLAIM)).await().atMost(TIMEOUT);
-        } catch (NullPointerException e) {
-            LOGGER.warn("msg: {} ", e.getMessage());
-            throw new UserNotFoundException("User not authorized");
-        } catch (Exception e) {
-            LOGGER.error("msg: {} ", e.getMessage(), e);
-            throw new UserNotFoundException("User not authorized");
-        }
     }
 
     protected Uni<IUser> getContextUser(RoutingContext rc) {
@@ -192,12 +116,6 @@ public abstract class AbstractController<T, V> extends BaseController {
         return newUser;
     }
 
-    public Uni<Response> delete(String uuid, AbstractService<T, V> service, @Context ContainerRequestContext requestContext) throws DocumentModificationAccessException, UserNotFoundException {
-        IUser userOptional = getUserId(requestContext);
-        return service.delete(uuid, userOptional)
-                .onItem().transform(count -> Response.ok(count).build());
-
-    }
 
     protected Response postError(Throwable e) {
         Random rand = new Random();

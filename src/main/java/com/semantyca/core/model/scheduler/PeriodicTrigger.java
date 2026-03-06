@@ -1,0 +1,15 @@
+package com.semantyca.core.model.scheduler;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
+
+@Setter
+@Getter
+public class PeriodicTrigger {
+    private String startTime;
+    private String endTime;
+    private int interval;
+    private List<String> weekdays;
+}

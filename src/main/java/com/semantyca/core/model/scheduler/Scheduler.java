@@ -1,6 +1,5 @@
 package com.semantyca.core.model.scheduler;
 
-import io.vertx.core.net.impl.pool.Task;
 import lombok.Getter;
 import lombok.Setter;
 
