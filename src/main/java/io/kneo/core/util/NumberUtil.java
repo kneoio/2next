@@ -9,7 +9,7 @@ import java.util.Random;
 
 public class NumberUtil {
 
-    public static String formatFloat(float originalCost) {
+   /* public static String formatFloat(float originalCost) {
         return NumberFormat.getInstance(new Locale(EnvConst.DEFAULT_COUNTRY_OF_NUMBER_FORMAT)).format(originalCost);
     }
 
@@ -61,5 +61,5 @@ public class NumberUtil {
         val = val / 100;
         return val;
     }
-
+*/
 }

@@ -3,6 +3,7 @@ package io.kneo.core.dto.document;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,6 +37,8 @@ public class UserDTO {
     String language;
     @NotNull
     String theme;
+    @Builder.Default
     List<String> roles = Collections.emptyList();
+    @Builder.Default
     List<String> modules = Collections.emptyList();
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.kneo.core.dto.AbstractReferenceDTO;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,6 +28,7 @@ public class EmployeeDTO extends AbstractReferenceDTO {
     @NotNull(message = "{employee.position.invalid}")
     PositionDTO position;
     @Positive(message = "{employee.rank.invalid}")
+    @Builder.Default
     int rank = 999;
     String phone;
 

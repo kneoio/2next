@@ -3,6 +3,7 @@ package io.kneo.core.dto;
 import io.kneo.core.dto.validation.ValidLocalizedName;
 import io.kneo.core.localization.LanguageCode;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,5 +26,6 @@ public abstract class AbstractReferenceDTO extends AbstractDTO {
             defaultLanguage = LanguageCode.en,
             message = "Invalid localized name format"
     )
+    @Builder.Default
     EnumMap<LanguageCode, String> localizedName = new EnumMap<>(LanguageCode.class);
 }

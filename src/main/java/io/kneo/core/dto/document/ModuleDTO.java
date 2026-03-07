@@ -5,6 +5,7 @@ import io.kneo.core.dto.AbstractReferenceDTO;
 import io.kneo.core.dto.Views;
 import io.kneo.core.localization.LanguageCode;
 import io.kneo.core.server.Environment;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,6 +19,7 @@ import java.util.EnumMap;
 @NoArgsConstructor
 public class ModuleDTO extends AbstractReferenceDTO {
     @JsonView(Views.ListView.class)
+    @Builder.Default
     private String realm = Environment.realmShortName;
     private boolean isOn;
     @JsonView(Views.ListView.class)
