@@ -12,7 +12,7 @@ import java.util.UUID;
 @Setter
 @Getter
 @NoArgsConstructor
-public class ScriptFilter {
+public class ScriptFilter implements IFilter{
     private boolean activated = false;
     private List<UUID> labels;
     private SceneTimingMode timingMode;
@@ -26,7 +26,7 @@ public class ScriptFilter {
         return hasAnyFilter();
     }
 
-    private boolean hasAnyFilter() {
+    public boolean hasAnyFilter() {
         if (labels != null && !labels.isEmpty()) {
             return true;
         }

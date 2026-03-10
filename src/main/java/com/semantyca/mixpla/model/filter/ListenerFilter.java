@@ -10,7 +10,7 @@ import java.util.List;
 @Setter
 @Getter
 @NoArgsConstructor
-public class ListenerFilter {
+public class ListenerFilter implements IFilter{
     private boolean activated = false;
     private List<CountryCode> countries;
     private String searchTerm;
@@ -22,7 +22,7 @@ public class ListenerFilter {
         return hasAnyFilter();
     }
 
-    private boolean hasAnyFilter() {
+    public boolean hasAnyFilter() {
         if (countries != null && !countries.isEmpty()) {
             return true;
         }

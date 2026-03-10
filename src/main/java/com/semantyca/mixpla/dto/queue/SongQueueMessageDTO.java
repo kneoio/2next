@@ -7,19 +7,13 @@ import lombok.Setter;
 import java.util.Map;
 import java.util.UUID;
 
-@Setter
 @Getter
-public class AddToQueueDTO {
+@Setter
+public class SongQueueMessageDTO {
     private MergingType mergingMethod;
+    private UUID sceneId;
+    private String sceneTitle;
     private Map<String, String> filePaths;
-    private Map<String, UUID> soundFragments;
+    private Map<String, SongInfoDTO> songs;
     private Integer priority = 100;
-
-    @Override
-    public String toString() {
-        return "mergingMethod=" + mergingMethod +
-                ", filePaths=" + filePaths +
-                ", priority=" + priority;
-    }
-
 }

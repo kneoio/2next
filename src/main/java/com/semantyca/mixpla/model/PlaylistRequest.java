@@ -14,14 +14,14 @@ import java.util.UUID;
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PlaylistRequest {
-    private WayOfSourcing sourcing;
-    private String title;
-    private String artist;
-    private List<UUID> genres;
-    private List<UUID> labels;
-    private List<PlaylistItemType> type;
-    private List<SourceType> source;
-    private String searchTerm;
-    private List<UUID> soundFragments;
-    private List<ScenePrompt> contentPrompts;
+    private WayOfSourcing sourcing = WayOfSourcing.RANDOM;
+    private String title = "";
+    private String artist = "";
+    private List<UUID> genres = List.of();
+    private List<UUID> labels = List.of();
+    private List<PlaylistItemType> type = List.of(PlaylistItemType.SONG);
+    private List<SourceType> source = List.of(SourceType.USER_UPLOAD);
+    private String searchTerm = "";
+    private List<UUID> soundFragments = List.of();
+    private List<ScenePrompt> contentPrompts = List.of();
 }

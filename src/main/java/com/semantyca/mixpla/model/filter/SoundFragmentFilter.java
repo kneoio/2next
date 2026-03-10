@@ -12,7 +12,7 @@ import java.util.UUID;
 @Setter
 @Getter
 @NoArgsConstructor
-public class SoundFragmentFilter {
+public class SoundFragmentFilter implements IFilter{
     private boolean activated = false;
     private List<UUID> genre;
     private List<UUID> labels;
@@ -27,7 +27,7 @@ public class SoundFragmentFilter {
         return hasAnyFilter();
     }
 
-    private boolean hasAnyFilter() {
+    public boolean hasAnyFilter() {
         if (genre != null && !genre.isEmpty()) {
             return true;
         }
