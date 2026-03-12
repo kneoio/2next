@@ -13,11 +13,12 @@ import java.util.UUID;
 @NoArgsConstructor
 public class SongQueueMessageDTO {
     private UUID messageId;
+    private int sequenceNumber;
     private String brandSlug;
     private MergingType mergingMethod;
     private UUID sceneId;
     private String sceneTitle;
-    private Map<String, String> filePaths;
-    private Map<String, SongInfoDTO> songs;
-    private Integer priority = 100;
+    private Map<IntroKey, IntroInfoDTO> filePaths;
+    private Map<SongKey, SongInfoDTO> songs;
+    private int priority = 100;
 }

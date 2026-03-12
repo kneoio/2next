@@ -3,17 +3,19 @@ package com.semantyca.mixpla.dto.queue;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import java.util.UUID;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class SongInfoDTO {
-    private UUID songId;
+public class IntroInfoDTO {
+    private String filePath;
+    private int sequenceNumber;
     private int durationSeconds;
 
-    public SongInfoDTO(UUID songId, int durationSeconds) {
-        this.songId = songId;
+    public IntroInfoDTO(String filePath, int durationSeconds) {
+        this.filePath = filePath;
         this.durationSeconds = durationSeconds;
     }
 }
