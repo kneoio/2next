@@ -1,4 +1,4 @@
-package com.semantyca.mixpla.dto.queue;
+package com.semantyca.mixpla.dto.queue.livestream;
 
 import com.semantyca.mixpla.model.cnst.MergingType;
 import lombok.Getter;
@@ -11,7 +11,6 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@Deprecated
 public class SongQueueMessageDTO {
     private UUID messageId;
     private int sequenceNumber;
@@ -22,5 +21,4 @@ public class SongQueueMessageDTO {
     private Map<IntroKey, IntroInfoDTO> filePaths;
     private Map<SongKey, SongInfoDTO> songs;
     private int priority = 100;
-    private String description;
 }
