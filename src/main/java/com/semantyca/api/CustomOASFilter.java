@@ -1,4 +1,4 @@
-package io.kneo.api;
+package com.semantyca.api;
 
 import org.eclipse.microprofile.openapi.OASFilter;
 import org.eclipse.microprofile.openapi.models.Components;

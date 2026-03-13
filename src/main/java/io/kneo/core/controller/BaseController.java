@@ -1,7 +1,7 @@
 
 package io.kneo.core.controller;
 
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import io.vertx.ext.web.RoutingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

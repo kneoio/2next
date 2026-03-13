@@ -4,7 +4,7 @@ import com.semantyca.officeframe.dto.GenreDTO;
 import com.semantyca.officeframe.dto.GenreFilterDTO;
 import com.semantyca.officeframe.model.Genre;
 import com.semantyca.officeframe.repository.GenreRepository;
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import io.kneo.core.model.user.IUser;
 import io.kneo.core.service.AbstractService;
 import io.kneo.core.service.IRESTService;

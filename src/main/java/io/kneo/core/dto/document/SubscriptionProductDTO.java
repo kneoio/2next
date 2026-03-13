@@ -2,7 +2,7 @@ package io.kneo.core.dto.document;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.kneo.core.dto.AbstractReferenceDTO;
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

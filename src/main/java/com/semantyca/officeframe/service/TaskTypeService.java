@@ -3,7 +3,7 @@ package com.semantyca.officeframe.service;
 import com.semantyca.officeframe.dto.TaskTypeDTO;
 import com.semantyca.officeframe.model.TaskType;
 import com.semantyca.officeframe.repository.TaskTypeRepository;
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import io.kneo.core.model.user.IUser;
 import io.kneo.core.service.AbstractService;
 import io.kneo.core.service.IRESTService;

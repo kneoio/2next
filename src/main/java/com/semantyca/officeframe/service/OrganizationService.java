@@ -6,7 +6,7 @@ import com.semantyca.officeframe.model.OrgCategory;
 import com.semantyca.officeframe.model.Organization;
 import com.semantyca.officeframe.repository.OrgCategoryRepository;
 import com.semantyca.officeframe.repository.OrganizationRepository;
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import io.kneo.core.model.user.IUser;
 import io.kneo.core.service.AbstractService;
 import io.kneo.core.service.IRESTService;

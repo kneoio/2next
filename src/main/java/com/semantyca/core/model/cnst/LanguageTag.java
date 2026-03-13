@@ -1,7 +1,6 @@
 package com.semantyca.core.model.cnst;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import io.kneo.core.localization.LanguageCode;
 
 public enum LanguageTag {
 

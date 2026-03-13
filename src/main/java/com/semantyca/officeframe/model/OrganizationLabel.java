@@ -2,7 +2,7 @@ package com.semantyca.officeframe.model;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import io.kneo.core.model.SimpleReferenceEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

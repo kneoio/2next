@@ -3,7 +3,7 @@ package com.semantyca.officeframe.service;
 import com.semantyca.officeframe.dto.DepartmentDTO;
 import com.semantyca.officeframe.model.Department;
 import com.semantyca.officeframe.repository.DepartmentRepository;
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import io.kneo.core.model.user.AnonymousUser;
 import io.kneo.core.model.user.IUser;
 import io.kneo.core.repository.exception.DocumentModificationAccessException;

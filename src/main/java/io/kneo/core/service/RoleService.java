@@ -2,7 +2,7 @@ package io.kneo.core.service;
 
 
 import io.kneo.core.dto.document.RoleDTO;
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import io.kneo.core.model.user.AnonymousUser;
 import io.kneo.core.model.user.IUser;
 import io.kneo.core.model.user.Role;

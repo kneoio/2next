@@ -1,4 +1,4 @@
-package com.semantyca.officeframe.cnst;
+package com.semantyca.officeframe.model.cnst;
 
 public enum MessengerType {
     WHATSAPP,

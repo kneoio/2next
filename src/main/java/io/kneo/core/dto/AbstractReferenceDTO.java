@@ -1,7 +1,7 @@
 package io.kneo.core.dto;
 
 import io.kneo.core.dto.validation.ValidLocalizedName;
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;

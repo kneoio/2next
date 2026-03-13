@@ -1,7 +1,7 @@
 package com.semantyca.core.model.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import io.kneo.core.model.SimpleReferenceEntity;
 import io.kneo.core.model.cnst.SystemRoleType;
 import lombok.Getter;

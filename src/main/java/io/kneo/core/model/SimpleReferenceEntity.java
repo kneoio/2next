@@ -1,6 +1,6 @@
 package io.kneo.core.model;
 
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import io.kneo.core.server.Environment;
 import lombok.Getter;
 import lombok.Setter;

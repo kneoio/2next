@@ -2,8 +2,7 @@ package io.kneo.core.service;
 
 import io.kneo.core.dto.AbstractDTO;
 import io.kneo.core.dto.DocumentAccessDTO;
-import io.kneo.core.dto.rls.RLSDTO;
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import io.kneo.core.model.DataEntity;
 import io.kneo.core.model.embedded.DocumentAccessInfo;
 import io.kneo.core.model.user.IUser;
@@ -12,9 +11,7 @@ import io.kneo.core.repository.exception.DocumentModificationAccessException;
 import io.smallrye.mutiny.Uni;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public abstract class AbstractService<T, V> {
     protected static final Duration TIMEOUT = Duration.ofSeconds(5);

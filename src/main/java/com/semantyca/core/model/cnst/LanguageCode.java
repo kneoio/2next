@@ -1,4 +1,4 @@
-package io.kneo.core.localization;
+package com.semantyca.core.model.cnst;
 
 import lombok.Getter;
 

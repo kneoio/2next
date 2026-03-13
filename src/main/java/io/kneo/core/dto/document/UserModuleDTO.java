@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.kneo.core.dto.AbstractReferenceDTO;
 import io.kneo.core.dto.Views;
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import io.kneo.core.server.Environment;
 import lombok.Builder;
 import lombok.Getter;

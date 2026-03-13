@@ -2,7 +2,7 @@ package io.kneo.core.model.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.kneo.core.repository.cnst.UserRegStatus;
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import io.kneo.core.model.DataEntity;
 import io.kneo.core.model.Module;
 import io.kneo.core.server.EnvConst;

@@ -3,7 +3,7 @@ package com.semantyca.officeframe.repository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.semantyca.officeframe.model.Organization;
 import com.semantyca.officeframe.repository.table.OfficeFrameNameResolver;
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import io.kneo.core.model.user.IUser;
 import io.kneo.core.repository.AsyncRepository;
 import io.kneo.core.repository.exception.DocumentHasNotFoundException;

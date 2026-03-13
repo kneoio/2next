@@ -1,7 +1,7 @@
 package io.kneo.core.dto.document;
 
 import io.kneo.core.dto.validation.ValidLanguageCode;
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

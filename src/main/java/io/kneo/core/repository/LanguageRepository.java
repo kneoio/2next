@@ -1,7 +1,7 @@
 package io.kneo.core.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import io.kneo.core.model.Language;
 import io.kneo.core.model.user.IUser;
 import io.kneo.core.repository.exception.DocumentHasNotFoundException;

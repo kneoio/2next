@@ -1,7 +1,7 @@
 package io.kneo.core.dto.actions;
 
 import io.kneo.core.dto.actions.cnst.ActionType;
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 
 public class ActionsFactory {
 

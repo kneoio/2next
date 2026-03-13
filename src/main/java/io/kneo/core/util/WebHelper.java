@@ -1,6 +1,6 @@
 package io.kneo.core.util;
 
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 
 import java.text.Normalizer;
 import java.util.Arrays;

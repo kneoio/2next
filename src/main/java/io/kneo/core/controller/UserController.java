@@ -5,7 +5,7 @@ import io.kneo.core.dto.document.UserDTO;
 import io.kneo.core.dto.view.View;
 import io.kneo.core.dto.view.ViewPage;
 import io.kneo.core.dto.form.FormPage;
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import io.kneo.core.model.user.User;
 import io.kneo.core.service.UserService;
 import io.kneo.core.util.RuntimeUtil;

@@ -4,7 +4,7 @@ import com.semantyca.officeframe.dto.OrgCategoryDTO;
 import com.semantyca.officeframe.model.OrgCategory;
 import com.semantyca.officeframe.model.Position;
 import com.semantyca.officeframe.repository.OrgCategoryRepository;
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import io.kneo.core.model.user.IUser;
 import io.kneo.core.service.AbstractService;
 import io.kneo.core.service.IRESTService;

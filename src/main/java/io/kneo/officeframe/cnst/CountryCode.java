@@ -1,6 +1,6 @@
 package io.kneo.officeframe.cnst;
 
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import lombok.Getter;
 
 /**

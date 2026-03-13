@@ -9,7 +9,7 @@ import com.semantyca.officeframe.repository.DepartmentRepository;
 import com.semantyca.officeframe.repository.EmployeeRepository;
 import com.semantyca.officeframe.repository.OrganizationRepository;
 import com.semantyca.officeframe.repository.PositionRepository;
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import io.kneo.core.model.user.IUser;
 import io.kneo.core.service.AbstractService;
 import io.kneo.core.service.IRESTService;

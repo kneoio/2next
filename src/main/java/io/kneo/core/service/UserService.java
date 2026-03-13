@@ -1,5 +1,6 @@
 package io.kneo.core.service;
 
+import com.semantyca.core.model.cnst.LanguageCode;
 import io.kneo.core.repository.cnst.UserRegStatus;
 import io.kneo.core.dto.document.UserDTO;
 import io.kneo.core.model.Module;
@@ -173,7 +174,7 @@ public class UserService {
         return repository.delete(Long.valueOf(id));
     }
 
-    public Uni<UserDTO> getDTO(long id, IUser requester, io.kneo.core.localization.LanguageCode languageCode) {
+    public Uni<UserDTO> getDTO(long id, IUser requester, LanguageCode languageCode) {
         return repository.get(id).chain(opt -> {
             if (opt.isEmpty()) {
                 return Uni.createFrom().failure(new IllegalArgumentException("User not found"));

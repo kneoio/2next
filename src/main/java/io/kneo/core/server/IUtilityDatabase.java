@@ -1,6 +1,6 @@
 package io.kneo.core.server;
 
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import io.kneo.core.localization.Sentence;
 import io.kneo.core.localization.exception.UtilityDBException;
 

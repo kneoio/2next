@@ -5,7 +5,7 @@ import io.kneo.core.dto.actions.ActionsFactory;
 import io.kneo.core.dto.cnst.PayloadType;
 import io.kneo.core.dto.view.View;
 import io.kneo.core.dto.view.ViewPage;
-import io.kneo.core.localization.LanguageCode;
+import com.semantyca.core.model.cnst.LanguageCode;
 import io.kneo.core.model.user.AnonymousUser;
 import io.kneo.core.model.user.IUser;
 import io.kneo.core.model.user.UndefinedUser;
