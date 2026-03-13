@@ -2,7 +2,7 @@ package com.semantyca.mixpla.model;
 
 import com.semantyca.core.model.cnst.LanguageTag;
 import com.semantyca.mixpla.model.cnst.PromptType;
-import io.kneo.core.model.SecureDataEntity;
+import com.semantyca.core.model.SecureDataEntity;
 import io.vertx.core.json.JsonObject;
 import lombok.Getter;
 import lombok.Setter;

@@ -1,10 +1,10 @@
 package io.kneo.officeframe.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.kneo.core.model.user.IUser;
-import io.kneo.core.repository.AsyncRepository;
-import io.kneo.core.repository.exception.DocumentHasNotFoundException;
-import io.kneo.core.repository.table.EntityData;
+import com.semantyca.core.model.user.IUser;
+import com.semantyca.core.repository.AsyncRepository;
+import com.semantyca.core.repository.exception.DocumentHasNotFoundException;
+import com.semantyca.core.repository.table.EntityData;
 import io.kneo.officeframe.model.Genre;
 import io.kneo.officeframe.dto.GenreFilterDTO;
 import io.kneo.officeframe.repository.table.OfficeFrameNameResolver;

@@ -2,7 +2,7 @@ package com.semantyca.mixpla.model;
 
 import com.semantyca.core.model.UserData;
 import com.semantyca.core.model.cnst.LanguageCode;
-import io.kneo.core.model.SecureDataEntity;
+import com.semantyca.core.model.SecureDataEntity;
 import lombok.Getter;
 import lombok.Setter;
 

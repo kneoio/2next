@@ -1,8 +1,8 @@
 package io.kneo.officeframe.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.kneo.core.repository.AsyncRepository;
-import io.kneo.core.repository.table.EntityData;
+import com.semantyca.core.repository.AsyncRepository;
+import com.semantyca.core.repository.table.EntityData;
 import io.kneo.officeframe.model.OrgCategory;
 import io.kneo.officeframe.repository.table.OfficeFrameNameResolver;
 import io.smallrye.mutiny.Multi;

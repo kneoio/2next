@@ -1,10 +1,10 @@
 package io.kneo.officeframe.service;
 
 import com.semantyca.core.model.cnst.LanguageCode;
-import io.kneo.core.model.user.IUser;
-import io.kneo.core.service.AbstractService;
-import io.kneo.core.service.IRESTService;
-import io.kneo.core.service.UserService;
+import com.semantyca.core.model.user.IUser;
+import com.semantyca.core.service.AbstractService;
+import com.semantyca.core.service.IRESTService;
+import com.semantyca.core.service.UserService;
 import io.kneo.officeframe.dto.PositionDTO;
 import io.kneo.officeframe.model.Position;
 import io.kneo.officeframe.repository.PositionRepository;

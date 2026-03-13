@@ -3,7 +3,7 @@ package com.semantyca.core.service.external.hetzner;
 import com.semantyca.core.config.HetznerConfig;
 import com.semantyca.core.model.FileMetadata;
 import com.semantyca.core.model.cnst.FileStorageType;
-import com.semantyca.core.repository.file.IFileStorage;
+import com.semantyca.core.repository.IFileStorage;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.infrastructure.Infrastructure;
 import jakarta.annotation.PostConstruct;

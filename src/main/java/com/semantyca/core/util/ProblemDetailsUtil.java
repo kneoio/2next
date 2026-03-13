@@ -1,6 +1,6 @@
 package com.semantyca.core.util;
 
-import io.kneo.core.server.EnvConst;
+import com.semantyca.core.server.EnvConst;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 

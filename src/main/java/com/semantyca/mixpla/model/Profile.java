@@ -1,6 +1,6 @@
 package com.semantyca.mixpla.model;
 
-import io.kneo.core.model.SimpleReferenceEntity;
+import com.semantyca.core.model.SimpleReferenceEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -5,7 +5,7 @@ import com.semantyca.core.model.scheduler.Schedulable;
 import com.semantyca.core.model.scheduler.Scheduler;
 import com.semantyca.mixpla.model.cnst.EventPriority;
 import com.semantyca.mixpla.model.cnst.EventType;
-import io.kneo.core.model.SecureDataEntity;
+import com.semantyca.core.model.SecureDataEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

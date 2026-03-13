@@ -1,7 +1,7 @@
 package com.semantyca.mixpla.repository;
 
-import io.kneo.core.repository.table.EntityData;
-import io.kneo.core.repository.table.TableNameResolver;
+import com.semantyca.core.repository.table.EntityData;
+import com.semantyca.core.repository.table.TableNameResolver;
 
 public class MixplaNameResolver extends TableNameResolver {
     public static final String SOUND_FRAGMENT = "sound fragment";

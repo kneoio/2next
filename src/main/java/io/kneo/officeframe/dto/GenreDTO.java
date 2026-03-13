@@ -2,8 +2,8 @@ package io.kneo.officeframe.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
-import io.kneo.core.dto.AbstractReferenceDTO;
-import io.kneo.core.dto.Views;
+import com.semantyca.core.dto.AbstractReferenceDTO;
+import com.semantyca.core.dto.Views;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

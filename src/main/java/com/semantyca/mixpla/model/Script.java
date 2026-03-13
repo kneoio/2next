@@ -3,7 +3,7 @@ package com.semantyca.mixpla.model;
 import com.semantyca.core.model.ScriptVariable;
 import com.semantyca.core.model.cnst.LanguageTag;
 import com.semantyca.mixpla.model.cnst.SceneTimingMode;
-import io.kneo.core.model.SecureDataEntity;
+import com.semantyca.core.model.SecureDataEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

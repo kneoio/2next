@@ -3,7 +3,7 @@ package com.semantyca.mixpla.model.soundfragment;
 import com.semantyca.core.model.FileMetadata;
 import com.semantyca.mixpla.model.cnst.PlaylistItemType;
 import com.semantyca.mixpla.model.cnst.SourceType;
-import io.kneo.core.model.SecureDataEntity;
+import com.semantyca.core.model.SecureDataEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

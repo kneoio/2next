@@ -1,7 +1,7 @@
 package io.kneo.officeframe.repository.table;
 
-import io.kneo.core.repository.table.EntityData;
-import io.kneo.core.repository.table.TableNameResolver;
+import com.semantyca.core.repository.table.EntityData;
+import com.semantyca.core.repository.table.TableNameResolver;
 
 public class OfficeFrameNameResolver extends TableNameResolver {
     public static final String ORGANIZATION = "organization";

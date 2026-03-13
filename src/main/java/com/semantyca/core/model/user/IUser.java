@@ -1,6 +1,6 @@
 package com.semantyca.core.model.user;
 
-import io.kneo.core.server.EnvConst;
+import com.semantyca.core.server.EnvConst;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;

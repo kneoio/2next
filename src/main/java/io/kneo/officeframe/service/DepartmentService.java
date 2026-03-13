@@ -1,12 +1,12 @@
 package io.kneo.officeframe.service;
 
 import com.semantyca.core.model.cnst.LanguageCode;
-import io.kneo.core.model.user.AnonymousUser;
-import io.kneo.core.model.user.IUser;
-import io.kneo.core.repository.exception.DocumentModificationAccessException;
-import io.kneo.core.service.AbstractService;
-import io.kneo.core.service.IRESTService;
-import io.kneo.core.service.UserService;
+import com.semantyca.core.model.user.AnonymousUser;
+import com.semantyca.core.model.user.IUser;
+import com.semantyca.core.repository.exception.DocumentModificationAccessException;
+import com.semantyca.core.service.AbstractService;
+import com.semantyca.core.service.IRESTService;
+import com.semantyca.core.service.UserService;
 import io.kneo.officeframe.dto.DepartmentDTO;
 import io.kneo.officeframe.model.Department;
 import io.kneo.officeframe.repository.DepartmentRepository;

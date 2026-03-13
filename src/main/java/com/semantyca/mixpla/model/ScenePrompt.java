@@ -1,6 +1,6 @@
 package com.semantyca.mixpla.model;
 
-import io.kneo.core.dto.actions.cnst.ActionType;
+import com.semantyca.core.dto.actions.cnst.ActionType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

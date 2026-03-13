@@ -1,7 +1,8 @@
 package com.semantyca.core.model.user;
 
 
-import io.kneo.core.model.cnst.SystemRoleType;
+
+import com.semantyca.core.model.cnst.SystemRoleType;
 
 import java.util.Collections;
 import java.util.List;

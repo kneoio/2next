@@ -1,8 +1,8 @@
 package io.kneo.officeframe.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.kneo.core.model.SimpleReferenceEntity;
-import io.kneo.officeframe.cnst.CountryCode;
+import com.semantyca.officeframe.model.cnst.CountryCode;
+import com.semantyca.core.model.SimpleReferenceEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

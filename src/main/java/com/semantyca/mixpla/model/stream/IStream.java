@@ -8,7 +8,7 @@ import com.semantyca.mixpla.model.cnst.AiAgentStatus;
 import com.semantyca.mixpla.model.cnst.ManagedBy;
 import com.semantyca.mixpla.model.cnst.StreamStatus;
 import com.semantyca.core.model.cnst.LanguageCode;
-import io.kneo.officeframe.cnst.CountryCode;
+import com.semantyca.officeframe.model.cnst.CountryCode;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;

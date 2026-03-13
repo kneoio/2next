@@ -2,8 +2,8 @@ package com.semantyca.core.model.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.semantyca.core.model.cnst.LanguageCode;
-import io.kneo.core.model.SimpleReferenceEntity;
-import io.kneo.core.model.cnst.SystemRoleType;
+import com.semantyca.core.model.cnst.SystemRoleType;
+import com.semantyca.core.model.SimpleReferenceEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

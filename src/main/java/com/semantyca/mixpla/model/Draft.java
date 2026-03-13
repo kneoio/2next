@@ -2,7 +2,7 @@ package com.semantyca.mixpla.model;
 
 import com.semantyca.core.model.cnst.LanguageTag;
 import com.semantyca.mixpla.model.cnst.DraftingMethod;
-import io.kneo.core.model.DataEntity;
+import com.semantyca.core.model.DataEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

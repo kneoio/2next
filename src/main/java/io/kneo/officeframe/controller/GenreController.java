@@ -1,15 +1,15 @@
 package io.kneo.officeframe.controller;
 
-import io.kneo.core.controller.AbstractSecuredController;
-import io.kneo.core.dto.actions.ActionBox;
-import io.kneo.core.dto.cnst.PayloadType;
-import io.kneo.core.dto.form.FormPage;
-import io.kneo.core.dto.view.View;
-import io.kneo.core.dto.view.ViewPage;
+import com.semantyca.core.controller.AbstractSecuredController;
+import com.semantyca.core.dto.actions.ActionBox;
+import com.semantyca.core.dto.cnst.PayloadType;
+import com.semantyca.core.dto.form.FormPage;
+import com.semantyca.core.dto.view.View;
+import com.semantyca.core.dto.view.ViewPage;
 import com.semantyca.core.model.cnst.LanguageCode;
-import io.kneo.core.service.UserService;
-import io.kneo.core.util.RuntimeUtil;
-import io.kneo.core.util.WebHelper;
+import com.semantyca.core.service.UserService;
+import com.semantyca.core.util.RuntimeUtil;
+import com.semantyca.core.util.WebHelper;
 import io.kneo.officeframe.dto.GenreDTO;
 import io.kneo.officeframe.dto.GenreFilterDTO;
 import io.kneo.officeframe.model.Genre;

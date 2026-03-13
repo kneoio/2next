@@ -1,8 +1,8 @@
 package io.kneo.officeframe.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.kneo.core.repository.AsyncRepository;
-import io.kneo.core.repository.table.EntityData;
+import com.semantyca.core.repository.AsyncRepository;
+import com.semantyca.core.repository.table.EntityData;
 import io.kneo.officeframe.model.Position;
 import io.kneo.officeframe.repository.table.OfficeFrameNameResolver;
 import io.smallrye.mutiny.Multi;
@@ -12,7 +12,6 @@ import io.vertx.mutiny.sqlclient.Row;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 

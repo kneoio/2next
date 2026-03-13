@@ -1,6 +1,6 @@
 package com.semantyca.mixpla.model.filter;
 
-import io.kneo.officeframe.cnst.CountryCode;
+import com.semantyca.officeframe.model.cnst.CountryCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
