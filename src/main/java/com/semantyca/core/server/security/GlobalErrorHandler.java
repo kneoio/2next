@@ -6,6 +6,7 @@ import io.vertx.ext.web.RoutingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -29,15 +30,18 @@ public class GlobalErrorHandler implements Handler<RoutingContext> {
             LOGGER.warn("ErrorId {} | Path {} | Status {}", errorId, ctx.normalizedPath(), status);
         }
 
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("status", status);
+        errorResponse.put("error", failure != null && failure.getMessage() != null
+                ? failure.getMessage()
+                : defaultMessage(status));
+        errorResponse.put("path", ctx.normalizedPath());
+        errorResponse.put("errorId", errorId);
+
         ctx.response()
                 .setStatusCode(status)
                 .putHeader("Content-Type", "application/json")
-                .end(Json.encode(Map.of(
-                        "status", status,
-                        "error", failure != null ? failure.getMessage() : defaultMessage(status),
-                        "path", ctx.normalizedPath(),
-                        "errorId", errorId
-                )));
+                .end(Json.encode(errorResponse));
     }
 
     private String defaultMessage(int status) {
@@ -49,5 +53,4 @@ public class GlobalErrorHandler implements Handler<RoutingContext> {
             default -> "Unexpected server error";
         };
     }
-
 }

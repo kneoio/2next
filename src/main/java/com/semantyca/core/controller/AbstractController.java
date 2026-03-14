@@ -85,25 +85,30 @@ public abstract class AbstractController<T, V> extends BaseController {
         JsonObject principal = vertxUser.principal();
         String username = principal.getString(USER_NAME);
         if (username == null || username.isEmpty()) {
-            LOGGER.info("preferred_username: {} ", principal.getString(USER_NAME_CLAIM));
-            return Uni.createFrom().failure(new IllegalArgumentException("Username is null or empty 789"));
-        } else {
-            return userService.findByLogin(username)
-                    .onItem().transformToUni(user -> {
-                        if (user == null || user instanceof UndefinedUser) {
-                            if (autoRegisterUser) {
-                                return userService.addOrGet(buildUser(username), List.of(), List.of(), true)
-                                        .onItem().transformToUni(userId -> userService.get(userId))
-                                        .onItem().transform(Optional::get);
-                            } else if (allowUndefinedUser) {
-                                return Uni.createFrom().item(buildUser(username));
-                            } else {
-                                return Uni.createFrom().failure(new UserNotFoundException(username));
-                            }
-                        }
-                        return Uni.createFrom().item(user);
-                    });
+            username = principal.getString(USER_NAME_CLAIM);
+            if (username == null || username.isEmpty()) {
+                LOGGER.error("Both username and preferred_username claims are missing from token");
+                return Uni.createFrom().failure(new IllegalArgumentException("Username is null or empty"));
+            }
+            LOGGER.debug("Using preferred_username claim: {}", username);
         }
+
+        String finalUsername = username;
+        return userService.findByLogin(username)
+                .onItem().transformToUni(user -> {
+                    if (user == null || user instanceof UndefinedUser) {
+                        if (autoRegisterUser) {
+                            return userService.addOrGet(buildUser(finalUsername), List.of(), List.of(), true)
+                                    .onItem().transformToUni(userId -> userService.get(userId))
+                                    .onItem().transform(Optional::get);
+                        } else if (allowUndefinedUser) {
+                            return Uni.createFrom().item(buildUser(finalUsername));
+                        } else {
+                            return Uni.createFrom().failure(new UserNotFoundException(finalUsername));
+                        }
+                    }
+                    return Uni.createFrom().item(user);
+                });
     }
 
     private com.semantyca.core.model.user.User buildUser(String userName) {
