@@ -13,7 +13,7 @@ public abstract class DataEntity<K> implements IDataEntity<K> {
     private ZonedDateTime regDate;
     private ZonedDateTime lastModifiedDate;
     private long lastModifier;
-    private Integer archived;
+    private int archived;
 
     @Override
     public K getId() {

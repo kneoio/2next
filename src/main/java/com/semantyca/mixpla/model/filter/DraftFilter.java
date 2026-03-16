@@ -12,7 +12,6 @@ public class DraftFilter implements IFilter{
     private boolean activated = false;
 
     private LanguageTag languageTag;
-    private Integer archived;
     private boolean enabled;
     private boolean master;
     private boolean locked;
@@ -23,8 +22,7 @@ public class DraftFilter implements IFilter{
 
     public boolean hasAnyFilter() {
         return languageTag != null ||
-               archived != null || 
-               enabled || 
+               enabled ||
                master || 
                locked;
     }

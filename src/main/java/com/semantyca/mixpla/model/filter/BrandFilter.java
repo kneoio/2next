@@ -10,22 +10,20 @@ import java.util.List;
 @Setter
 @Getter
 @NoArgsConstructor
-public class ListenerFilter implements IFilter{
+public class BrandFilter implements IFilter{
     private boolean activated = false;
     private List<CountryCode> countries;
-    private String searchTerm;
+    private boolean publicBrand;
+
 
     public boolean isActivated() {
-        if (activated) {
-            return true;
-        }
-        return hasAnyFilter();
+        return activated || hasAnyFilter();
     }
 
     public boolean hasAnyFilter() {
         if (countries != null && !countries.isEmpty()) {
             return true;
         }
-        return searchTerm != null && !searchTerm.isEmpty();
+        return publicBrand;
     }
 }

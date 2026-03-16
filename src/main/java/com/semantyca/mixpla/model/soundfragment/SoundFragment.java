@@ -29,7 +29,6 @@ public class SoundFragment extends SecureDataEntity<UUID> {
     private String slugName;
     private Duration length;
     private String description;
-    private Integer archived;
     private LocalDateTime expiresAt;
     private List<FileMetadata> fileMetadataList;
     private ContributionWorkflow contributionWorkflow;

@@ -23,7 +23,6 @@ public class Script extends SecureDataEntity<UUID> {
     private UUID defaultProfileId;
     private String description;
     private Integer accessLevel = 0;
-    private Integer archived;
     private List<UUID> labels;
     private List<UUID> brands;
     private NavigableSet<Scene> scenes =
