@@ -9,10 +9,10 @@ import com.semantyca.core.controller.UserController;
 import com.semantyca.core.controller.UserSubscriptionController;
 import com.semantyca.core.controller.WorkspaceController;
 import com.semantyca.core.server.security.GlobalErrorHandler;
-import io.kneo.officeframe.controller.LabelController;
 import com.semantyca.core.controller.AgreementController;
 import com.semantyca.core.controller.UserConsentController;
-import io.kneo.officeframe.controller.GenreController;
+import com.semantyca.officeframe.controller.GenreController;
+import com.semantyca.officeframe.controller.LabelController;;
 import io.quarkus.runtime.ShutdownEvent;
 import io.smallrye.mutiny.Uni;
 import io.vertx.ext.web.Router;
@@ -21,6 +21,9 @@ import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class AbstractApplicationInit {
 
@@ -61,6 +64,11 @@ public class AbstractApplicationInit {
     @Inject
     SubscriptionProductController subscriptionProductController;
 
+    @Inject
+    EndpointConfig endpointConfig;
+
+    private Set<String> enabledControllers;
+
 
     public AbstractApplicationInit(
             PgPool client
@@ -75,19 +83,46 @@ public class AbstractApplicationInit {
 
 
     protected void setupRoutes(Router router) {
+        parseEnabledControllers();
+        
         router.route().failureHandler(new GlobalErrorHandler());
-        userController.setupRoutes(router);
-        languageController.setupRoutes(router);
-        moduleController.setupRoutes(router);
-        roleController.setupRoutes(router);
-        workspaceController.setupRoutes(router);
-        labelController.setupRoutes(router);
-        genreController.setupRoutes(router);
-        agreementController.setupRoutes(router);
-        userConsentController.setupRoutes(router);
-        userBillingController.setupRoutes(router);
-        userSubscriptionController.setupRoutes(router);
-        subscriptionProductController.setupRoutes(router);
+        
+        if (isControllerEnabled("users")) {
+            userController.setupRoutes(router);
+        }
+        if (isControllerEnabled("languages")) {
+            languageController.setupRoutes(router);
+        }
+        if (isControllerEnabled("modules")) {
+            moduleController.setupRoutes(router);
+        }
+        if (isControllerEnabled("roles")) {
+            roleController.setupRoutes(router);
+        }
+        if (isControllerEnabled("workspaces")) {
+            workspaceController.setupRoutes(router);
+        }
+        if (isControllerEnabled("labels")) {
+            labelController.setupRoutes(router);
+        }
+        if (isControllerEnabled("genres")) {
+            genreController.setupRoutes(router);
+        }
+        if (isControllerEnabled("agreements")) {
+            agreementController.setupRoutes(router);
+        }
+        if (isControllerEnabled("user-consents")) {
+            userConsentController.setupRoutes(router);
+        }
+        if (isControllerEnabled("user-billing")) {
+            userBillingController.setupRoutes(router);
+        }
+        if (isControllerEnabled("user-subscriptions")) {
+            userSubscriptionController.setupRoutes(router);
+        }
+        if (isControllerEnabled("subscription-products")) {
+            subscriptionProductController.setupRoutes(router);
+        }
     }
 
     protected void logRegisteredRoutes(Router router) {
@@ -106,5 +141,17 @@ public class AbstractApplicationInit {
                 .onFailure()
                 .recoverWithItem("Database connection failed");
         LOGGER.info(connected.await().indefinitely());
+    }
+
+    private void parseEnabledControllers() {
+        String enabled = endpointConfig.enabled();
+        enabledControllers = Arrays.stream(enabled.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toSet());
+    }
+
+    private boolean isControllerEnabled(String controllerName) {
+        return enabledControllers.contains(controllerName);
     }
 }
