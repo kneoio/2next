@@ -23,7 +23,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static io.kneo.officeframe.repository.table.OfficeFrameNameResolver.LABEL;
+import static com.semantyca.officeframe.repository.table.OfficeFrameNameResolver.LABEL;
+
 
 @ApplicationScoped
 public class LabelRepository extends AsyncRepository {

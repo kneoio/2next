@@ -12,7 +12,7 @@ import com.semantyca.core.server.security.GlobalErrorHandler;
 import com.semantyca.core.controller.AgreementController;
 import com.semantyca.core.controller.UserConsentController;
 import com.semantyca.officeframe.controller.GenreController;
-import com.semantyca.officeframe.controller.LabelController;;
+import com.semantyca.officeframe.controller.LabelController;
 import io.quarkus.runtime.ShutdownEvent;
 import io.smallrye.mutiny.Uni;
 import io.vertx.ext.web.Router;

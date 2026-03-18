@@ -18,7 +18,8 @@ import jakarta.inject.Inject;
 import java.util.List;
 import java.util.UUID;
 
-import static io.kneo.officeframe.repository.table.OfficeFrameNameResolver.DEPARTMENT;
+import static com.semantyca.officeframe.repository.table.OfficeFrameNameResolver.DEPARTMENT;
+
 
 @ApplicationScoped
 public class DepartmentRepository extends AsyncRepository {

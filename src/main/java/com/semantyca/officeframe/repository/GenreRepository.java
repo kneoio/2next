@@ -22,7 +22,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static io.kneo.officeframe.repository.table.OfficeFrameNameResolver.GENRE;
+import static com.semantyca.officeframe.repository.table.OfficeFrameNameResolver.GENRE;
+
 
 @ApplicationScoped
 public class GenreRepository extends AsyncRepository {

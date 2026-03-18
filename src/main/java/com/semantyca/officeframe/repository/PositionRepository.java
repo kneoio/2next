@@ -15,7 +15,8 @@ import jakarta.inject.Inject;
 import java.util.List;
 import java.util.UUID;
 
-import static io.kneo.officeframe.repository.table.OfficeFrameNameResolver.POSITION;
+import static com.semantyca.officeframe.repository.table.OfficeFrameNameResolver.POSITION;
+
 
 @ApplicationScoped
 public class PositionRepository extends AsyncRepository {

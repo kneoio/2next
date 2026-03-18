@@ -23,7 +23,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.UUID;
 
-import static io.kneo.officeframe.repository.table.OfficeFrameNameResolver.ORGANIZATION;
+import static com.semantyca.officeframe.repository.table.OfficeFrameNameResolver.ORGANIZATION;
+
 
 @ApplicationScoped
 public class OrganizationRepository extends AsyncRepository {

@@ -28,7 +28,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static io.kneo.officeframe.repository.table.OfficeFrameNameResolver.EMPLOYEE;
+import static com.semantyca.officeframe.repository.table.OfficeFrameNameResolver.EMPLOYEE;
+
 
 @ApplicationScoped
 public class EmployeeRepository extends AsyncRepository {

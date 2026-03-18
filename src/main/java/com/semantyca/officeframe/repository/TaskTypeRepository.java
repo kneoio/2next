@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static io.kneo.officeframe.repository.table.OfficeFrameNameResolver.TASK_TYPE;
+import static com.semantyca.officeframe.repository.table.OfficeFrameNameResolver.TASK_TYPE;
 
 @ApplicationScoped
 public class TaskTypeRepository extends AsyncRepository {
