@@ -14,6 +14,7 @@ import java.util.UUID;
 public class SongQueueMessageDTO {
     private UUID messageId;
     private Long timestamp; // Unix timestamp in milliseconds when message was created
+    private Long sceneDeadlineTimestamp;
     private int sequenceNumber;
     private String brandSlug;
     private MergingType mergingMethod;
