@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
-@ApplicationScoped
+//@ApplicationScoped
 public class LocalFileCleanupService {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocalFileCleanupService.class);
     private static final Duration TEMP_FILE_MAX_AGE = Duration.ofHours(2);
