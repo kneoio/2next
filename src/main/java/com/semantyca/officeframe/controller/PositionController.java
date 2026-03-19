@@ -40,7 +40,7 @@ public class PositionController extends AbstractSecuredController<Position, Posi
     }
 
     public void setupRoutes(Router router) {
-        String path = "/api/positions";
+        String path = "/officeframe/positions";
 
         BodyHandler jsonBodyHandler = BodyHandler.create().setHandleFileUploads(false);
 

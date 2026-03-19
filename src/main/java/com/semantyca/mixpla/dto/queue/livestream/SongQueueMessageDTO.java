@@ -13,6 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class SongQueueMessageDTO {
     private UUID messageId;
+    private UUID traceId;
     private Long timestamp; // Unix timestamp in milliseconds when message was created
     private Long sceneDeadlineTimestamp;
     private int sequenceNumber;

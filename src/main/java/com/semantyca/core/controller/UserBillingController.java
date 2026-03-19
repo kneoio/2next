@@ -38,7 +38,7 @@ public class UserBillingController extends AbstractSecuredController<UserBilling
     }
 
     public void setupRoutes(Router router) {
-        String path = "/api/billings";
+        String path = "/core/billings";
 
         BodyHandler jsonBodyHandler = BodyHandler.create().setHandleFileUploads(false);
 

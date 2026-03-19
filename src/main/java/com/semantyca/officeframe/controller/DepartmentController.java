@@ -41,7 +41,7 @@ public class DepartmentController extends AbstractSecuredController<Department, 
     }
 
     public void setupRoutes(Router router) {
-        String path = "/api/departments";
+        String path = "/officeframe/departments";
 
         BodyHandler jsonBodyHandler = BodyHandler.create().setHandleFileUploads(false);
 

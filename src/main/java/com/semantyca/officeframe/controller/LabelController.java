@@ -42,7 +42,7 @@ public class LabelController extends AbstractSecuredController<Label, LabelDTO> 
     }
 
     public void setupRoutes(Router router) {
-        String path = "/api/labels";
+        String path = "/officeframe/labels";
 
         BodyHandler jsonBodyHandler = BodyHandler.create().setHandleFileUploads(false);
 

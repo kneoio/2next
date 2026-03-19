@@ -41,7 +41,7 @@ public class TaskTypeController extends AbstractSecuredController<TaskType, Task
     }
 
     public void setupRoutes(Router router) {
-        String path = "/api/tasktypes";
+        String path = "/officeframe/tasktypes";
 
         BodyHandler jsonBodyHandler = BodyHandler.create().setHandleFileUploads(false);
 

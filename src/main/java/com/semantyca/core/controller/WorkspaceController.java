@@ -38,7 +38,7 @@ public class WorkspaceController extends AbstractSecuredController<Module, Modul
     }
 
     public void setupRoutes(Router router) {
-        router.route(HttpMethod.GET, "/api/workspace").handler(this::get);
+        router.route(HttpMethod.GET, "/core/workspace").handler(this::get);
     }
 
     private void get(RoutingContext rc) {

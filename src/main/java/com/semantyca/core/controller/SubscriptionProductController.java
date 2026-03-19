@@ -38,7 +38,7 @@ public class SubscriptionProductController extends AbstractSecuredController<Sub
     }
 
     public void setupRoutes(Router router) {
-        String path = "/api/subscription-products";
+        String path = "/core/subscription-products";
 
         BodyHandler jsonBodyHandler = BodyHandler.create().setHandleFileUploads(false);
 

@@ -42,7 +42,7 @@ public class GenreController extends AbstractSecuredController<Genre, GenreDTO> 
     }
 
     public void setupRoutes(Router router) {
-        String path = "/api/genres";
+        String path = "/officeframe/genres";
 
         BodyHandler jsonBodyHandler = BodyHandler.create().setHandleFileUploads(false);
 

@@ -38,7 +38,7 @@ public class AgreementController extends AbstractSecuredController<Agreement, Ag
     }
 
     public void setupRoutes(Router router) {
-        String path = "/api/agreements";
+        String path = "/core/agreements";
 
         BodyHandler jsonBodyHandler = BodyHandler.create().setHandleFileUploads(false);
 

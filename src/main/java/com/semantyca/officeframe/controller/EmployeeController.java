@@ -41,7 +41,7 @@ public class EmployeeController extends AbstractSecuredController<Employee, Empl
     }
 
     public void setupRoutes(Router router) {
-        String path = "/api/employees";
+        String path = "/officeframe/employees";
 
         BodyHandler jsonBodyHandler = BodyHandler.create().setHandleFileUploads(false);
 

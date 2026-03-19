@@ -44,7 +44,7 @@ public class OrgCategoryController extends AbstractSecuredController<OrgCategory
     }
 
     public void setupRoutes(Router router) {
-        String path = "/api/orgcategories";
+        String path = "/officeframe/orgcategories";
 
         BodyHandler jsonBodyHandler = BodyHandler.create().setHandleFileUploads(false);
 

@@ -66,7 +66,7 @@ public class UserController extends AbstractSecuredController<User, UserDTO> {
     }
 
     public void setupRoutes(Router router) {
-        String path = "/api/users";
+        String path = "/core/users";
         BodyHandler jsonBodyHandler = BodyHandler.create().setHandleFileUploads(false);
 
         router.route(path + "*").handler(this::addHeaders);

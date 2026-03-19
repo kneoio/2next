@@ -38,7 +38,7 @@ public class RoleController extends AbstractSecuredController<Role, RoleDTO> {
     }
 
     public void setupRoutes(Router router) {
-        String path = "/api/roles";
+        String path = "/core/roles";
 
         router.route(path + "*").handler(this::addHeaders);
         router.route(HttpMethod.GET, path).handler(this::get);

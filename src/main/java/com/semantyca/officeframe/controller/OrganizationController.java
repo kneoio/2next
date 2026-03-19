@@ -41,7 +41,7 @@ public class OrganizationController extends AbstractSecuredController<Organizati
     }
 
     public void setupRoutes(Router router) {
-        String path = "/api/orgs";
+        String path = "/officeframe/orgs";
 
         BodyHandler jsonBodyHandler = BodyHandler.create().setHandleFileUploads(false);
 

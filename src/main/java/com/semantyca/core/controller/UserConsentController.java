@@ -38,7 +38,7 @@ public class UserConsentController extends AbstractSecuredController<UserConsent
     }
 
     public void setupRoutes(Router router) {
-        String path = "/api/consents";
+        String path = "/core/consents";
 
         BodyHandler jsonBodyHandler = BodyHandler.create().setHandleFileUploads(false);
 
