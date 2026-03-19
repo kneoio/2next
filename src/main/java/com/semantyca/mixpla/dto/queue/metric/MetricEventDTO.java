@@ -10,9 +10,10 @@ public record MetricEventDTO(
         MetricEventType type,
         Instant timestamp,
         UUID traceId,
+        String code,
         Map<String, Object> payload
 ) {
-    public static MetricEventDTO of(String serviceId, String brandName, MetricEventType type, UUID traceId, Map<String, Object> payload) {
-        return new MetricEventDTO(serviceId, brandName, type, Instant.now(), traceId, payload);
+    public static MetricEventDTO of(String serviceId, String brandName, MetricEventType type, UUID traceId,  String code, Map<String, Object> payload) {
+        return new MetricEventDTO(serviceId, brandName, type, Instant.now(), traceId, code, payload);
     }
 }
