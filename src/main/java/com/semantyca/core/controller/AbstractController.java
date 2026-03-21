@@ -19,10 +19,10 @@ import io.vertx.ext.auth.User;
 import io.vertx.ext.web.RoutingContext;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -37,7 +37,8 @@ public abstract class AbstractController<T, V> extends BaseController {
     protected static final String USER_NAME_CLAIM = "preferred_username";
     protected static final String USER_NAME = "username";
 
-    UserService userService;
+    @Getter
+    private final UserService userService;
 
     @Inject
     public AbstractController(UserService userService) {

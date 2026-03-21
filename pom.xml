@@ -6,7 +6,7 @@
 
     <groupId>io.kneo</groupId>
     <artifactId>2next</artifactId>
-    <version>1.3.19</version>
+    <version>1.3.23</version>
     <packaging>jar</packaging>
     <name>2next</name>
 
@@ -206,6 +206,12 @@
                 </executions>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
 
 
