@@ -1,6 +1,6 @@
 package com.semantyca.core.service.maintenance;
 
-import com.semantyca.core.config.IINextConfig;
+import com.semantyca.core.config.TwoNextConfig;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -8,7 +8,6 @@ import io.smallrye.mutiny.infrastructure.Infrastructure;
 import io.smallrye.mutiny.subscription.Cancellable;
 import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.core.file.FileSystem;
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import lombok.Getter;
@@ -43,7 +42,7 @@ public class LocalFileCleanupService {
     private LocalDateTime lastCleanupTime;
 
     @Inject
-    public LocalFileCleanupService(IINextConfig config, Vertx vertx) {
+    public LocalFileCleanupService(TwoNextConfig config, Vertx vertx) {
         this.fileSystem = vertx.fileSystem();
         String baseUploadPath = config.getPathUploads();
         this.managedDirectories = List.of(

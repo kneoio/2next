@@ -8,12 +8,15 @@ import io.smallrye.config.WithName;
 public interface HetznerConfig {
 
     @WithName("access.key")
+    @WithDefault("none")
     String getAccessKey();
 
     @WithName("secret.key")
+    @WithDefault("none")
     String getSecretKey();
 
     @WithName("bucket.name")
+    @WithDefault("lousy-pubic")
     String getBucketName();
 
     @WithName("region")
