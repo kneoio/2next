@@ -12,6 +12,9 @@ public enum PlaylistItemType {
     MIX_SONG_1_SONG_2,
     MIX_1_SONG,
     MIX_2_INTRO_SONG,
-    MIX_DJ_CUSTOM_INTRO_SONG
+    MIX_DJ_CUSTOM_INTRO_SONG,
+    JINGLE_INTRO,
+    JINGLE_OUTRO,
+    BACKGROUND_LOOP;
 }
 
