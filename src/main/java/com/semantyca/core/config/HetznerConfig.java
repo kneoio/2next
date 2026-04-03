@@ -27,4 +27,20 @@ public interface HetznerConfig {
     @WithDefault("hel1.your-objectstorage.com")
     String getEndpoint();
 
+
+    @WithName("connection.timeout.seconds")
+    @WithDefault("30")
+    int getConnectionTimeoutSeconds();
+
+    @WithName("socket.timeout.seconds")
+    @WithDefault("600")  // 10 minutes
+    int getSocketTimeoutSeconds();
+
+    @WithName("api.call.timeout.seconds")
+    @WithDefault("600")  // 10 minutes
+    int getApiCallTimeoutSeconds();
+
+    @WithName("api.call.attempt.timeout.seconds")
+    @WithDefault("300")  // 5 minutes
+    int getApiCallAttemptTimeoutSeconds();
 }

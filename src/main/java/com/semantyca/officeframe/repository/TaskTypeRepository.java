@@ -9,6 +9,7 @@ import com.semantyca.core.repository.table.EntityData;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.pgclient.PgPool;
+import io.vertx.mutiny.sqlclient.Pool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
@@ -28,7 +29,7 @@ public class TaskTypeRepository extends AsyncRepository {
 
 
     @Inject
-    public TaskTypeRepository(PgPool client, ObjectMapper mapper) {
+    public TaskTypeRepository(Pool client, ObjectMapper mapper) {
         super(client, mapper, null);
     }
 

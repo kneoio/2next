@@ -10,8 +10,8 @@ import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.jboss.logging.Logger;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
@@ -35,7 +35,7 @@ import java.time.Duration;
 @ApplicationScoped
 public class HetznerStorageService implements IFileStorage {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HetznerStorageService.class);
+    private static final Logger LOGGER = Logger.getLogger(HetznerStorageService.class);
     private final HetznerConfig hetznerConfig;
     private S3Client s3Client;
 
@@ -47,15 +47,18 @@ public class HetznerStorageService implements IFileStorage {
     @PostConstruct
     public void init() {
         String endpointUrl = "https://" + this.hetznerConfig.getEndpoint();
-        LOGGER.info("Initializing Hetzner S3 client with endpoint: {}, bucket: {}", endpointUrl, this.hetznerConfig.getBucketName());
+        LOGGER.infof("Initializing Hetzner S3 client with endpoint: %s, bucket: %s", endpointUrl, this.hetznerConfig.getBucketName());
+
         SdkHttpClient httpClient = UrlConnectionHttpClient.builder()
-                .connectionTimeout(Duration.ofSeconds(30L))
-                .socketTimeout(Duration.ofSeconds(60L))
+                .connectionTimeout(Duration.ofSeconds(this.hetznerConfig.getConnectionTimeoutSeconds()))
+                .socketTimeout(Duration.ofSeconds(this.hetznerConfig.getSocketTimeoutSeconds()))
                 .build();
+
         ClientOverrideConfiguration overrideConfig = ClientOverrideConfiguration.builder()
-                .apiCallTimeout(Duration.ofMinutes(2L))
-                .apiCallAttemptTimeout(Duration.ofSeconds(90L))
+                .apiCallTimeout(Duration.ofSeconds(this.hetznerConfig.getApiCallTimeoutSeconds()))
+                .apiCallAttemptTimeout(Duration.ofSeconds(this.hetznerConfig.getApiCallAttemptTimeoutSeconds()))
                 .build();
+
         this.s3Client = S3Client.builder()
                 .credentialsProvider(StaticCredentialsProvider.create(
                         AwsBasicCredentials.create(this.hetznerConfig.getAccessKey(), this.hetznerConfig.getSecretKey())))
@@ -65,12 +68,18 @@ public class HetznerStorageService implements IFileStorage {
                 .overrideConfiguration(overrideConfig)
                 .forcePathStyle(true)
                 .build();
+
+        LOGGER.infof("S3 client initialized with timeouts - connection: %ss, socket: %ss, apiCall: %ss, apiCallAttempt: %ss",
+                this.hetznerConfig.getConnectionTimeoutSeconds(),
+                this.hetznerConfig.getSocketTimeoutSeconds(),
+                this.hetznerConfig.getApiCallTimeoutSeconds(),
+                this.hetznerConfig.getApiCallAttemptTimeoutSeconds());
     }
 
     @Override
     public Uni<FileMetadata> getFileStream(String keyName) {
         return Uni.createFrom().item(() -> {
-                    LOGGER.debug("Retrieving file stream for key: {}", keyName);
+                    LOGGER.debugf("Retrieving file stream for key: %s", keyName);
                     GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                             .bucket(this.hetznerConfig.getBucketName())
                             .key(keyName)
@@ -82,12 +91,12 @@ public class HetznerStorageService implements IFileStorage {
                     metadata.setMimeType(responseInputStream.response().contentType());
                     metadata.setContentLength(responseInputStream.response().contentLength());
                     metadata.setFileKey(keyName);
-                    LOGGER.debug("Stream created for key: {}, size: {} bytes", keyName, responseInputStream.response().contentLength());
+                    LOGGER.debugf("Stream created for key: %s, size: %s bytes", keyName, responseInputStream.response().contentLength());
                     return metadata;
                 })
                 .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
                 .onFailure().invoke(throwable -> {
-                    LOGGER.error("Error retrieving file stream: {} from Hetzner bucket: {}", keyName, this.hetznerConfig.getBucketName(), throwable);
+                    LOGGER.errorf("Error retrieving file stream: %s from Hetzner bucket: %s", keyName, this.hetznerConfig.getBucketName(), throwable);
                 })
                 .onFailure().recoverWithUni(Uni.createFrom()::failure);
     }
@@ -95,19 +104,19 @@ public class HetznerStorageService implements IFileStorage {
     @Override
     public Uni<Void> uploadFile(String keyName, String fileToUpload, String mimeType) {
         return Uni.createFrom().<Void>item(() -> {
-                    LOGGER.info("Uploading file with key: {}", keyName);
+                    LOGGER.infof("Uploading file with key: %s", keyName);
                     PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                             .bucket(this.hetznerConfig.getBucketName())
                             .key(keyName)
                             .contentType(mimeType)
                             .build();
                     this.s3Client.putObject(putObjectRequest, RequestBody.fromFile(Paths.get(fileToUpload)));
-                    LOGGER.info("Successfully uploaded file with key: {}", keyName);
+                    LOGGER.infof("Successfully uploaded file with key: %s", keyName);
                     return null;
                 })
                 .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
                 .onFailure().invoke(throwable ->
-                        LOGGER.error("Error uploading file to Hetzner. Key: {}, Bucket: {}", keyName, this.hetznerConfig.getBucketName(), throwable))
+                        LOGGER.errorf("Error uploading file to Hetzner. Key: %s, Bucket: %s", keyName, this.hetznerConfig.getBucketName(), throwable))
                 .onFailure().recoverWithUni(Uni.createFrom()::failure);
     }
 
@@ -132,7 +141,7 @@ public class HetznerStorageService implements IFileStorage {
                 })
                 .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
                 .onFailure().invoke(throwable ->
-                        LOGGER.error("Error deleting file from Hetzner. Key: {}, Bucket: {}", keyName, this.hetznerConfig.getBucketName(), throwable))
+                        LOGGER.errorf("Error deleting file from Hetzner. Key: %s, Bucket: %s", keyName, this.hetznerConfig.getBucketName(), throwable))
                 .onFailure().recoverWithUni(Uni.createFrom()::failure);
     }
 

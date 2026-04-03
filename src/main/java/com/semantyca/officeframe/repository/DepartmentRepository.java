@@ -10,6 +10,7 @@ import com.semantyca.core.repository.table.EntityData;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.pgclient.PgPool;
+import io.vertx.mutiny.sqlclient.Pool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -27,7 +28,7 @@ public class DepartmentRepository extends AsyncRepository {
     private static final EntityData entityData = OfficeFrameNameResolver.create().getEntityNames(DEPARTMENT);
 
     @Inject
-    public DepartmentRepository(PgPool client, ObjectMapper mapper) {
+    public DepartmentRepository(Pool client, ObjectMapper mapper) {
         super(client, mapper, null);
     }
 

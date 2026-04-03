@@ -12,6 +12,7 @@ import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.pgclient.PgPool;
+import io.vertx.mutiny.sqlclient.Pool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
@@ -34,7 +35,7 @@ public class ModuleRepository extends AsyncRepository {
     private static final EntityData entityData = TableNameResolver.create().getEntityNames(MODULES_ENTITY_NAME);
 
     @Inject
-    public ModuleRepository(PgPool client, ObjectMapper mapper) {
+    public ModuleRepository(Pool client, ObjectMapper mapper) {
         super(client, mapper, null);
     }
 

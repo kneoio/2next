@@ -14,6 +14,7 @@ import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.pgclient.PgPool;
+import io.vertx.mutiny.sqlclient.Pool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -36,7 +37,7 @@ public class EmployeeRepository extends AsyncRepository {
     private static final EntityData entityData = OfficeFrameNameResolver.create().getEntityNames(EMPLOYEE);
 
     @Inject
-    public EmployeeRepository(PgPool client, ObjectMapper mapper) {
+    public EmployeeRepository(Pool client, ObjectMapper mapper) {
         super(client, mapper, null);
     }
 

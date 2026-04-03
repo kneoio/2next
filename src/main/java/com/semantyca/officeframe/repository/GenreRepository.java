@@ -12,6 +12,7 @@ import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.pgclient.PgPool;
+import io.vertx.mutiny.sqlclient.Pool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
@@ -32,7 +33,7 @@ public class GenreRepository extends AsyncRepository {
     private static final String BASE_REQUEST = String.format("SELECT * FROM %s", entityData.getTableName());
 
     @Inject
-    public GenreRepository(PgPool client, ObjectMapper mapper) {
+    public GenreRepository(Pool client, ObjectMapper mapper) {
         super(client, mapper, null);
     }
 

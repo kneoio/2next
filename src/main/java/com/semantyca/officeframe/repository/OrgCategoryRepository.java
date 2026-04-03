@@ -8,6 +8,7 @@ import com.semantyca.core.repository.table.EntityData;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.pgclient.PgPool;
+import io.vertx.mutiny.sqlclient.Pool;
 import io.vertx.mutiny.sqlclient.Row;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -23,7 +24,7 @@ public class OrgCategoryRepository extends AsyncRepository {
     private static final EntityData entityData = OfficeFrameNameResolver.create().getEntityNames(ORG_CATEGORY);
 
     @Inject
-    public OrgCategoryRepository(PgPool client, ObjectMapper mapper) {
+    public OrgCategoryRepository(Pool client, ObjectMapper mapper) {
         super(client, mapper, null);
     }
 

@@ -10,6 +10,7 @@ import com.semantyca.core.repository.table.TableNameResolver;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.pgclient.PgPool;
+import io.vertx.mutiny.sqlclient.Pool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
@@ -27,7 +28,7 @@ public class AgreementRepository extends AsyncRepository {
     private static final EntityData entityData = TableNameResolver.create().getEntityNames(AGREEMENT_ENTITY_NAME);
 
     @Inject
-    public AgreementRepository(PgPool client, ObjectMapper mapper) {
+    public AgreementRepository(Pool client, ObjectMapper mapper) {
         super(client, mapper, null);
     }
 
