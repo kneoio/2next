@@ -15,6 +15,7 @@ import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.pgclient.PgPool;
+import io.vertx.mutiny.sqlclient.Pool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
@@ -39,7 +40,7 @@ public class AsyncRepository extends AbstractRepository{
     protected static final String COLUMN_RANK = "rank";
     protected static final String COLUMN_LOCALIZED_NAME = "loc_name";
 
-    protected PgPool client;
+    protected Pool client;
     protected ObjectMapper mapper;
     protected RLSRepository rlsRepository;
 
@@ -47,7 +48,7 @@ public class AsyncRepository extends AbstractRepository{
 
     }
 
-    public AsyncRepository(PgPool client, ObjectMapper mapper, RLSRepository rlsRepository) {
+    public AsyncRepository(Pool client, ObjectMapper mapper, RLSRepository rlsRepository) {
         this.client = client;
         this.mapper = mapper;
         this.rlsRepository = rlsRepository;
