@@ -15,6 +15,7 @@ public enum PlaylistItemType {
     MIX_DJ_CUSTOM_INTRO_SONG,
     JINGLE_INTRO,
     JINGLE_OUTRO,
-    BACKGROUND_LOOP;
+    BACKGROUND_LOOP,
+    GENERATED_CONTENT;
 }
 
