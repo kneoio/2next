@@ -1,5 +1,6 @@
 package com.semantyca.mixpla.model;
 
+import com.semantyca.mixpla.model.cnst.ExpirationType;
 import com.semantyca.mixpla.model.cnst.SceneTimingMode;
 import com.semantyca.core.model.SecureDataEntity;
 import lombok.Getter;
@@ -27,4 +28,6 @@ public class Scene extends SecureDataEntity<UUID> {
     private double talkativity = 0.5;
     private List<Integer> weekdays;
     private List<UUID> soundFragmentIds;
+    private ExpirationType expiration;
+    private int expiredAfterMinutes;
 }

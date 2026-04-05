@@ -1,6 +1,6 @@
 package com.semantyca.mixpla.dto.queue.livestream;
 
-import com.semantyca.mixpla.model.cnst.MergingType;
+import com.semantyca.mixpla.model.cnst.MixingType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,7 +18,7 @@ public class SongQueueMessageDTO {
     private Long sceneDeadlineTimestamp;
     private int sequenceNumber;
     private String brandSlug;
-    private MergingType mergingMethod;
+    private MixingType mergingMethod;
     private UUID sceneId;
     private String sceneTitle;
     private Map<IntroKey, IntroInfoDTO> filePaths;

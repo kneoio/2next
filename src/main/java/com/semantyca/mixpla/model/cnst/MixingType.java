@@ -1,6 +1,6 @@
 package com.semantyca.mixpla.model.cnst;
 
-public enum MergingType {
+public enum MixingType {
     INTRO_SONG,
     LISTENER_INTRO_SONG,
     NOT_MIXED,

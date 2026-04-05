@@ -1,6 +1,6 @@
 package com.semantyca.mixpla.model.cnst;
 
-public enum GeneratedContentStatus {
+public enum ContentStatus {
     PENDING,
     GENERATED,
     REUSING,
