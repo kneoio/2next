@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.UUID;
 
 @Setter
 @Getter
@@ -14,6 +15,7 @@ public class BrandFilter implements IFilter{
     private boolean activated = false;
     private List<CountryCode> countries;
     private boolean publicBrand;
+    private List<UUID> labels;
 
 
     public boolean isActivated() {
@@ -21,6 +23,10 @@ public class BrandFilter implements IFilter{
     }
 
     public boolean hasAnyFilter() {
+        if (labels != null && !labels.isEmpty()) {
+            return true;
+        }
+
         if (countries != null && !countries.isEmpty()) {
             return true;
         }
