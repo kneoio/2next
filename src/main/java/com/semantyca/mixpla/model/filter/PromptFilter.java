@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+import java.util.UUID;
+
 @Setter
 @Getter
 @NoArgsConstructor
@@ -16,6 +19,7 @@ public class PromptFilter implements IFilter{
     private boolean enabled;
     private boolean master;
     private boolean locked;
+    private List<UUID> labels;
 
     @Override
     public boolean isActivated() {
@@ -24,6 +28,10 @@ public class PromptFilter implements IFilter{
 
     @Override
     public boolean hasAnyFilter() {
+        if (labels != null && !labels.isEmpty()) {
+            return true;
+        }
+
         return languageTag != null ||
                 promptType != null ||
                 enabled ||
