@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Setter
@@ -19,4 +20,5 @@ public class ScenePrompt {
     private boolean active = true;
     private int rank = 0;
     private BigDecimal weight = BigDecimal.valueOf(0.5);
+    private List<UUID> labels;
 }
