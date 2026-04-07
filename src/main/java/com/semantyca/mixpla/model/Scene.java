@@ -30,4 +30,5 @@ public class Scene extends SecureDataEntity<UUID> {
     private List<UUID> soundFragmentIds;
     private ExpirationType expiration;
     private int expiredAfterMinutes;
+    private List<UUID> labels;
 }

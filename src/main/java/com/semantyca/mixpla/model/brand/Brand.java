@@ -1,11 +1,11 @@
 package com.semantyca.mixpla.model.brand;
 
+import com.semantyca.core.model.SecureDataEntity;
+import com.semantyca.core.model.cnst.LanguageCode;
 import com.semantyca.mixpla.model.cnst.ManagedBy;
 import com.semantyca.mixpla.model.cnst.SubmissionPolicy;
-import com.semantyca.core.model.cnst.LanguageCode;
 import com.semantyca.officeframe.model.Label;
 import com.semantyca.officeframe.model.cnst.CountryCode;
-import com.semantyca.core.model.SecureDataEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,7 +21,6 @@ import java.util.UUID;
 public class Brand extends SecureDataEntity<UUID> {
 
     private EnumMap<LanguageCode, String> localizedName = new EnumMap<>(LanguageCode.class);
-    //private IStreamManager streamManager;
     private String slugName;
     private ZoneId timeZone;
     private Integer isTemporary = 0;
@@ -44,6 +43,7 @@ public class Brand extends SecureDataEntity<UUID> {
     private List<BrandScriptEntry> scripts;
     private int archived;
     private Owner owner;
+    private List<UUID> labels;
 
     public String toString() {
         return String.format("id: %s, slug: %s", getId(), slugName);
