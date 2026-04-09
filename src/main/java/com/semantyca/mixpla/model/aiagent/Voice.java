@@ -10,6 +10,7 @@ public class Voice {
     private String id;
     private String name;
     private TTSEngineType engineType;
+    private float gain;
 
     public Voice() {}
 
