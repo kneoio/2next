@@ -110,7 +110,7 @@ public class LanguageController extends AbstractSecuredController<Language, Lang
                             doc -> rc.response()
                                     .setStatusCode(id == null ? 201 : 200)
                                     .end(JsonObject.mapFrom(doc).encode()),
-                            throwable -> handleFailure(rc, throwable)
+                            rc::fail
                     );
 
         } catch (Exception e) {
@@ -125,7 +125,7 @@ public class LanguageController extends AbstractSecuredController<Language, Lang
                 .chain(user -> service.delete(id, user))
                 .subscribe().with(
                         count -> rc.response().setStatusCode(count > 0 ? 204 : 404).end(),
-                        throwable -> handleFailure(rc, throwable)
+                        rc::fail
                 );
     }
 }
