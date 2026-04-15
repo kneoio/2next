@@ -7,6 +7,7 @@ import io.vertx.core.json.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -25,5 +26,6 @@ public class Prompt extends SecureDataEntity<UUID> {
     private UUID draftId;
     private UUID masterId;
     private double version;
+    private List<UUID> labels;
 
 }
