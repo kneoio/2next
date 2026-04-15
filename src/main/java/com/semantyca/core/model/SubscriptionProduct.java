@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.EnumMap;
+import java.util.List;
+import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Setter
@@ -17,4 +19,5 @@ public class SubscriptionProduct extends SimpleReferenceEntity {
     private String stripePriceId;
     private String stripeProductId;
     private boolean active = true;
+    private List<UUID> labels;
 }

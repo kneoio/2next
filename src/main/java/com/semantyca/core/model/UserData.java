@@ -23,7 +23,7 @@ public class UserData {
         }
     }
 
-    public String get(String key) {
+    public String getCopy(String key) {
         return data.get(key);
     }
 

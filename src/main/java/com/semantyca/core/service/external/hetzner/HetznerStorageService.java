@@ -79,24 +79,34 @@ public class HetznerStorageService implements IFileStorage {
     @Override
     public Uni<FileMetadata> getFileStream(String keyName) {
         return Uni.createFrom().item(() -> {
-                    LOGGER.debugf("Retrieving file stream for key: %s", keyName);
+                    LOGGER.infof("S3 GET - bucket: %s, key: '%s'", this.hetznerConfig.getBucketName(), keyName);
                     GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                             .bucket(this.hetznerConfig.getBucketName())
                             .key(keyName)
                             .build();
-                    ResponseInputStream<GetObjectResponse> responseInputStream =
-                            this.s3Client.getObject(getObjectRequest, ResponseTransformer.toInputStream());
-                    FileMetadata metadata = new FileMetadata();
-                    metadata.setInputStream(responseInputStream);
-                    metadata.setMimeType(responseInputStream.response().contentType());
-                    metadata.setContentLength(responseInputStream.response().contentLength());
-                    metadata.setFileKey(keyName);
-                    LOGGER.debugf("Stream created for key: %s, size: %s bytes", keyName, responseInputStream.response().contentLength());
-                    return metadata;
+                    try {
+                        ResponseInputStream<GetObjectResponse> responseInputStream =
+                                this.s3Client.getObject(getObjectRequest, ResponseTransformer.toInputStream());
+                        FileMetadata metadata = new FileMetadata();
+                        metadata.setInputStream(responseInputStream);
+                        metadata.setMimeType(responseInputStream.response().contentType());
+                        metadata.setContentLength(responseInputStream.response().contentLength());
+                        metadata.setFileKey(keyName);
+                        LOGGER.infof("S3 GET success - key: '%s', size: %s bytes, mimeType: %s", keyName, responseInputStream.response().contentLength(), responseInputStream.response().contentType());
+                        return metadata;
+                    } catch (software.amazon.awssdk.services.s3.model.S3Exception s3ex) {
+                        LOGGER.errorf("S3 GET failed - key: '%s', bucket: %s, statusCode: %s, errorCode: %s, requestId: %s, message: %s",
+                                keyName, this.hetznerConfig.getBucketName(),
+                                s3ex.statusCode(), s3ex.awsErrorDetails() != null ? s3ex.awsErrorDetails().errorCode() : "unknown",
+                                s3ex.requestId(), s3ex.getMessage());
+                        throw s3ex;
+                    }
                 })
                 .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
                 .onFailure().invoke(throwable -> {
-                    LOGGER.errorf("Error retrieving file stream: %s from Hetzner bucket: %s", keyName, this.hetznerConfig.getBucketName(), throwable);
+                    if (!(throwable instanceof software.amazon.awssdk.services.s3.model.S3Exception)) {
+                        LOGGER.errorf(throwable, "Non-S3 error retrieving key: '%s' from bucket: %s", keyName, this.hetznerConfig.getBucketName());
+                    }
                 })
                 .onFailure().recoverWithUni(Uni.createFrom()::failure);
     }
