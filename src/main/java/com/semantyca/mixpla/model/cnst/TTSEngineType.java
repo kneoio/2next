@@ -8,7 +8,8 @@ import lombok.Getter;
 public enum TTSEngineType {
     ELEVENLABS("elevenlabs"),
     MODELSLAB("modelslab"),
-    GOOGLE("google");
+    GOOGLE("google"),
+    FISH_AUDIO("fishaudio");
 
     private final String value;
 
