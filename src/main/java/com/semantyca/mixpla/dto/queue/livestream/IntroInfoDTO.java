@@ -11,6 +11,7 @@ public class IntroInfoDTO {
     private String filePath;
     private int sequenceNumber;
     private int durationSeconds;
+    private float gain;
 
     public IntroInfoDTO(String filePath, int durationSeconds) {
         this.filePath = filePath;
