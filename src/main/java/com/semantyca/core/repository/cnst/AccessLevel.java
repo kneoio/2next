@@ -22,8 +22,4 @@ public enum AccessLevel {
         this.alias = alias;
     }
 
-    public String getAlias() {
-        return alias;
-    }
-
 }

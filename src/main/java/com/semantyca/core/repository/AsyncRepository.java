@@ -1,9 +1,9 @@
 package com.semantyca.core.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.semantyca.core.model.cnst.LanguageCode;
 import com.semantyca.core.model.DataEntity;
 import com.semantyca.core.model.SimpleReferenceEntity;
+import com.semantyca.core.model.cnst.LanguageCode;
 import com.semantyca.core.model.embedded.DocumentAccessInfo;
 import com.semantyca.core.model.user.IUser;
 import com.semantyca.core.model.user.User;
@@ -14,7 +14,6 @@ import com.semantyca.core.repository.table.EntityData;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
-import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Pool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowSet;

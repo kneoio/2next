@@ -26,6 +26,7 @@ public enum UserRegStatus {
         }
         return NO_ACCESS;
     }
+
     UserRegStatus(String alias) {
         this.alias = alias;
     }

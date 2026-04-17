@@ -3,15 +3,14 @@ package com.semantyca.core.server.security;
 import io.vertx.core.Handler;
 import io.vertx.core.json.Json;
 import io.vertx.ext.web.RoutingContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jboss.logging.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class GlobalErrorHandler implements Handler<RoutingContext> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalErrorHandler.class);
+    private static final Logger LOGGER = Logger.getLogger(GlobalErrorHandler.class);
 
     @Override
     public void handle(RoutingContext ctx) {
@@ -25,9 +24,9 @@ public class GlobalErrorHandler implements Handler<RoutingContext> {
         String errorId = UUID.randomUUID().toString();
 
         if (failure != null) {
-            LOGGER.error("ErrorId {} | Path {} | Status {}", errorId, ctx.normalizedPath(), status, failure);
+            LOGGER.errorf("ErrorId %s | Path %s | Status %s", errorId, ctx.normalizedPath(), status, failure);
         } else {
-            LOGGER.warn("ErrorId {} | Path {} | Status {}", errorId, ctx.normalizedPath(), status);
+            LOGGER.warnf("ErrorId %s | Path %s | Status %s", errorId, ctx.normalizedPath(), status);
         }
 
         Map<String, Object> errorResponse = new HashMap<>();

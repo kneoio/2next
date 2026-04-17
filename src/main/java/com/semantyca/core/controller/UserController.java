@@ -17,13 +17,12 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public class UserController extends AbstractSecuredController<User, UserDTO> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+    private static final Logger LOGGER = Logger.getLogger(UserController.class);
     private UserService service;
 
     public UserController() {
@@ -121,7 +120,7 @@ public class UserController extends AbstractSecuredController<User, UserDTO> {
                     );
 
         } catch (Exception e) {
-            LOGGER.error("Error processing request: {}", e.getMessage());
+            LOGGER.errorf("Error processing request: %s", e.getMessage());
             rc.response().setStatusCode(400).end("Invalid request body");
         }
     }

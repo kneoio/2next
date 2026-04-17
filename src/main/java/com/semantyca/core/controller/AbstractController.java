@@ -1,4 +1,3 @@
-
 package com.semantyca.core.controller;
 
 import com.semantyca.core.dto.actions.ActionsFactory;
