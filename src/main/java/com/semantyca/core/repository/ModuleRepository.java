@@ -155,7 +155,6 @@ public class ModuleRepository extends AsyncRepository {
 
 
     public Module update(Module doc) {
-
         return doc;
     }
 

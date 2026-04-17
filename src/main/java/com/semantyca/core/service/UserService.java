@@ -18,8 +18,7 @@ import io.smallrye.mutiny.Uni;
 import io.vertx.pgclient.PgException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jboss.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +27,7 @@ import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class UserService {
-    private static final Logger LOGGER = LoggerFactory.getLogger("UserService");
+    private static final Logger LOGGER = Logger.getLogger("UserService");
     @Inject
     private UserRepository repository;
     @Inject

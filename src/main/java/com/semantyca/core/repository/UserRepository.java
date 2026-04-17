@@ -7,12 +7,10 @@ import com.semantyca.core.repository.cnst.UserRegStatus;
 import com.semantyca.core.server.EnvConst;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
-import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jboss.logging.Logger;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -21,7 +19,7 @@ import java.util.*;
 
 @ApplicationScoped
 public class UserRepository extends AsyncRepository {
-    private static final Logger LOGGER = LoggerFactory.getLogger("UserRepository");
+    private static final Logger LOGGER = Logger.getLogger("UserRepository");
 
     public UserRepository() {
         super();

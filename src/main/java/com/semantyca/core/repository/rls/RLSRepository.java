@@ -15,7 +15,6 @@ import java.util.UUID;
 
 @ApplicationScoped
 public class RLSRepository {
-
     protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass().getSimpleName());
     private final PgPool client;
 

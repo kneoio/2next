@@ -19,15 +19,15 @@ import io.vertx.ext.web.Router;
 import io.vertx.mutiny.pgclient.PgPool;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jboss.logging.Logger;
+
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class AbstractApplicationInit {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractApplicationInit.class);
+    private static final Logger LOGGER = Logger.getLogger(AbstractApplicationInit.class);
 
     private final PgPool client;
 
@@ -74,11 +74,11 @@ public class AbstractApplicationInit {
             PgPool client
     ) {
         this.client = client;
-        LOGGER.info("===== 2next {} =====", EnvConst.VERSION);
+        LOGGER.infof("===== 2next %s =====", EnvConst.VERSION);
     }
 
     public void onStop(@Observes ShutdownEvent ev) {
-        LOGGER.info("The application is stopping...");
+        LOGGER.infof("The application %s is stopping...", EnvConst.APP_ID);
     }
 
 
@@ -130,7 +130,7 @@ public class AbstractApplicationInit {
         router.getRoutes().stream()
                 .filter(route -> route.getPath() != null && route.methods() != null)
                 .filter(route -> !route.getPath().startsWith("/q/"))
-                .forEach(route -> LOGGER.info("{} {}", route.methods(), route.getPath()));
+                .forEach(route -> LOGGER.infof("%s %s", route.methods(), route.getPath()));
     }
 
     public void checkDatabaseConnection() {
