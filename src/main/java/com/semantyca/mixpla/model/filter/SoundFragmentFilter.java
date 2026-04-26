@@ -19,6 +19,7 @@ public class SoundFragmentFilter implements IFilter{
     private List<SourceType> source;
     private List<PlaylistItemType> type;
     private String searchTerm;
+    private int author;
 
     public boolean isActivated() {
         if (activated) {
@@ -38,6 +39,9 @@ public class SoundFragmentFilter implements IFilter{
             return true;
         }
         if (type != null && !type.isEmpty()) {
+            return true;
+        }
+        if (author != 0) {
             return true;
         }
         return searchTerm != null && !searchTerm.trim().isEmpty();

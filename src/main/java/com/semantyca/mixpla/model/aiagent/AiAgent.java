@@ -20,6 +20,7 @@ public class AiAgent extends SimpleReferenceEntity {
     private UUID copilot;
     private TTSSetting ttsSetting;
     private List<UUID> labels;
+    private String description;
 
     public AiAgent() {
         this.preferredLang = new ArrayList<>();
