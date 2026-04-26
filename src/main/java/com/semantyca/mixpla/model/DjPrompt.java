@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class Prompt extends SecureDataEntity<UUID> {
+public class DjPrompt extends SecureDataEntity<UUID> {
     private boolean enabled;
     private String prompt;
     private String description;
