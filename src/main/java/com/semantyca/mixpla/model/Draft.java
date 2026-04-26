@@ -20,7 +20,6 @@ public class Draft extends DataEntity<UUID> {
     private LanguageTag languageTag;
     private DraftingMethod method;
     private boolean enabled;
-    private boolean isMaster;
     private boolean locked;
     private UUID masterId;
     private double version;
