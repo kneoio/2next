@@ -12,8 +12,7 @@ import java.util.UUID;
 @Setter
 @Getter
 @NoArgsConstructor
-@Deprecated
-public class PromptFilter implements IFilter{
+public class DjPromptFilter implements IFilter{
     private boolean activated = false;
     private LanguageTag languageTag;
     private PromptType promptType;

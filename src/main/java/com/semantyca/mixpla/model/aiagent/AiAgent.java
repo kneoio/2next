@@ -1,7 +1,7 @@
 package com.semantyca.mixpla.model.aiagent;
 
-import com.semantyca.mixpla.model.cnst.LlmType;
 import com.semantyca.core.model.SimpleReferenceEntity;
+import com.semantyca.mixpla.model.cnst.LlmType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,6 +20,7 @@ public class AiAgent extends SimpleReferenceEntity {
     private UUID copilot;
     private TTSSetting ttsSetting;
     private List<UUID> labels;
+    private boolean enabled;
     private String description;
 
     public AiAgent() {
