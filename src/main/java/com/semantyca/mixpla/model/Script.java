@@ -25,11 +25,12 @@ public class Script extends SecureDataEntity<UUID> {
     private Integer accessLevel = 0;
     private List<UUID> labels;
     private List<UUID> brands;
+    @Deprecated
     private NavigableSet<Scene> scenes =
             new TreeSet<>(Comparator
                     .comparingInt(Scene::getSeqNum)
                     .thenComparing(Scene::getId));
-
+    private boolean enabled;
     private LanguageTag languageTag;
     private SceneTimingMode timingMode;
     private List<ScriptVariable> requiredVariables;

@@ -21,6 +21,7 @@ public class Listener extends SecureDataEntity<UUID> {
     private UserData userData;
     private List<UUID> listenerOf;
     private List<UUID> labels;
+    private Ban ban;
 
     public Listener() {
         this.localizedName = new EnumMap<>(LanguageCode.class);

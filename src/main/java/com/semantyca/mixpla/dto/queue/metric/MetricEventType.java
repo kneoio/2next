@@ -6,6 +6,7 @@ public enum MetricEventType {
     COMMAND,
     INFORMATION,
     IMPORTANT_INFORMATION,
+    SECURITY,
     WARNING,
     DEBUG
 }
