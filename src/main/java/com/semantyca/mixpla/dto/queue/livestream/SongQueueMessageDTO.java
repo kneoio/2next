@@ -18,6 +18,7 @@ public class SongQueueMessageDTO {
     private Long sceneDeadlineTimestamp;
     private int sequenceNumber;
     private String brandSlug;
+    private String otsSlugName;
     private MixingType mergingMethod;
     private UUID sceneId;
     private String sceneTitle;
