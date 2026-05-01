@@ -44,6 +44,7 @@ public class Brand extends SecureDataEntity<UUID> {
     private int archived;
     private Owner owner;
     private List<UUID> labels;
+    private List<UUID> genres;
 
     public String toString() {
         return String.format("id: %s, slug: %s", getId(), slugName);
