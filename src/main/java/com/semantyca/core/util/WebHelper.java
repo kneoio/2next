@@ -140,7 +140,7 @@ public class WebHelper {
                     case 2: b = 200 + random.nextInt(56); break;
                 }
             }
-        } while (isGrayish(r, g, b) || isBrownish(r, g, b));
+        } while (isGrayish(r, g, b) || isBrownish(r, g, b) || isTooDark(r, g, b) || isTooWhite(r, g, b));
 
         return String.format("#%02X%02X%02X", r, g, b);
     }
@@ -151,5 +151,15 @@ public class WebHelper {
 
     private static boolean isBrownish(int r, int g, int b) {
         return r > g && g > b && r < 180 && g < 120;
+    }
+
+    private static boolean isTooDark(int r, int g, int b) {
+        int perceivedBrightness = (299 * r + 587 * g + 114 * b) / 1000;
+        return perceivedBrightness < 150;
+    }
+
+    private static boolean isTooWhite(int r, int g, int b) {
+        int perceivedBrightness = (299 * r + 587 * g + 114 * b) / 1000;
+        return perceivedBrightness > 240 || (r > 245 && g > 245 && b > 245);
     }
 }
