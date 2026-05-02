@@ -20,6 +20,7 @@ public class AiAgent extends SimpleReferenceEntity {
     private UUID copilot;
     private TTSSetting ttsSetting;
     private List<UUID> labels;
+    private String manner;
     private boolean enabled;
     private String description;
 
