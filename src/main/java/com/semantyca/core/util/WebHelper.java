@@ -1,18 +1,26 @@
 package com.semantyca.core.util;
 
+import com.ibm.icu.text.Transliterator;
 import com.semantyca.core.model.cnst.LanguageCode;
 
 import java.io.File;
 import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.Locale;
 import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class WebHelper {
-    private static final Pattern UNSAFE_CHARS = Pattern.compile("[\\\\/:*?\"<>|\\s'`~!@#$%^&()+=\\[\\]{}|;,]");
-    private static final Pattern WHITESPACE = Pattern.compile("\\s");
+    /**
+     * ICU/CLDR: map any script to Latin, then to ASCII (Cyrillic, Greek, accents, ligatures, etc.).
+     */
+    private static final Transliterator TO_ASCII_LATIN = Transliterator.getInstance("Any-Latin; Latin-ASCII");
+
+    private static final Pattern WHITESPACE = Pattern.compile("\\s+", Pattern.UNICODE_CHARACTER_CLASS);
+    private static final Pattern COMBINING_MARKS = Pattern.compile("\\p{M}+");
+    private static final Pattern NON_ASCII_ALNUM_RUNS = Pattern.compile("[^a-z0-9]+");
     private static final Pattern MULTIPLE_DASHES = Pattern.compile("-+");
 
     public static String generateSlug(String element1, String element2) {
@@ -27,19 +35,9 @@ public class WebHelper {
             return "";
         }
 
-        String fileName;
-        String extension = "";
-
-        int lastDotIndex = input.lastIndexOf('.');
-        if (lastDotIndex > 0 && lastDotIndex < input.length() - 1) {
-            fileName = input.substring(0, lastDotIndex);
-            extension = input.substring(lastDotIndex);
-        } else {
-            fileName = input;
-        }
-
-        String slug = processSlug(fileName);
-        return slug + extension;
+        String[] stemAndExt = splitPreservingKnownExtension(input);
+        String slug = processSlug(stemAndExt[0]);
+        return slug + stemAndExt[1];
     }
 
     public static String generateSlugPath(String... segments) {
@@ -63,18 +61,9 @@ public class WebHelper {
             input = input.substring(0, atIndex);
         }
 
-        String extension = "";
-        int lastDotIndex = input.lastIndexOf('.');
-        if (lastDotIndex > 0 && lastDotIndex < input.length() - 1) {
-            extension = input.substring(lastDotIndex).toLowerCase();
-            input = input.substring(0, lastDotIndex);
-        }
-
-        String slug = java.text.Normalizer.normalize(input, java.text.Normalizer.Form.NFD)
-                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
-                .toLowerCase()
-                .replaceAll("[^a-z0-9]+", "-")
-                .replaceAll("^-+|-+$", "");
+        String[] stemAndExt = splitPreservingKnownExtension(input);
+        String extension = stemAndExt[1].toLowerCase(Locale.ROOT);
+        String slug = processSlug(stemAndExt[0]);
 
         return slug + extension;
     }
@@ -108,19 +97,41 @@ public class WebHelper {
         };
     }
 
+    /** Splits a trailing {@code .ext} only for known file types so dots inside titles stay. */
+    private static String[] splitPreservingKnownExtension(String input) {
+        int lastDotIndex = input.lastIndexOf('.');
+        if (lastDotIndex > 0 && lastDotIndex < input.length() - 1) {
+            String extCandidate = input.substring(lastDotIndex + 1);
+            if (isKnownFileExtension(extCandidate)) {
+                return new String[] { input.substring(0, lastDotIndex), input.substring(lastDotIndex) };
+            }
+        }
+        return new String[] { input, "" };
+    }
+
+    private static boolean isKnownFileExtension(String extensionWithoutDot) {
+        return switch (extensionWithoutDot.toLowerCase(Locale.ROOT)) {
+            case "mp3", "wav", "ogg", "flac", "jpg", "jpeg", "png", "gif", "webp", "pdf" -> true;
+            default -> false;
+        };
+    }
+
     private static String processSlug(String input) {
         if (input == null || input.trim().isEmpty()) {
             return "";
         }
 
-        String noWhitespace = WHITESPACE.matcher(input).replaceAll("-");
-        String normalized = Normalizer.normalize(noWhitespace, Normalizer.Form.NFD);
-        String cleaned = UNSAFE_CHARS.matcher(normalized).replaceAll("");
-        String lowercase = cleaned.toLowerCase();
-        String finalSlug = MULTIPLE_DASHES.matcher(lowercase).replaceAll("-");
-        finalSlug = finalSlug.replaceAll("^-+|-+$", "");
+        String s = WHITESPACE.matcher(input).replaceAll("-");
+        s = Normalizer.normalize(s, Normalizer.Form.NFKC);
+        s = TO_ASCII_LATIN.transliterate(s);
+        s = s.toLowerCase(Locale.ROOT);
+        s = Normalizer.normalize(s, Normalizer.Form.NFKD);
+        s = COMBINING_MARKS.matcher(s).replaceAll("");
+        s = NON_ASCII_ALNUM_RUNS.matcher(s).replaceAll("-");
+        s = MULTIPLE_DASHES.matcher(s).replaceAll("-");
+        s = s.replaceAll("^-+|-+$", "");
 
-        return finalSlug;
+        return s;
     }
 
     public static String generateRandomBrightColor() {
