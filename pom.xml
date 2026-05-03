@@ -6,7 +6,7 @@
 
     <groupId>io.kneo</groupId>
     <artifactId>2next</artifactId>
-    <version>1.3.57</version>
+    <version>1.3.58</version>
     <packaging>jar</packaging>
     <name>2next</name>
 
