@@ -3,6 +3,7 @@ package com.semantyca.core.server.security;
 import io.vertx.core.Handler;
 import io.vertx.core.json.Json;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.pgclient.PgException;
 import org.jboss.logging.Logger;
 
 import java.util.HashMap;
@@ -24,7 +25,26 @@ public class GlobalErrorHandler implements Handler<RoutingContext> {
         String errorId = UUID.randomUUID().toString();
 
         if (failure != null) {
-            LOGGER.errorf("ErrorId %s | Path %s | Status %s", errorId, ctx.normalizedPath(), status, failure);
+            if (failure instanceof PgException e) {
+                LOGGER.errorf(
+                        "ErrorId %s | Path %s | Status %s | PgState %s | Message %s | Detail %s",
+                        errorId,
+                        ctx.normalizedPath(),
+                        status,
+                        e.getSqlState(),
+                        e.getMessage(),
+                        e.getDetail()
+                );
+            } else {
+                LOGGER.errorf(
+                        "ErrorId %s | Path %s | Status %s | Message %s | Throwable %s",
+                        errorId,
+                        ctx.normalizedPath(),
+                        status,
+                        failure.getMessage(),
+                        failure
+                );
+            }
         } else {
             LOGGER.warnf("ErrorId %s | Path %s | Status %s", errorId, ctx.normalizedPath(), status);
         }
