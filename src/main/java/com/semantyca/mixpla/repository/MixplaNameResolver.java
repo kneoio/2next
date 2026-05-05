@@ -21,7 +21,7 @@ public class MixplaNameResolver extends TableNameResolver {
 
     private static final String SOUND_FRAGMENT_TABLE_NAME = "mixpla__sound_fragments";
     private static final String SOUND_FRAGMENT_ACCESS_TABLE_NAME = "mixpla__sound_fragment_readers";
-    private static final String SOUND_FRAGMENT_FILES_TABLE_NAME = "mixpla__sound_fragment_files";
+    //private static final String SOUND_FRAGMENT_FILES_TABLE_NAME = "mixpla__sound_fragment_files";
     private static final String LISTENER_TABLE_NAME = "mixpla__listeners";
     private static final String LISTENER_ACCESS_TABLE_NAME = "mixpla__listener_readers";
     private static final String RADIO_STATION_TABLE_NAME = "mixpla__brands";
@@ -50,8 +50,8 @@ public class MixplaNameResolver extends TableNameResolver {
             case SOUND_FRAGMENT -> new EntityData(
                     SOUND_FRAGMENT_TABLE_NAME,
                     SOUND_FRAGMENT_ACCESS_TABLE_NAME,
-                    null,
-                    SOUND_FRAGMENT_FILES_TABLE_NAME
+                    null
+                   // SOUND_FRAGMENT_FILES_TABLE_NAME
             );
             case LISTENER -> new EntityData(
                     LISTENER_TABLE_NAME,
