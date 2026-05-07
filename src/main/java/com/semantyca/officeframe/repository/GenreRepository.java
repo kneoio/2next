@@ -1,17 +1,16 @@
 package com.semantyca.officeframe.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.semantyca.officeframe.dto.GenreFilterDTO;
-import com.semantyca.officeframe.model.Genre;
-import com.semantyca.officeframe.repository.table.OfficeFrameNameResolver;
 import com.semantyca.core.model.user.IUser;
 import com.semantyca.core.repository.AsyncRepository;
 import com.semantyca.core.repository.exception.DocumentHasNotFoundException;
 import com.semantyca.core.repository.table.EntityData;
+import com.semantyca.officeframe.dto.GenreFilterDTO;
+import com.semantyca.officeframe.model.Genre;
+import com.semantyca.officeframe.repository.table.OfficeFrameNameResolver;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
-import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Pool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowSet;
