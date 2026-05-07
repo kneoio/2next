@@ -82,6 +82,7 @@ public class GenreService extends AbstractService<Genre, GenreDTO> implements IR
         return repository.findById(uuid);
     }
 
+    //used in datanest
     public Uni<List<Genre>> getByFuzzyIdentifier(String name) {
         return repository.findByFuzzyIdentifier(name);
     }

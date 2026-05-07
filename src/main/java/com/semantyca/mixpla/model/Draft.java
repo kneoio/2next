@@ -1,8 +1,7 @@
 package com.semantyca.mixpla.model;
 
-import com.semantyca.core.model.cnst.LanguageTag;
-import com.semantyca.mixpla.model.cnst.DraftingMethod;
 import com.semantyca.core.model.DataEntity;
+import com.semantyca.mixpla.model.cnst.DraftingMethod;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,10 +16,7 @@ public class Draft extends DataEntity<UUID> {
     private String title;
     private String content;
     private String description;
-    private LanguageTag languageTag;
     private DraftingMethod method;
     private boolean enabled;
-    private boolean locked;
-    private UUID masterId;
     private double version;
 }
