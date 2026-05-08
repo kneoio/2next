@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum LifecycleStatus {
-    NOT_APPROVED(10),
+    NOT_APPROVED(11),
     APPROVED(12),
     REJECTED(13);
 
