@@ -8,7 +8,8 @@ public enum StreamPriority {
     GENTLE_INTERRUPT(7),
     PRIORITIZED_FRONT(8),
     PRIORITIZED(9),
-    NORMAL(10);
+    NORMAL(10),
+    OPTIONAL(11);
 
     private final int value;
 
