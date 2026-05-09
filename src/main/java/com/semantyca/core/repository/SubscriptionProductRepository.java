@@ -37,7 +37,7 @@ public class SubscriptionProductRepository extends AsyncRepository {
         if (limit > 0) {
             sql += String.format(" LIMIT %s OFFSET %s", limit, offset);
         }
-        return client.query(sql)
+        return client.query(sql + " ORDER BY order_number DESC ")
                 .execute()
                 .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
                 .onItem().transform(this::from)
