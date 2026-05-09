@@ -1,5 +1,6 @@
 package com.semantyca.mixpla.model.filter;
 
+import com.semantyca.mixpla.model.cnst.SubmissionPolicy;
 import com.semantyca.officeframe.model.cnst.CountryCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,9 @@ public class BrandFilter implements IFilter{
     private List<CountryCode> countries;
     private boolean publicBrand;
     private List<UUID> labels;
+    private SubmissionPolicy oneTimeStreamPolicy;
+    private SubmissionPolicy submissionPolicy;
+    private SubmissionPolicy messagingPolicy;
 
 
     public boolean isActivated() {
@@ -28,6 +32,9 @@ public class BrandFilter implements IFilter{
         }
 
         if (countries != null && !countries.isEmpty()) {
+            return true;
+        }
+        if (oneTimeStreamPolicy != null || submissionPolicy != null || messagingPolicy != null) {
             return true;
         }
         return publicBrand;
