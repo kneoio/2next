@@ -18,6 +18,7 @@ public class ScenePrompt {
     private ActionType actionType;
     private UUID promptId;
     private boolean active = true;
+    private boolean mandatory;
     private int rank = 0;
     private BigDecimal weight = BigDecimal.valueOf(0.5);
     private List<UUID> labels;
