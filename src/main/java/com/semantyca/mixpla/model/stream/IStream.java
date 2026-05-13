@@ -18,7 +18,7 @@ import java.util.UUID;
 
 public interface IStream {
 
-    String getId();
+    String getStreamId();
 
     UUID getMasterBrandId();
 
