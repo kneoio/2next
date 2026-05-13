@@ -20,7 +20,7 @@ public class BrandFilter implements IFilter{
     private SubmissionPolicy oneTimeStreamPolicy;
     private SubmissionPolicy submissionPolicy;
     private SubmissionPolicy messagingPolicy;
-
+    private String searchTerm;
 
     public boolean isActivated() {
         return activated || hasAnyFilter();
@@ -35,6 +35,9 @@ public class BrandFilter implements IFilter{
             return true;
         }
         if (oneTimeStreamPolicy != null || submissionPolicy != null || messagingPolicy != null) {
+            return true;
+        }
+        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
             return true;
         }
         return publicBrand;
