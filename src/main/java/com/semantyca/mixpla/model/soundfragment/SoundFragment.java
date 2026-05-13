@@ -32,8 +32,6 @@ public class SoundFragment extends SecureDataEntity<UUID> {
     private String description;
     private LocalDateTime expiresAt;
     private List<FileMetadata> fileMetadataList;
-    private ContributionWorkflow contributionWorkflow;
-    private Object addInfo;
 
     public String getMetadata() {
         return String.format("%s#%s", title, artist);
