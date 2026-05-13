@@ -21,6 +21,8 @@ public class MixplaNameResolver extends TableNameResolver {
 
     private static final String SOUND_FRAGMENT_TABLE_NAME = "mixpla__sound_fragments";
     private static final String SOUND_FRAGMENT_ACCESS_TABLE_NAME = "mixpla__sound_fragment_readers";
+    private static final String SHARED_SOUND_FRAGMENT_TABLE_NAME = "mixpla__shared_sound_fragments";
+    private static final String SHARED_SOUND_FRAGMENT_ACCESS_TABLE_NAME = "mixpla__shared_sound_fragment_readers";
     //private static final String SOUND_FRAGMENT_FILES_TABLE_NAME = "mixpla__sound_fragment_files";
     private static final String LISTENER_TABLE_NAME = "mixpla__listeners";
     private static final String LISTENER_ACCESS_TABLE_NAME = "mixpla__listener_readers";
