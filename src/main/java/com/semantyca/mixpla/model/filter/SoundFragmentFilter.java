@@ -21,6 +21,7 @@ public class SoundFragmentFilter implements IFilter {
     private String searchTerm;
     private int author;
     private List<UUID> brands;
+    private boolean shared;
 
     public boolean isActivated() {
         if (activated) {
@@ -46,6 +47,9 @@ public class SoundFragmentFilter implements IFilter {
             return true;
         }
         if (author != 0) {
+            return true;
+        }
+        if (shared) {
             return true;
         }
         return searchTerm != null && !searchTerm.trim().isEmpty();
