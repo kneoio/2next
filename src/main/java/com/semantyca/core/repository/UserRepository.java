@@ -1,7 +1,6 @@
 package com.semantyca.core.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.semantyca.core.model.Module;
 import com.semantyca.core.model.user.*;
 import com.semantyca.core.repository.cnst.UserRegStatus;
 import com.semantyca.core.server.EnvConst;
@@ -153,9 +152,6 @@ public class UserRepository extends AsyncRepository {
         user.setLogin(row.getString("login"));
         user.setEmail(row.getString("email"));
         user.setDefaultLang(row.getInteger("default_lang"));
-        user.setRoles(List.of());
-        user.setModules(List.of());
-
         // Handle time_zone from database or default
         String dbTimeZone = row.getString("time_zone");
         if (dbTimeZone != null && !dbTimeZone.isEmpty()) {
@@ -173,8 +169,6 @@ public class UserRepository extends AsyncRepository {
         ZonedDateTime nowZonedTime = ZonedDateTime.now();
         LocalDateTime nowLocalDateTime = nowZonedTime.toLocalDateTime();
         String sql = "INSERT INTO _users (author, default_lang, email, i_su, login, reg_date, last_mod_date, status, confirmation_code, last_mod_user, time_zone) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id";
-        String modulesSQL = "INSERT INTO _modules (module_id, user_id, is_on) VALUES($1, $2, $3)";
-        String rolesSQL = "INSERT INTO _roles (role_id, user_id, is_on) VALUES($1, $2, $3)";
 
         String timeZoneId = doc.getTimeZone() != null ? doc.getTimeZone().getID() : TimeZone.getDefault().getID();
 
@@ -185,38 +179,13 @@ public class UserRepository extends AsyncRepository {
                 .addLong(user.getId())
                 .addString(timeZoneId);
 
-        return client.withTransaction(tx -> tx.preparedQuery(sql)
+        return client.preparedQuery(sql)
                 .execute(finalParams)
                 .onItem().transform(result -> result.iterator().next().getLong("id"))
-                .onItem().transformToUni(id -> {
-                    List<Uni<Integer>> userModulesList = new ArrayList<>();
-                    for (Module module : doc.getModules()) {
-                        userModulesList.add(tx.preparedQuery(modulesSQL)
-                                .execute(Tuple.of(module.getId(), id, true))
-                                .onItem().transform(SqlResult::rowCount));
-                    }
-                    if (userModulesList.isEmpty()) {
-                        return Uni.createFrom().item(id);
-                    } else {
-                        return Uni.combine().all().unis(userModulesList).with(results -> id);
-                    }
-                })
-                .onItem().transformToUni(id -> {
-                    List<Uni<Integer>> userRolesList = new ArrayList<>();
-                    for (Role role : doc.getRoles()) {
-                        userRolesList.add(tx.preparedQuery(rolesSQL)
-                                .execute(Tuple.of(role.getId(), id, true))
-                                .onItem().transform(SqlResult::rowCount));
-                    }
-                    if (userRolesList.isEmpty()) {
-                        return Uni.createFrom().item(id);
-                    } else {
-                        return Uni.combine().all().unis(userRolesList).with(results -> id);
-                    }
-                }).onFailure().recoverWithUni(throwable -> {
+                .onFailure().recoverWithUni(throwable -> {
                     LOGGER.error(throwable.getMessage(), throwable);
-                    return Uni.createFrom().failure(new RuntimeException("Failed to insert user, roles or modules", throwable));
-                }));
+                    return Uni.createFrom().failure(new RuntimeException("Failed to insert user", throwable));
+                });
     }
 
     public Uni<Long> update(User doc, IUser user) {

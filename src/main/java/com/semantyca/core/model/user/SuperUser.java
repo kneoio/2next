@@ -2,11 +2,6 @@ package com.semantyca.core.model.user;
 
 
 
-import com.semantyca.core.model.cnst.SystemRoleType;
-
-import java.util.Collections;
-import java.util.List;
-
 public class SuperUser extends SystemAbstractUser {
     public final static String USER_NAME = "supervisor";
     public final static long ID = 1;
@@ -18,13 +13,6 @@ public class SuperUser extends SystemAbstractUser {
     @Override
     public String getUserName() {
         return USER_NAME;
-    }
-
-    @Override
-    public List<IRole> getActivatedRoles() {
-        return  Collections.singletonList(new Role.Builder()
-                .setIdentifier(SystemRoleType.SUPERVISOR.getName())
-                .build()) ;
     }
 
     @Override

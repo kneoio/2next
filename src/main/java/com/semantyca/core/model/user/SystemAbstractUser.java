@@ -1,7 +1,5 @@
 package com.semantyca.core.model.user;
 
-import java.util.List;
-
 public abstract class SystemAbstractUser implements IUser {
 
     @Override
@@ -13,12 +11,6 @@ public abstract class SystemAbstractUser implements IUser {
     public Integer getPageSize() {
         return 20;
     }
-
-    @Override
-    public List<IRole> getActivatedRoles() {
-        return null;
-    }
-
 
     @Override
     public boolean isSupervisor() {

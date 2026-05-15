@@ -25,21 +25,16 @@ public class CustomOASFilter implements OASFilter {
         paths.removePathItem("/users");
         paths.removePathItem("/departments");
         paths.removePathItem("/languages");
-        paths.removePathItem("/modules");
         paths.removePathItem("/logout");
         paths.removePathItem("/translations");
         paths.removePathItem("/orgcategories");
         paths.removePathItem("/positions");
-        paths.removePathItem("/roles");
         paths.removePathItem("/workspace");
 
         Components components = openAPI.getComponents();
         components.removeSchema("RLS");
         components.removeSchema("RLSDTO");
-        components.removeSchema("ModuleDTO");
         components.removeSchema("AccessLevel");
-        components.removeSchema("IRole");
-
 
     }
 }

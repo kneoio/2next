@@ -10,9 +10,6 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.ZonedDateTime;
-import java.util.Collections;
-import java.util.List;
-
 @Setter
 @Getter
 @SuperBuilder
@@ -37,8 +34,4 @@ public class UserDTO {
     String language;
     @NotNull
     String theme;
-    @Builder.Default
-    List<String> roles = Collections.emptyList();
-    @Builder.Default
-    List<String> modules = Collections.emptyList();
 }

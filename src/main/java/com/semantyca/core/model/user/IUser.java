@@ -3,8 +3,6 @@ package com.semantyca.core.model.user;
 import com.semantyca.core.server.EnvConst;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.List;
-
 public interface IUser {
     Long getId();
 
@@ -14,8 +12,6 @@ public interface IUser {
         return EnvConst.DEFAULT_PAGE_SIZE;
     }
     String getEmail();
-
-    List<IRole> getActivatedRoles();
 
     boolean isSupervisor();
 
