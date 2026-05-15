@@ -1,8 +1,6 @@
 package com.semantyca.core.server;
 
 import com.semantyca.core.controller.LanguageController;
-import com.semantyca.core.controller.ModuleController;
-import com.semantyca.core.controller.RoleController;
 import com.semantyca.core.controller.SubscriptionProductController;
 import com.semantyca.core.controller.UserBillingController;
 import com.semantyca.core.controller.UserController;
@@ -35,10 +33,6 @@ public class AbstractApplicationInit {
     UserController userController;
     @Inject
     LanguageController languageController;
-    @Inject
-    ModuleController moduleController;
-    @Inject
-    RoleController roleController;
     @Inject
     WorkspaceController workspaceController;
     //OF
@@ -92,12 +86,6 @@ public class AbstractApplicationInit {
         }
         if (isControllerEnabled("languages")) {
             languageController.setupRoutes(router);
-        }
-        if (isControllerEnabled("modules")) {
-            moduleController.setupRoutes(router);
-        }
-        if (isControllerEnabled("roles")) {
-            roleController.setupRoutes(router);
         }
         if (isControllerEnabled("workspaces")) {
             workspaceController.setupRoutes(router);

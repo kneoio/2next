@@ -3,16 +3,10 @@ package com.semantyca.core.service;
 import com.semantyca.core.model.cnst.LanguageCode;
 import com.semantyca.core.repository.cnst.UserRegStatus;
 import com.semantyca.core.dto.document.UserDTO;
-import com.semantyca.core.model.Module;
-import com.semantyca.core.model.SimpleReferenceEntity;
 import com.semantyca.core.model.user.IUser;
-import com.semantyca.core.model.user.Role;
 import com.semantyca.core.model.user.SuperUser;
 import com.semantyca.core.model.user.User;
-import com.semantyca.core.repository.ModuleRepository;
-import com.semantyca.core.repository.RoleRepository;
 import com.semantyca.core.repository.UserRepository;
-import com.semantyca.core.service.exception.ServiceException;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.pgclient.PgException;
@@ -20,7 +14,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.jboss.logging.Logger;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,14 +23,6 @@ public class UserService {
     private static final Logger LOGGER = Logger.getLogger("UserService");
     @Inject
     private UserRepository repository;
-    @Inject
-    private RoleService roleService;
-
-    @Inject
-    private RoleRepository roleRepository;
-
-    @Inject
-    private ModuleRepository moduleRepository;
 
     public Uni<List<User>> getAll() {
         return repository.getAll();
@@ -108,10 +93,10 @@ public class UserService {
         user.setLogin(dto.getLogin());
         user.setEmail(dto.getEmail());
         user.setDefaultLang(0);
-       return addOrGet(user, dto.getRoles(), dto.getModules(), allowAutoRegistration);
+        return addOrGet(user, allowAutoRegistration);
     }
 
-    public Uni<Long> addOrGet(User user, List<String> newRoles, List<String> newModules, boolean allowAutoRegistration) {
+    public Uni<Long> addOrGet(User user, boolean allowAutoRegistration) {
         user.setDefaultLang(0);
         if (allowAutoRegistration) {
             user.setRegStatus(UserRegStatus.REGISTERED_AUTOMATICALLY);
@@ -119,31 +104,17 @@ public class UserService {
             user.setRegStatus(UserRegStatus.REGISTERED);
         }
 
-        Uni<List<Role>> rolesUni = roleRepository.getAll(0, 1000);
-        Uni<List<Module>> moduleUni = moduleRepository.getAll(0, 1000);
-
-        return rolesUni.onItem().transformToUni(roles -> {
-            user.setRoles(getAllValidReferences(roles, newRoles));
-            return moduleUni;
-        }).onFailure().recoverWithUni(failure -> {
-            throw new ServiceException(failure);
-        }).onItem().transformToUni(modules -> {
-            try {
-                user.setModules(getAllValidReferences(modules, newModules));
-                return repository.insert(user, SuperUser.build());
-            } catch (Exception e) {
-                return Uni.createFrom().failure(e);
-            }
-        }).onFailure().recoverWithUni(throwable -> {
-            if (allowAutoRegistration && throwable instanceof RuntimeException
-                    && throwable.getCause() instanceof PgException pgException) {
-                if ("23505".equals(pgException.getSqlState()) && pgException.getMessage().contains("_users_login_key")) {
-                    return repository.findByLogin(user.getLogin())
-                            .onItem().transform(IUser::getId);
-                }
-            }
-            return Uni.createFrom().failure(throwable);
-        });
+        return repository.insert(user, SuperUser.build())
+                .onFailure().recoverWithUni(throwable -> {
+                    if (allowAutoRegistration && throwable instanceof RuntimeException
+                            && throwable.getCause() instanceof PgException pgException) {
+                        if ("23505".equals(pgException.getSqlState()) && pgException.getMessage().contains("_users_login_key")) {
+                            return repository.findByLogin(user.getLogin())
+                                    .onItem().transform(IUser::getId);
+                        }
+                    }
+                    return Uni.createFrom().failure(throwable);
+                });
     }
 
     public Uni<Long> upsert(String id, UserDTO userDTO, IUser actor) {
@@ -195,16 +166,6 @@ public class UserService {
                 return Uni.createFrom().item(dto);
             }
         });
-    }
-
-    private <T extends SimpleReferenceEntity> List<T> getAllValidReferences(List<T> allAvailable, List<String> provided) {
-        List<T> allValidRoles = new ArrayList<>();
-        for (T e : allAvailable) {
-            if (provided.contains(e.getIdentifier())) {
-                allValidRoles.add(e);
-            }
-        }
-        return allValidRoles;
     }
 
     private Uni<UserDTO> mapToDTO(User doc) {

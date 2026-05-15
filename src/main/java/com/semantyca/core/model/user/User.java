@@ -2,15 +2,12 @@ package com.semantyca.core.model.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.semantyca.core.model.DataEntity;
-import com.semantyca.core.model.Module;
 import com.semantyca.core.repository.cnst.UserRegStatus;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.TimeZone;
 
 @Setter
@@ -23,8 +20,6 @@ public class User extends DataEntity<Long> implements IUser {
     @NotBlank
     private String email;
     private boolean isSupervisor;
-    private List<Module> modules = new ArrayList<>();
-    private List<Role> roles = new ArrayList<>();
     private Integer defaultLang;
     private TimeZone timeZone;
     private UserRegStatus regStatus;
@@ -37,11 +32,6 @@ public class User extends DataEntity<Long> implements IUser {
     @Override
     public Integer getPageSize() {
         return IUser.super.getPageSize();
-    }
-
-    @Override
-    public List<IRole> getActivatedRoles() {
-        return new ArrayList<>(roles);
     }
 
 }
