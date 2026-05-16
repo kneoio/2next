@@ -32,7 +32,7 @@ public class WorkspaceController extends AbstractSecuredController<Language, Lan
     }
 
     public void setupRoutes(Router router) {
-        router.route(HttpMethod.GET, "/core/workspace").handler(this::get);
+        router.route(HttpMethod.GET, "/core/workspace").handler(requireRoles("admitp")).handler(this::get);
     }
 
     private void get(RoutingContext rc) {

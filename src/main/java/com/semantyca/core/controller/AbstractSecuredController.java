@@ -4,6 +4,7 @@ import com.semantyca.core.repository.exception.DocumentModificationAccessExcepti
 import com.semantyca.core.repository.exception.UploadAbsenceException;
 import com.semantyca.core.service.UserService;
 import io.smallrye.jwt.auth.principal.DefaultJWTCallerPrincipal;
+import io.vertx.core.Handler;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -11,6 +12,9 @@ import io.vertx.ext.web.RoutingContext;
 import jakarta.validation.ConstraintViolation;
 import jakarta.ws.rs.container.ContainerRequestContext;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 public abstract class AbstractSecuredController<T, V> extends AbstractController<T, V> {
@@ -86,6 +90,61 @@ public abstract class AbstractSecuredController<T, V> extends AbstractController
         rc.response()
                 .setStatusCode(id == null ? 201 : 200)
                 .end(JsonObject.mapFrom(doc).encode());
+    }
+
+    /**
+     * Returns a route handler that enforces role membership before passing to the next handler.
+     * The user must have AT LEAST ONE of the given roles (OR logic).
+     * Roles are read from the Keycloak JWT claim: realm_access.roles
+     *
+     * Usage in setupRoutes():
+     *   router.route(HttpMethod.DELETE, path + "/:id")
+     *       .handler(requireRoles("admin"))
+     *       .handler(this::delete);
+     */
+    protected Handler<RoutingContext> requireRoles(String... roles) {
+        List<String> required = Arrays.asList(roles);
+        return rc -> {
+            if (hasAnyRole(rc, required)) {
+                rc.next();
+            } else {
+                rc.response()
+                        .setStatusCode(403)
+                        .putHeader("Content-Type", "application/json")
+                        .end(new JsonObject()
+                                .put("message", "Forbidden: insufficient role")
+                                .put("required", required.toString())
+                                .encode());
+            }
+        };
+    }
+
+    /**
+     * Inline check — returns true if the current user has the given role.
+     * Roles are read from the Keycloak JWT claim: realm_access.roles
+     */
+    protected boolean hasRole(RoutingContext rc, String role) {
+        return hasAnyRole(rc, Collections.singletonList(role));
+    }
+
+    private boolean hasAnyRole(RoutingContext rc, List<String> roles) {
+        if (rc.user() == null) {
+            return false;
+        }
+        JsonObject realmAccess = rc.user().principal().getJsonObject("realm_access");
+        if (realmAccess == null) {
+            return false;
+        }
+        JsonArray realmRoles = realmAccess.getJsonArray("roles");
+        if (realmRoles == null) {
+            return false;
+        }
+        for (String role : roles) {
+            if (realmRoles.contains(role)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

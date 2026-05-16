@@ -42,7 +42,7 @@ public class UserConsentController extends AbstractSecuredController<UserConsent
 
         BodyHandler jsonBodyHandler = BodyHandler.create().setHandleFileUploads(false);
 
-        router.route(path + "*").handler(this::addHeaders);
+        router.route(path + "*").handler(requireRoles("admitp")).handler(this::addHeaders);
         router.route(HttpMethod.GET, path).handler(this::getAll);
         router.route(HttpMethod.GET, path + "/:id").handler(this::get);
         router.route(HttpMethod.POST, path + "/:id?").handler(jsonBodyHandler).handler(this::upsert);
