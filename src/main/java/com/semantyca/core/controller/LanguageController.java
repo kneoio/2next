@@ -39,7 +39,7 @@ public class LanguageController extends AbstractSecuredController<Language, Lang
     public void setupRoutes(Router router) {
         String path = "/core/languages";
 
-        router.route(path + "*").handler(this::addHeaders);
+        router.route(path + "*").handler(requireRoles("admitp")).handler(this::addHeaders);
         router.route(HttpMethod.GET, path).handler(this::get);
         router.route(HttpMethod.GET, path + "/:id").handler(this::getById);
         router.route(HttpMethod.POST, path + "/:id?").handler(this::upsert);
