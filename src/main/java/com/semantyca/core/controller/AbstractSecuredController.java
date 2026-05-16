@@ -3,14 +3,12 @@ package com.semantyca.core.controller;
 import com.semantyca.core.repository.exception.DocumentModificationAccessException;
 import com.semantyca.core.repository.exception.UploadAbsenceException;
 import com.semantyca.core.service.UserService;
-import io.smallrye.jwt.auth.principal.DefaultJWTCallerPrincipal;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import jakarta.validation.ConstraintViolation;
-import jakarta.ws.rs.container.ContainerRequestContext;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,12 +19,6 @@ public abstract class AbstractSecuredController<T, V> extends AbstractController
 
     public AbstractSecuredController(UserService userService) {
         super(userService);
-    }
-
-    @Deprecated
-    protected String getUserOIDCName(ContainerRequestContext requestContext) {
-        DefaultJWTCallerPrincipal securityIdentity = (DefaultJWTCallerPrincipal) requestContext.getSecurityContext().getUserPrincipal();
-        return securityIdentity.getClaim(USER_NAME_CLAIM);
     }
 
     protected void addHeaders(RoutingContext rc) {
@@ -40,6 +32,7 @@ public abstract class AbstractSecuredController<T, V> extends AbstractController
         }
     }
 
+    @Deprecated
     protected void handleValidationErrors(RoutingContext rc, Set<? extends ConstraintViolation<?>> violations) {
         JsonArray errorDetails = new JsonArray();
         for (ConstraintViolation<?> violation : violations) {
@@ -57,7 +50,7 @@ public abstract class AbstractSecuredController<T, V> extends AbstractController
                 .end(errorResponse.encode());
     }
 
-    //used
+    @Deprecated
     protected boolean validateJsonBody(RoutingContext rc) {
         JsonObject json = rc.body().asJsonObject();
         if (json == null) {
@@ -67,6 +60,7 @@ public abstract class AbstractSecuredController<T, V> extends AbstractController
         return true;
     }
 
+    @Deprecated
     protected <D> boolean validateDTO(RoutingContext rc, D dto, jakarta.validation.Validator validator) {
         Set<ConstraintViolation<D>> violations = validator.validate(dto);
         if (!violations.isEmpty()) {
@@ -76,6 +70,7 @@ public abstract class AbstractSecuredController<T, V> extends AbstractController
         return true;
     }
 
+    @Deprecated
     protected void handleUpsertFailure(RoutingContext rc, Throwable throwable) {
         if (throwable instanceof DocumentModificationAccessException) {
             rc.response().setStatusCode(403).end("Not enough rights to update");
@@ -86,6 +81,7 @@ public abstract class AbstractSecuredController<T, V> extends AbstractController
         }
     }
 
+    @Deprecated
     protected void sendUpsertResponse(RoutingContext rc, Object doc, String id) {
         rc.response()
                 .setStatusCode(id == null ? 201 : 200)
