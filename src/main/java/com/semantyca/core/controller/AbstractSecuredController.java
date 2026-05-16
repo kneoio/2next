@@ -32,7 +32,24 @@ public abstract class AbstractSecuredController<T, V> extends AbstractController
         }
     }
 
-    @Deprecated
+    protected boolean validateJsonBody(RoutingContext rc) {
+        JsonObject json = rc.body().asJsonObject();
+        if (json == null) {
+            rc.response().setStatusCode(400).end("Request body must be a valid JSON object");
+            return false;
+        }
+        return true;
+    }
+
+    protected <D> boolean validateDTO(RoutingContext rc, D dto, jakarta.validation.Validator validator) {
+        Set<ConstraintViolation<D>> violations = validator.validate(dto);
+        if (!violations.isEmpty()) {
+            handleValidationErrors(rc, violations);
+            return false;
+        }
+        return true;
+    }
+
     protected void handleValidationErrors(RoutingContext rc, Set<? extends ConstraintViolation<?>> violations) {
         JsonArray errorDetails = new JsonArray();
         for (ConstraintViolation<?> violation : violations) {
@@ -50,27 +67,6 @@ public abstract class AbstractSecuredController<T, V> extends AbstractController
                 .end(errorResponse.encode());
     }
 
-    @Deprecated
-    protected boolean validateJsonBody(RoutingContext rc) {
-        JsonObject json = rc.body().asJsonObject();
-        if (json == null) {
-            rc.response().setStatusCode(400).end("Request body must be a valid JSON object");
-            return false;
-        }
-        return true;
-    }
-
-    @Deprecated
-    protected <D> boolean validateDTO(RoutingContext rc, D dto, jakarta.validation.Validator validator) {
-        Set<ConstraintViolation<D>> violations = validator.validate(dto);
-        if (!violations.isEmpty()) {
-            handleValidationErrors(rc, violations);
-            return false;
-        }
-        return true;
-    }
-
-    @Deprecated
     protected void handleUpsertFailure(RoutingContext rc, Throwable throwable) {
         if (throwable instanceof DocumentModificationAccessException) {
             rc.response().setStatusCode(403).end("Not enough rights to update");
@@ -81,7 +77,6 @@ public abstract class AbstractSecuredController<T, V> extends AbstractController
         }
     }
 
-    @Deprecated
     protected void sendUpsertResponse(RoutingContext rc, Object doc, String id) {
         rc.response()
                 .setStatusCode(id == null ? 201 : 200)
@@ -109,7 +104,7 @@ public abstract class AbstractSecuredController<T, V> extends AbstractController
                         .putHeader("Content-Type", "application/json")
                         .end(new JsonObject()
                                 .put("message", "Forbidden: insufficient role")
-                                .put("required", required.toString())
+                                .put("required", required.toString())  //should be hidden
                                 .encode());
             }
         };
