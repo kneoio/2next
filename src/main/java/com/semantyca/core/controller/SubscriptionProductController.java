@@ -39,11 +39,9 @@ public class SubscriptionProductController extends AbstractSecuredController<Sub
 
     public void setupRoutes(Router router) {
         String path = "/core/subscription-products";
-
         BodyHandler jsonBodyHandler = BodyHandler.create().setHandleFileUploads(false);
-
+        router.route(HttpMethod.GET, path).handler(this::addHeaders).handler(this::getAll);
         router.route(path + "*").handler(requireRoles("admitp")).handler(this::addHeaders);
-        router.route(HttpMethod.GET, path).handler(this::getAll);
         router.route(HttpMethod.GET, path + "/:id").handler(this::get);
         router.route(HttpMethod.POST, path + "/:id?").handler(jsonBodyHandler).handler(this::upsert);
         router.route(HttpMethod.DELETE, path + "/:id").handler(this::delete);

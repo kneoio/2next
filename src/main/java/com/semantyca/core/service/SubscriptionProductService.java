@@ -1,9 +1,9 @@
 package com.semantyca.core.service;
 
-import com.semantyca.core.model.cnst.LanguageCode;
-import com.semantyca.core.model.SubscriptionProduct;
-import com.semantyca.core.model.user.IUser;
 import com.semantyca.core.dto.document.SubscriptionProductDTO;
+import com.semantyca.core.model.SubscriptionProduct;
+import com.semantyca.core.model.cnst.LanguageCode;
+import com.semantyca.core.model.user.IUser;
 import com.semantyca.core.repository.SubscriptionProductRepository;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -35,11 +35,6 @@ public class SubscriptionProductService extends AbstractService<SubscriptionProd
     @Override
     public Uni<Integer> getAllCount(IUser user) {
         return repository.getAllCount();
-    }
-
-
-    public Uni<SubscriptionProductDTO> getDTOByIdentifier(String identifier) {
-        return null;
     }
 
     @Override
