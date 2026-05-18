@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.EnumMap;
 import java.util.List;
@@ -187,7 +188,7 @@ public class AsyncRepository extends AbstractRepository{
                             entityData.getTableName());
 
                     return client.preparedQuery(sql)
-                            .execute(Tuple.of(ZonedDateTime.now().toLocalDateTime(), user.getId(), uuid))
+                            .execute(Tuple.of(ZonedDateTime.now(ZoneOffset.UTC).toOffsetDateTime(), user.getId(), uuid))
                             .onItem().transform(RowSet::rowCount);
                 });
     }

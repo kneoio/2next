@@ -26,6 +26,7 @@ public class GlobalErrorHandler implements Handler<RoutingContext> {
 
         if (failure != null) {
             if (failure instanceof PgException e) {
+                e.printStackTrace();
                 LOGGER.errorf(
                         "ErrorId %s | Path %s | Status %s | PgState %s | Message %s | Detail %s",
                         errorId,
