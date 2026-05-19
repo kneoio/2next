@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -30,7 +30,7 @@ public class SoundFragment extends SecureDataEntity<UUID> {
     private Duration length;
     private int boost;
     private String description;
-    private LocalDateTime expiresAt;
+    private OffsetDateTime expiresAt;
     private List<FileMetadata> fileMetadataList;
 
     public String getMetadata() {
