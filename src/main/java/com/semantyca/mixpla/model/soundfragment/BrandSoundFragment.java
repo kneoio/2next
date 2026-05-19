@@ -3,7 +3,7 @@ package com.semantyca.mixpla.model.soundfragment;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -14,8 +14,7 @@ public class BrandSoundFragment {
     private UUID id;
     private UUID defaultBrandId;
     private int playedByBrandCount;
-    private int ratedByBrandCount;
-    private LocalDateTime playedTime;
+    private OffsetDateTime playedTime;
     private SoundFragment soundFragment;
     private List<UUID> representedInBrands;
 
