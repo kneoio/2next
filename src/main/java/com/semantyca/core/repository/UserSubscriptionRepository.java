@@ -18,7 +18,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
@@ -63,9 +62,9 @@ public class UserSubscriptionRepository extends AsyncRepository {
         doc.setStripeSubscriptionId(row.getString("stripe_subscription_id"));
         doc.setSubscriptionType(row.getString("subscription_type"));
         doc.setSubscriptionStatus(row.getString("subscription_status"));
-        LocalDateTime te = row.getLocalDateTime("trial_end");
+        var te = row.getOffsetDateTime("trial_end");
         if (te != null) {
-            doc.setTrialEnd(te.atZone(ZoneId.systemDefault()));
+            doc.setTrialEnd(te.toZonedDateTime());
         }
         Boolean active = row.getBoolean("active");
         doc.setActive(active != null ? active : false);
