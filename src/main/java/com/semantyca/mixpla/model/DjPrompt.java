@@ -22,7 +22,6 @@ public class DjPrompt extends SecureDataEntity<UUID> {
     private boolean locked;
     private String title;
     private JsonObject backup;
-    private boolean podcast;
     private UUID draftId;
     private UUID masterId;
     private double version;
