@@ -21,7 +21,6 @@ import io.vertx.mutiny.sqlclient.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.EnumMap;
@@ -220,18 +219,18 @@ public class AsyncRepository extends AbstractRepository{
     public static void setDefaultFields(DataEntity<UUID> entity, Row row) {
         entity.setId(row.getUUID("id"));
         entity.setAuthor(row.getLong(COLUMN_AUTHOR));
-        entity.setRegDate(row.getLocalDateTime(COLUMN_REG_DATE).atZone(ZoneId.systemDefault()));
+        entity.setRegDate(row.getOffsetDateTime(COLUMN_REG_DATE).toZonedDateTime());
         entity.setLastModifier(row.getLong(COLUMN_LAST_MOD_USER));
-        entity.setLastModifiedDate(row.getLocalDateTime(COLUMN_LAST_MOD_DATE).atZone(ZoneId.systemDefault()));
+        entity.setLastModifiedDate(row.getOffsetDateTime(COLUMN_LAST_MOD_DATE).toZonedDateTime());
     }
 
 
     public static void setDefaultFields(User entity, Row row) {
         entity.setId(row.getLong("id"));
         entity.setAuthor(row.getLong(COLUMN_AUTHOR));
-        entity.setRegDate(row.getLocalDateTime(COLUMN_REG_DATE).atZone(ZoneId.systemDefault()));
+        entity.setRegDate(row.getOffsetDateTime(COLUMN_REG_DATE).toZonedDateTime());
         entity.setLastModifier(row.getLong(COLUMN_LAST_MOD_USER));
-        entity.setLastModifiedDate(row.getLocalDateTime(COLUMN_LAST_MOD_DATE).atZone(ZoneId.systemDefault()));
+        entity.setLastModifiedDate(row.getOffsetDateTime(COLUMN_LAST_MOD_DATE).toZonedDateTime());
     }
 
     public static void setLocalizedNames(SimpleReferenceEntity entity, Row row) {

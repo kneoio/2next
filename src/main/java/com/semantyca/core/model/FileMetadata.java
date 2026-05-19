@@ -16,7 +16,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -31,7 +31,7 @@ public class FileMetadata {
     private String parentTable;
     private UUID parentId;
     private int archived = 0;
-    private LocalDateTime archivedDate;
+    private OffsetDateTime archivedDate;
     private String mimeType;
     private String slugName;
     private String fileKey;
