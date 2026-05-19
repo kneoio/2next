@@ -17,7 +17,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
@@ -62,8 +61,8 @@ public class UserConsentRepository extends AsyncRepository {
         doc.setAnalytics(analytics != null ? analytics : false);
         Boolean marketing = row.getBoolean("marketing");
         doc.setMarketing(marketing != null ? marketing : false);
-        if (row.getLocalDateTime("timestamp") != null) {
-            doc.setTimestamp(row.getLocalDateTime("timestamp").atZone(ZoneId.systemDefault()));
+        if (row.getOffsetDateTime("timestamp") != null) {
+            doc.setTimestamp(row.getOffsetDateTime("timestamp").toZonedDateTime());
         }
         doc.setIpAddress(row.getString("ip_address"));
         doc.setUserAgent(row.getString("user_agent"));

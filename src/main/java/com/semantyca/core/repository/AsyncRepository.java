@@ -115,7 +115,7 @@ public class AsyncRepository extends AbstractRepository{
                 .onItem().transform(row -> {
                     DocumentAccessInfo doc = new DocumentAccessInfo();
                     doc.setUserId(row.getLong("reader"));
-                    doc.setReadingTime(row.getLocalDateTime("reading_time"));
+                    doc.setReadingTime(row.getOffsetDateTime("reading_time"));
                     doc.setCanEdit(row.getBoolean("can_edit"));
                     doc.setCanDelete(row.getBoolean("can_delete"));
                     doc.setUserLogin(row.getString("login"));
