@@ -3,6 +3,7 @@ package com.semantyca.mixpla.model;
 import com.semantyca.core.model.cnst.LanguageTag;
 import com.semantyca.mixpla.model.cnst.PromptType;
 import com.semantyca.core.model.SecureDataEntity;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +26,9 @@ public class DjPrompt extends SecureDataEntity<UUID> {
     private UUID draftId;
     private UUID masterId;
     private double version;
+    private int allowAsOption;
+    private JsonObject optionLocName;
+    private JsonArray exposedVariables;
     private List<UUID> labels;
 
 }
