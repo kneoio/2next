@@ -23,10 +23,13 @@ public class WebHelper {
     private static final Pattern NON_ASCII_ALNUM_RUNS = Pattern.compile("[^a-z0-9]+");
     private static final Pattern MULTIPLE_DASHES = Pattern.compile("-+");
 
-    public static String generateSlug(String element1, String element2) {
-        if (element1 == null) element1 = "";
-        if (element2 == null) element2 = "";
-        String input = element1 + " " + element2;
+    public static String generateSlug(String... parts) {
+        if (parts == null || parts.length == 0) {
+            return "";
+        }
+        String input = Arrays.stream(parts)
+                .map(p -> p != null ? p : "")
+                .collect(Collectors.joining(" "));
         return processSlug(input);
     }
 
