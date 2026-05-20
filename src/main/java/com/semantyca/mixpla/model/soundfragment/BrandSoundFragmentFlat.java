@@ -17,6 +17,7 @@ public class BrandSoundFragmentFlat {
     private UUID id;
     private UUID defaultBrandId;
     private int playedByBrandCount;
+    private int boost;
     private OffsetDateTime playedTime;
     private String title;
     private String artist;

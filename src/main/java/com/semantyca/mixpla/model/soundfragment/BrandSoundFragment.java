@@ -14,6 +14,7 @@ public class BrandSoundFragment {
     private UUID id;
     private UUID defaultBrandId;
     private int playedByBrandCount;
+    private int boost;
     private OffsetDateTime playedTime;
     private SoundFragment soundFragment;
     private List<UUID> representedInBrands;
