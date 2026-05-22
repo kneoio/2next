@@ -33,6 +33,7 @@ public class DjPrompt extends SecureDataEntity<UUID> {
     @Deprecated
     private JsonObject optionLocName;
     private EnumMap<LanguageCode, String> localizedOptionName = new EnumMap<>(LanguageCode.class);
+    //TODO should be map most likely
     private JsonArray exposedVariables;
     private List<UUID> labels;
 
