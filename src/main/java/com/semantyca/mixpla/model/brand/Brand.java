@@ -19,7 +19,6 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 public class Brand extends SecureDataEntity<UUID> {
-
     private EnumMap<LanguageCode, String> localizedName = new EnumMap<>(LanguageCode.class);
     private String slugName;
     private ZoneId timeZone;
