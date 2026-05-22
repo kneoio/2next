@@ -19,6 +19,7 @@ public class Script extends SecureDataEntity<UUID> {
     private String slugName;
     private UUID defaultProfileId;
     private String description;
+    private String color;
     private boolean custom;
     private List<UUID> labels;
     private boolean enabled;
