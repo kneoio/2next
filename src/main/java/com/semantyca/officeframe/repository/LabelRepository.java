@@ -147,6 +147,16 @@ public class LabelRepository extends AsyncRepository {
                 .collect().asList();
     }
 
+    public Uni<Label> findByCategoryAndNameOrSlug(String category, String slug, JsonObject localizedName) {
+        String sql = BASE_REQUEST + " WHERE category = $1 AND (identifier = $2 OR loc_name @> $3::jsonb) LIMIT 1";
+        return client.preparedQuery(sql)
+                .execute(Tuple.of(category, slug, localizedName))
+                .onItem().transform(rows -> {
+                    var it = rows.iterator();
+                    return it.hasNext() ? from(it.next()) : null;
+                });
+    }
+
     public Uni<Label> findByIdentifier(String identifier) {
         return client.preparedQuery(BASE_REQUEST + " WHERE identifier = $1")
                 .execute(Tuple.of(identifier))

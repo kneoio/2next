@@ -13,6 +13,7 @@ import com.semantyca.core.dto.view.ViewPage;
 import com.semantyca.core.model.cnst.LanguageCode;
 import com.semantyca.core.service.UserService;
 import com.semantyca.core.util.RuntimeUtil;
+import com.semantyca.core.util.ColorUtil;
 import com.semantyca.core.util.WebHelper;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.http.HttpMethod;
@@ -119,7 +120,9 @@ public class LabelController extends AbstractSecuredController<Label, LabelDTO> 
                         LabelDTO dto = new LabelDTO();
                         dto.setAuthor(user.getUserName());
                         dto.setLastModifier(user.getUserName());
-                        dto.setColor(WebHelper.generateRandomBrightColor());
+                        String[] colorPair = ColorUtil.generateContrastColorPair();
+                    dto.setColor(colorPair[0]);
+                    dto.setFontColor(colorPair[1]);
                         return Uni.createFrom().item(dto);
                     }
                     return service.getDTO(UUID.fromString(id), user, languageCode);
