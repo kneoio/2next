@@ -9,8 +9,10 @@ import com.semantyca.core.model.user.IUser;
 import com.semantyca.core.service.AbstractService;
 import com.semantyca.core.service.IRESTService;
 import com.semantyca.core.service.UserService;
+import com.semantyca.core.util.ColorUtil;
 import com.semantyca.core.util.WebHelper;
 import io.smallrye.mutiny.Uni;
+import io.vertx.core.json.JsonObject;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -86,21 +88,41 @@ public class LabelService extends AbstractService<Label, LabelDTO> implements IR
     
     @Override
     public Uni<LabelDTO> upsert(String id, LabelDTO dto, IUser user, LanguageCode code) {
+        String slug = WebHelper.generateSlug(dto.getLocalizedName());
+
+        if ("new".equalsIgnoreCase(id) || id == null) {
+            JsonObject localizedNameJson = JsonObject.mapFrom(dto.getLocalizedName());
+            return repository.findByCategoryAndNameOrSlug(dto.getCategory(), slug, localizedNameJson)
+                    .chain(existing -> {
+                        if (existing != null) {
+                            dto.getLocalizedName().forEach((lang, val) ->
+                                    existing.getLocalizedName().putIfAbsent(lang, val));
+                            return repository.update(existing.getId(), existing, user).chain(this::mapToDTO);
+                        }
+                        return repository.insert(buildLabel(dto, slug), user).chain(this::mapToDTO);
+                    });
+        } else {
+            return repository.update(UUID.fromString(id), buildLabel(dto, slug), user).chain(this::mapToDTO);
+        }
+    }
+
+    private Label buildLabel(LabelDTO dto, String slug) {
         Label doc = new Label();
-        doc.setIdentifier(dto.getIdentifier());
+        doc.setIdentifier(slug);
         doc.setParent(dto.getParent());
         doc.setCategory(dto.getCategory());
         doc.setLocalizedName(dto.getLocalizedName());
         doc.setHidden(dto.isHidden());
-        doc.setColor(dto.getColor());
-        doc.setFontColor(dto.getFontColor());
-        doc.setIdentifier(WebHelper.generateSlug(dto.getLocalizedName()));
-
-        if ("new".equalsIgnoreCase(id) || id == null) {
-            return repository.insert(doc, user).chain(this::mapToDTO);
+        if (dto.getColor() == null || dto.getColor().isBlank()) {
+            String[] pair = ColorUtil.generateContrastColorPair();
+            doc.setColor(pair[0]);
+            doc.setFontColor(pair[1]);
         } else {
-            return repository.update(UUID.fromString(id), doc, user).chain(this::mapToDTO);
+            doc.setColor(dto.getColor());
+            doc.setFontColor(dto.getFontColor() != null ? dto.getFontColor()
+                    : ColorUtil.contrastingFontColor(dto.getColor()));
         }
+        return doc;
     }
 
     private Uni<LabelDTO> mapToDTO(Label label) {
