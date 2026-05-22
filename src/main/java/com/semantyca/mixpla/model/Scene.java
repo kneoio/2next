@@ -20,6 +20,7 @@ public class Scene extends SecureDataEntity<UUID> {
     private String scriptTitle;
     private SceneTimingMode timingMode;
     private List<ScenePrompt> introPrompts;
+    private List<CustomAction> actions;
     private PlaylistRequest playlistRequest;
     private List<LocalTime> startTime;
     private int durationSeconds;
