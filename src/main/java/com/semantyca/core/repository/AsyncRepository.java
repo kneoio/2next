@@ -145,10 +145,7 @@ public class AsyncRepository extends AbstractRepository{
     public Uni<Void> insertRLSPermissions(io.vertx.mutiny.sqlclient.SqlClient tx, UUID entityId, EntityData entityData, IUser user) {
         String rlsSql = String.format(
                 "INSERT INTO %s (reader, entity_id, can_edit, can_delete) VALUES ($1, $2, $3, $4) " +
-                        "ON CONFLICT (reader, entity_id) DO UPDATE SET " +
-                        "can_edit = EXCLUDED.can_edit, " +
-                        "can_delete = EXCLUDED.can_delete, " +
-                        "reading_time = now()",
+                        "ON CONFLICT (reader, entity_id) DO NOTHING",
                 entityData.getRlsName()
         );
 
