@@ -37,6 +37,7 @@ public class ScriptFilter implements IFilter{
         if (languageTag != null) {
             return true;
         }
-        return custom || (searchTerm != null && !searchTerm.trim().isEmpty());
+
+        return custom || searchTerm != null && !searchTerm.trim().isEmpty();
     }
 }
