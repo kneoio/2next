@@ -18,6 +18,7 @@ public class ScriptFilter implements IFilter{
     private SceneTimingMode timingMode;
     private LanguageTag languageTag;
     private String searchTerm;
+    private boolean custom;
 
     public boolean isActivated() {
         if (activated) {
@@ -36,6 +37,7 @@ public class ScriptFilter implements IFilter{
         if (languageTag != null) {
             return true;
         }
-        return searchTerm != null && !searchTerm.trim().isEmpty();
+
+        return custom || searchTerm != null && !searchTerm.trim().isEmpty();
     }
 }
