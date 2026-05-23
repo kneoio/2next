@@ -40,6 +40,7 @@ public class Brand extends SecureDataEntity<UUID> {
     private SubmissionPolicy messagingPolicy = SubmissionPolicy.REVIEW_REQUIRED;
     private List<Label> labelList;
     private List<BrandScriptEntry> scripts;
+    private String scriptMode = "PREDEFINED";
     private Owner owner;
     private List<UUID> labels;
     private List<UUID> genres;
