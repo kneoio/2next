@@ -15,7 +15,7 @@ public class SceneFilter implements IFilter {
 
     private SceneTimingMode timingMode;
     private UUID scriptId;
-
+    private Boolean customScript;
 
     @Override
     public boolean isActivated() {
@@ -24,6 +24,6 @@ public class SceneFilter implements IFilter {
 
     @Override
     public boolean hasAnyFilter() {
-        return timingMode != null || scriptId != null;
+        return timingMode != null || scriptId != null || customScript != null;
     }
 }
