@@ -26,6 +26,8 @@ public class Scene extends SecureDataEntity<UUID> {
     private int durationSeconds;
     private int seqNum;
     private boolean oneTimeRun;
+    private boolean allowJingles;
+    private boolean allowAds;
     private double talkativity = 0.5;
     private List<Integer> weekdays;
     private List<UUID> soundFragmentIds;
