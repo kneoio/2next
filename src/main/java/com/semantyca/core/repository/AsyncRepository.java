@@ -216,18 +216,18 @@ public class AsyncRepository extends AbstractRepository{
     public static void setDefaultFields(DataEntity<UUID> entity, Row row) {
         entity.setId(row.getUUID("id"));
         entity.setAuthor(row.getLong(COLUMN_AUTHOR));
-        entity.setRegDate(row.getOffsetDateTime(COLUMN_REG_DATE).toZonedDateTime());
+        entity.setRegDate(row.getLocalDateTime(COLUMN_REG_DATE).atZone(ZoneOffset.UTC));
         entity.setLastModifier(row.getLong(COLUMN_LAST_MOD_USER));
-        entity.setLastModifiedDate(row.getOffsetDateTime(COLUMN_LAST_MOD_DATE).toZonedDateTime());
+        entity.setLastModifiedDate(row.getLocalDateTime(COLUMN_LAST_MOD_DATE).atZone(ZoneOffset.UTC));
     }
 
 
     public static void setDefaultFields(User entity, Row row) {
         entity.setId(row.getLong("id"));
         entity.setAuthor(row.getLong(COLUMN_AUTHOR));
-        entity.setRegDate(row.getOffsetDateTime(COLUMN_REG_DATE).toZonedDateTime());
+        entity.setRegDate(row.getLocalDateTime(COLUMN_REG_DATE).atZone(ZoneOffset.UTC));
         entity.setLastModifier(row.getLong(COLUMN_LAST_MOD_USER));
-        entity.setLastModifiedDate(row.getOffsetDateTime(COLUMN_LAST_MOD_DATE).toZonedDateTime());
+        entity.setLastModifiedDate(row.getLocalDateTime(COLUMN_LAST_MOD_DATE).atZone(ZoneOffset.UTC));
     }
 
     public static void setLocalizedNames(SimpleReferenceEntity entity, Row row) {
