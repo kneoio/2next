@@ -1,5 +1,6 @@
 package com.semantyca.mixpla.dto.queue.livestream;
 
+import com.semantyca.mixpla.model.cnst.TTSEngineType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,7 @@ public class IntroInfoDTO {
     private int sequenceNumber;
     private int durationSeconds;
     private float gain;
+    private TTSEngineType engineType;
 
     public IntroInfoDTO(String filePath, int durationSeconds) {
         this.filePath = filePath;
