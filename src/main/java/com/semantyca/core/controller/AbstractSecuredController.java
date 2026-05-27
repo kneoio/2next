@@ -8,6 +8,9 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import jakarta.validation.ConstraintViolation;
 
 import java.util.Arrays;
@@ -119,21 +122,24 @@ public abstract class AbstractSecuredController<T, V> extends AbstractController
     }
 
     private boolean hasAnyRole(RoutingContext rc, List<String> roles) {
-        if (rc.user() == null) {
+        String authHeader = rc.request().getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return false;
         }
-        JsonObject realmAccess = rc.user().principal().getJsonObject("realm_access");
-        if (realmAccess == null) {
-            return false;
-        }
-        JsonArray realmRoles = realmAccess.getJsonArray("roles");
-        if (realmRoles == null) {
-            return false;
-        }
-        for (String role : roles) {
-            if (realmRoles.contains(role)) {
-                return true;
+        try {
+            String[] parts = authHeader.substring(7).split("\\.");
+            if (parts.length < 2) return false;
+            String payload = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
+            JsonObject claims = new JsonObject(payload);
+            JsonObject realmAccess = claims.getJsonObject("realm_access");
+            if (realmAccess == null) return false;
+            JsonArray realmRoles = realmAccess.getJsonArray("roles");
+            if (realmRoles == null) return false;
+            for (String role : roles) {
+                if (realmRoles.contains(role)) return true;
             }
+        } catch (Exception e) {
+            return false;
         }
         return false;
     }
