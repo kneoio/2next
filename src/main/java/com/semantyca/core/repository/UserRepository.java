@@ -12,8 +12,8 @@ import jakarta.inject.Inject;
 import org.jboss.logging.Logger;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 
 @ApplicationScoped
@@ -166,14 +166,13 @@ public class UserRepository extends AsyncRepository {
     }
 
     public Uni<Long> insert(User doc, IUser user) {
-        ZonedDateTime nowZonedTime = ZonedDateTime.now();
-        LocalDateTime nowLocalDateTime = nowZonedTime.toLocalDateTime();
+        OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
         String sql = "INSERT INTO _users (author, default_lang, email, i_su, login, reg_date, last_mod_date, status, confirmation_code, last_mod_user, time_zone) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id";
 
         String timeZoneId = doc.getTimeZone() != null ? doc.getTimeZone().getID() : TimeZone.getDefault().getID();
 
-        Tuple finalParams = Tuple.of(user.getId(), doc.getDefaultLang(), doc.getEmail(), doc.isSupervisor(), doc.getLogin(), nowLocalDateTime)
-                .addValue(nowLocalDateTime)  // last_mod_date
+        Tuple finalParams = Tuple.of(user.getId(), doc.getDefaultLang(), doc.getEmail(), doc.isSupervisor(), doc.getLogin(), now)
+                .addValue(now)  // last_mod_date
                 .addInteger(doc.getRegStatus().ordinal())  // Convert enum to integer
                 .addInteger(doc.getConfirmationCode())
                 .addLong(user.getId())
