@@ -9,7 +9,6 @@ import com.semantyca.core.repository.table.TableNameResolver;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
-import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Pool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowSet;
@@ -18,8 +17,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,11 +32,12 @@ public class SubscriptionProductRepository extends AsyncRepository {
     }
 
     public Uni<List<SubscriptionProduct>> getAll(final int limit, final int offset) {
-        String sql = String.format("SELECT * FROM %s", entityData.getTableName());
+
+        String sql = String.format("SELECT * FROM %s ORDER BY order_number DESC", entityData.getTableName());
         if (limit > 0) {
             sql += String.format(" LIMIT %s OFFSET %s", limit, offset);
         }
-        return client.query(sql + " ORDER BY order_number DESC ")
+        return client.query(sql)
                 .execute()
                 .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
                 .onItem().transform(this::from)
