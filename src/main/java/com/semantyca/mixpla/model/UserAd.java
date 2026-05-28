@@ -17,4 +17,5 @@ public class UserAd extends DataEntity<UUID> {
     private String description;
     private String contacts;
     private UserData userData;
+    private PlayHistory playHistory;
 }

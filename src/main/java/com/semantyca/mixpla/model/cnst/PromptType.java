@@ -1,5 +1,5 @@
 package com.semantyca.mixpla.model.cnst;
 
 public enum PromptType {
-    SONG, ADVERTISEMENT, REMINDER, GENERATOR
+    SONG_INTRO, ADVERTISEMENT_INTRO, REMINDER_INTRO, GENERATOR
 }

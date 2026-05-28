@@ -1,6 +1,7 @@
 package com.semantyca.mixpla.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.semantyca.mixpla.model.cnst.MixingType;
 import com.semantyca.mixpla.model.cnst.PlaylistItemType;
 import com.semantyca.mixpla.model.cnst.SourceType;
 import com.semantyca.mixpla.model.cnst.WayOfSourcing;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PlaylistRequest {
     private WayOfSourcing sourcing = WayOfSourcing.RANDOM;
+    private MixingType defaultMixingType;
     private String title = "";
     private String artist = "";
     private List<UUID> genres = List.of();
