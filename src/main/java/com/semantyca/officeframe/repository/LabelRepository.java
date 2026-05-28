@@ -16,7 +16,7 @@ import io.vertx.mutiny.sqlclient.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -190,14 +190,14 @@ public class LabelRepository extends AsyncRepository {
                 entityData.getTableName());
 
         JsonObject localizedNameJson = JsonObject.mapFrom(doc.getLocalizedName());
-        LocalDateTime now = LocalDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now();
         UUID id = UUID.randomUUID();
 
         Tuple params = Tuple.of(id)
                 .addLong(user.getId())
-                .addLocalDateTime(now)
+                .addOffsetDateTime(now)
                 .addLong(user.getId())
-                .addLocalDateTime(now)
+                .addOffsetDateTime(now)
                 .addString(doc.getIdentifier())
                 .addString(doc.getColor())
                 .addString(doc.getFontColor())
@@ -228,10 +228,10 @@ public class LabelRepository extends AsyncRepository {
                 COLUMN_LOCALIZED_NAME);
 
         JsonObject localizedNameJson = JsonObject.mapFrom(doc.getLocalizedName());
-        LocalDateTime now = LocalDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now();
 
         Tuple params = Tuple.of(user.getId())
-                .addLocalDateTime(now)
+                .addOffsetDateTime(now)
                 .addString(doc.getIdentifier())
                 .addString(doc.getColor())
                 .addString(doc.getFontColor())
