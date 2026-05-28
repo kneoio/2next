@@ -19,6 +19,7 @@ public class MixplaNameResolver extends TableNameResolver {
     public static final String CHAT_MESSAGE = "chat message";
     public static final String CHAT_SUMMARY = "chat summary";
     public static final String SCENE_OVERRIDE = "scene override";
+    public static final String USER_AD = "user ad";
 
     private static final String SOUND_FRAGMENT_TABLE_NAME = "mixpla__sound_fragments";
     private static final String SOUND_FRAGMENT_ACCESS_TABLE_NAME = "mixpla__sound_fragment_readers";
@@ -48,6 +49,7 @@ public class MixplaNameResolver extends TableNameResolver {
     private static final String CHAT_SUMMARY_TABLE_NAME = "mixpla__chat_summaries";
     private static final String SCENE_OVERRIDE_TABLE_NAME = "mixpla__scene_overrides";
     private static final String SCENE_OVERRIDE_ACCESS_TABLE_NAME = "mixpla__scene_override_readers";
+    private static final String USER_AD_TABLE_NAME = "mixpla__user_ads";
 
     @Override
     public EntityData getEntityNames(String type) {
@@ -108,6 +110,9 @@ public class MixplaNameResolver extends TableNameResolver {
             case SCENE_OVERRIDE -> new EntityData(
                     SCENE_OVERRIDE_TABLE_NAME,
                     SCENE_OVERRIDE_ACCESS_TABLE_NAME
+            );
+            case USER_AD -> new EntityData(
+                    USER_AD_TABLE_NAME
             );
             default -> super.getEntityNames(type);
         };

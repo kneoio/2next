@@ -1,0 +1,18 @@
+package com.semantyca.mixpla.model;
+
+import com.semantyca.core.model.DataEntity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.UUID;
+
+@Setter
+@Getter
+@NoArgsConstructor
+public class UserAd extends DataEntity<UUID> {
+    private long userId;
+    private String title;
+    private String description;
+    private String contacts;
+}
