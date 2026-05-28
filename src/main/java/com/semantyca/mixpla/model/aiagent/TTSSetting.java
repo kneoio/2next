@@ -10,4 +10,5 @@ public class TTSSetting {
     private Voice copilot;
     private Voice newsReporter;
     private Voice weatherReporter;
+    private Voice adReader;
 }

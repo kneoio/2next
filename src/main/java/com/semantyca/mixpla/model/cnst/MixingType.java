@@ -2,6 +2,7 @@ package com.semantyca.mixpla.model.cnst;
 
 public enum MixingType {
     INTRO_SONG,
+    JINGLE_INTRO_SONG,
     LISTENER_INTRO_SONG,
     NOT_MIXED,
     SONG_ONLY,
@@ -10,5 +11,6 @@ public enum MixingType {
     INTRO_SONG_INTRO_SONG,
     SONG_CROSSFADE_SONG,
     JINGLE_GENERATED_JINGLE_WITH_BACKGROUND,
+    JINGLE_GENERATED_JINGLE,
     INTRO_JINGLE_GENERATED_JINGLE_WITH_BACKGROUND;
 }
