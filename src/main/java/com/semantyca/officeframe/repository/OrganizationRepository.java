@@ -19,7 +19,7 @@ import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.UUID;
@@ -112,7 +112,7 @@ public class OrganizationRepository extends AsyncRepository {
                 COLUMN_LOCALIZED_NAME);
 
         JsonObject localizedNameJson = JsonObject.mapFrom(doc.getLocalizedName());
-        LocalDateTime now = LocalDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now();
 
         Tuple params = Tuple.of(user.getId(), now, user.getId(), now)
                 .addString(doc.getIdentifier())
@@ -142,7 +142,7 @@ public class OrganizationRepository extends AsyncRepository {
                 COLUMN_LOCALIZED_NAME);
 
         JsonObject localizedNameJson = JsonObject.mapFrom(doc.getLocalizedName());
-        LocalDateTime now = LocalDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now();
 
         Tuple params = Tuple.of(user.getId(), now)
                 .addString(doc.getIdentifier())

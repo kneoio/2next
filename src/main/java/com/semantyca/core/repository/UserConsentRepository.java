@@ -16,7 +16,7 @@ import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -74,17 +74,17 @@ public class UserConsentRepository extends AsyncRepository {
                         "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id",
                 entityData.getTableName());
 
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime ts = doc.getTimestamp() != null ? doc.getTimestamp().toLocalDateTime() : now;
+        OffsetDateTime now = OffsetDateTime.now();
+        OffsetDateTime ts = doc.getTimestamp() != null ? doc.getTimestamp().toOffsetDateTime() : now;
         Tuple params = Tuple.of(user.getId())
-                .addLocalDateTime(now)
+                .addOffsetDateTime(now)
                 .addLong(user.getId())
-                .addLocalDateTime(now)
+                .addOffsetDateTime(now)
                 .addString(doc.getUserId())
                 .addBoolean(doc.isEssential())
                 .addBoolean(doc.isAnalytics())
                 .addBoolean(doc.isMarketing())
-                .addLocalDateTime(ts)
+                .addOffsetDateTime(ts)
                 .addString(doc.getIpAddress())
                 .addString(doc.getUserAgent());
 
@@ -100,15 +100,15 @@ public class UserConsentRepository extends AsyncRepository {
         String sql = String.format("UPDATE %s SET %s=$1, %s=$2, user_id=$3, essential=$4, analytics=$5, marketing=$6, timestamp=$7, ip_address=$8, user_agent=$9 WHERE id=$10",
                 entityData.getTableName(), COLUMN_LAST_MOD_USER, COLUMN_LAST_MOD_DATE);
 
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime ts = doc.getTimestamp() != null ? doc.getTimestamp().toLocalDateTime() : now;
+        OffsetDateTime now = OffsetDateTime.now();
+        OffsetDateTime ts = doc.getTimestamp() != null ? doc.getTimestamp().toOffsetDateTime() : now;
         Tuple params = Tuple.of(user.getId())
-                .addLocalDateTime(now)
+                .addOffsetDateTime(now)
                 .addString(doc.getUserId())
                 .addBoolean(doc.isEssential())
                 .addBoolean(doc.isAnalytics())
                 .addBoolean(doc.isMarketing())
-                .addLocalDateTime(ts)
+                .addOffsetDateTime(ts)
                 .addString(doc.getIpAddress())
                 .addString(doc.getUserAgent())
                 .addUUID(id);

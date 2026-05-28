@@ -17,7 +17,7 @@ import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -78,16 +78,16 @@ public class UserSubscriptionRepository extends AsyncRepository {
                         "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id",
                 entityData.getTableName());
 
-        LocalDateTime now = LocalDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now();
         Tuple params = Tuple.of(user.getId())
-                .addLocalDateTime(now)
+                .addOffsetDateTime(now)
                 .addLong(user.getId())
-                .addLocalDateTime(now)
+                .addOffsetDateTime(now)
                 .addLong(doc.getUserId())
                 .addString(doc.getStripeSubscriptionId())
                 .addString(doc.getSubscriptionType())
                 .addString(doc.getSubscriptionStatus())
-                .addLocalDateTime(doc.getTrialEnd() != null ? doc.getTrialEnd().toLocalDateTime() : null)
+                .addOffsetDateTime(doc.getTrialEnd() != null ? doc.getTrialEnd().toOffsetDateTime() : null)
                 .addBoolean(doc.isActive())
                 .addJsonObject(doc.getMeta() != null ? doc.getMeta() : new JsonObject());
 
@@ -103,14 +103,14 @@ public class UserSubscriptionRepository extends AsyncRepository {
         String sql = String.format("UPDATE %s SET %s=$1, %s=$2, user_id=$3, stripe_subscription_id=$4, subscription_type=$5, subscription_status=$6, trial_end=$7, active=$8, meta=$9 WHERE id=$10",
                 entityData.getTableName(), COLUMN_LAST_MOD_USER, COLUMN_LAST_MOD_DATE);
 
-        LocalDateTime now = LocalDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now();
         Tuple params = Tuple.of(user.getId())
-                .addLocalDateTime(now)
+                .addOffsetDateTime(now)
                 .addLong(doc.getUserId())
                 .addString(doc.getStripeSubscriptionId())
                 .addString(doc.getSubscriptionType())
                 .addString(doc.getSubscriptionStatus())
-                .addLocalDateTime(doc.getTrialEnd() != null ? doc.getTrialEnd().toLocalDateTime() : null)
+                .addOffsetDateTime(doc.getTrialEnd() != null ? doc.getTrialEnd().toOffsetDateTime() : null)
                 .addBoolean(doc.isActive())
                 .addJsonObject(doc.getMeta() != null ? doc.getMeta() : new JsonObject())
                 .addUUID(id);

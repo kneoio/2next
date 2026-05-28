@@ -16,7 +16,7 @@ import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -70,11 +70,11 @@ public class SubscriptionProductRepository extends AsyncRepository {
                         "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id",
                 entityData.getTableName());
 
-        LocalDateTime now = LocalDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now();
         Tuple params = Tuple.of(user.getId())
-                .addLocalDateTime(now)
+                .addOffsetDateTime(now)
                 .addLong(user.getId())
-                .addLocalDateTime(now)
+                .addOffsetDateTime(now)
                 .addString(doc.getIdentifier())
                 .addString(doc.getStripePriceId())
                 .addString(doc.getStripeProductId())
@@ -94,9 +94,9 @@ public class SubscriptionProductRepository extends AsyncRepository {
         String sql = String.format("UPDATE %s SET %s=$1, %s=$2, identifier=$3, stripe_price_id=$4, stripe_product_id=$5, loc_name=$6, loc_descr=$7, active=$8 WHERE id=$9",
                 entityData.getTableName(), COLUMN_LAST_MOD_USER, COLUMN_LAST_MOD_DATE);
 
-        LocalDateTime now = LocalDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now();
         Tuple params = Tuple.of(user.getId())
-                .addLocalDateTime(now)
+                .addOffsetDateTime(now)
                 .addString(doc.getIdentifier())
                 .addString(doc.getStripePriceId())
                 .addString(doc.getStripeProductId())

@@ -17,7 +17,7 @@ import io.vertx.mutiny.sqlclient.Tuple;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -72,11 +72,11 @@ public class UserBillingRepository extends AsyncRepository {
                         "VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
                 entityData.getTableName());
 
-        LocalDateTime now = LocalDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now();
         Tuple params = Tuple.of(user.getId())
-                .addLocalDateTime(now)
+                .addOffsetDateTime(now)
                 .addLong(user.getId())
-                .addLocalDateTime(now)
+                .addOffsetDateTime(now)
                 .addLong(doc.getUserId())
                 .addString(doc.getStripeCustomerId())
                 .addJsonObject(doc.getMeta() != null ? doc.getMeta() : new JsonObject());
@@ -93,9 +93,9 @@ public class UserBillingRepository extends AsyncRepository {
         String sql = String.format("UPDATE %s SET %s=$1, %s=$2, user_id=$3, stripe_customer_id=$4, meta=$5 WHERE id=$6",
                 entityData.getTableName(), COLUMN_LAST_MOD_USER, COLUMN_LAST_MOD_DATE);
 
-        LocalDateTime now = LocalDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now();
         Tuple params = Tuple.of(user.getId())
-                .addLocalDateTime(now)
+                .addOffsetDateTime(now)
                 .addLong(doc.getUserId())
                 .addString(doc.getStripeCustomerId())
                 .addJsonObject(doc.getMeta() != null ? doc.getMeta() : new JsonObject())
