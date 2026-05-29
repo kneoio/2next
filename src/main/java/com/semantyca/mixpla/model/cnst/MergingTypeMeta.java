@@ -54,9 +54,9 @@ public final class MergingTypeMeta {
             Map.entry(MixingType.JINGLE_INTRO_SONG,                               new Info(1, 1, true,  false, false, false, Set.of(SongKey.SONG_1, SongKey.JINGLE_1))),
             Map.entry(MixingType.INTRO_SONG_INTRO_SONG,                           new Info(2, 2, false, false, false, false, Set.of(SongKey.SONG_1, SongKey.SONG_2))),
             Map.entry(MixingType.SONG_CROSSFADE_SONG,                             new Info(2, 0, false, true,  false, false, Set.of(SongKey.SONG_1, SongKey.SONG_2))),
-            Map.entry(MixingType.JINGLE_GENERATED_JINGLE_WITH_BACKGROUND,         new Info(1, 0, true,  false, true,  true,  Set.of(SongKey.JINGLE_INTRO, SongKey.JINGLE_OUTRO, SongKey.GENERATED_CONTENT, SongKey.BACKGROUND_MUSIC))),
+            Map.entry(MixingType.JINGLE_GENERATED_JINGLE_WITH_BACKGROUND,         new Info(1, 0, true,  false, true,  true,  Set.of(SongKey.JINGLE_INTRO, SongKey.JINGLE_OUTRO, SongKey.GENERATED_CONTENT, SongKey.BACKGROUND_LOOP))),
             Map.entry(MixingType.JINGLE_GENERATED_JINGLE,                         new Info(1, 0, true,  false, false, true,  Set.of(SongKey.JINGLE_INTRO, SongKey.JINGLE_OUTRO, SongKey.GENERATED_CONTENT))),
-            Map.entry(MixingType.INTRO_JINGLE_GENERATED_JINGLE_WITH_BACKGROUND,   new Info(1, 1, true,  false, true,  true,  Set.of(SongKey.JINGLE_INTRO, SongKey.JINGLE_OUTRO, SongKey.GENERATED_CONTENT, SongKey.BACKGROUND_MUSIC)))
+            Map.entry(MixingType.INTRO_JINGLE_GENERATED_JINGLE_WITH_BACKGROUND,   new Info(1, 1, true,  false, true,  true,  Set.of(SongKey.JINGLE_INTRO, SongKey.JINGLE_OUTRO, SongKey.GENERATED_CONTENT, SongKey.BACKGROUND_LOOP)))
     );
 
     public static Info of(MixingType type) {
