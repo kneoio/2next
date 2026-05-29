@@ -4,6 +4,8 @@ import java.time.OffsetDateTime;
 
 public record PlayHistory(
         OffsetDateTime playedAt,
-        Integer duration
+        Integer duration,
+        String speechText,
+        String djName
 ) {
 }
