@@ -13,6 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class UserAd extends DataEntity<UUID> {
     private long userId;
+    private UUID brandId;
     private String title;
     private String description;
     private String contacts;
