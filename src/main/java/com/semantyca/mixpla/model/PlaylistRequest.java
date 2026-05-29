@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Setter
@@ -16,7 +17,8 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PlaylistRequest {
     private WayOfSourcing sourcing = WayOfSourcing.RANDOM;
-    private MixingType defaultMixingType;
+    private MixingType mixingType;
+    private Map<String, String> mixingArtefacts;
     private String title = "";
     private String artist = "";
     private List<UUID> genres = List.of();
