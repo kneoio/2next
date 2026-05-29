@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Setter
@@ -18,5 +19,5 @@ public class UserAd extends DataEntity<UUID> {
     private String description;
     private String contacts;
     private UserData userData;
-    private PlayHistory playHistory;
+    private List<PlayHistory> playHistory;
 }
