@@ -16,6 +16,7 @@ public class UserAd extends DataEntity<UUID> {
     private long userId;
     private UUID brandId;
     private String title;
+    private String slugName;
     private String description;
     private String contacts;
     private UserData userData;
