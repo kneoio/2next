@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,4 +22,5 @@ public class UserAd extends DataEntity<UUID> {
     private String contacts;
     private UserData userData;
     private List<PlayHistory> playHistory;
+    private OffsetDateTime expiresAt;
 }

@@ -3,6 +3,8 @@ package com.semantyca.mixpla.model.cnst;
 public enum PlaylistItemType {
     SONG,
     ADVERTISEMENT,
+    PRERECORDED_ADVERTISEMENT,
+    PRERECORDED_PODCAST,
     JINGLE,
     NEWS,
     WEATHER,
