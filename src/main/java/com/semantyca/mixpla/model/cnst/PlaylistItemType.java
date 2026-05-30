@@ -6,6 +6,9 @@ public enum PlaylistItemType {
     PRERECORDED_ADVERTISEMENT,
     PRERECORDED_PODCAST,
     JINGLE,
+    JINGLE_INTRO,
+    JINGLE_OUTRO,
+    BACKGROUND_LOOP,
     NEWS,
     WEATHER,
     MIX_INTRO_SONG,
@@ -15,9 +18,6 @@ public enum PlaylistItemType {
     MIX_1_SONG,
     MIX_2_INTRO_SONG,
     MIX_DJ_CUSTOM_INTRO_SONG,
-    MIX_JINGLE_SONG,
-    JINGLE_INTRO,
-    JINGLE_OUTRO,
-    BACKGROUND_LOOP;
+    MIX_JINGLE_SONG
 }
 

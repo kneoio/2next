@@ -12,6 +12,8 @@ public interface IFileStorage {
 
     Uni<Void> deleteFile(String keyName);
 
+    Uni<Void> copyFile(String sourceKey, String destKey);
+
     FileStorageType getStorageType();
 
     @Deprecated

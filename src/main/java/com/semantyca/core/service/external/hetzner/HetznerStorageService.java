@@ -22,6 +22,7 @@ import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.http.urlconnection.UrlConnectionHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
@@ -134,6 +135,26 @@ public class HetznerStorageService implements IFileStorage {
     @Override
     public Uni<FileMetadata> retrieveFile(String key) {
         return getFileStream(key);
+    }
+
+    @Override
+    public Uni<Void> copyFile(String sourceKey, String destKey) {
+        return Uni.createFrom().<Void>item(() -> {
+                    LOGGER.infof("Copying S3 object from '%s' to '%s' in bucket: %s", sourceKey, destKey, this.hetznerConfig.getBucketName());
+                    CopyObjectRequest copyRequest = CopyObjectRequest.builder()
+                            .sourceBucket(this.hetznerConfig.getBucketName())
+                            .sourceKey(sourceKey)
+                            .destinationBucket(this.hetznerConfig.getBucketName())
+                            .destinationKey(destKey)
+                            .build();
+                    this.s3Client.copyObject(copyRequest);
+                    LOGGER.infof("Successfully copied S3 object from '%s' to '%s'", sourceKey, destKey);
+                    return null;
+                })
+                .runSubscriptionOn(Infrastructure.getDefaultWorkerPool())
+                .onFailure().invoke(throwable ->
+                        LOGGER.errorf("Error copying file in Hetzner. From: %s, To: %s, Bucket: %s", sourceKey, destKey, this.hetznerConfig.getBucketName(), throwable))
+                .onFailure().recoverWithUni(Uni.createFrom()::failure);
     }
 
     @Override
