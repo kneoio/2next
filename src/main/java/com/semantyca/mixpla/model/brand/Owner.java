@@ -9,4 +9,6 @@ public class Owner {
     private long userId;
     private String name;
     private String email;
+    private boolean exposeWhileSharing;
+    private boolean actionDebugEnabled;
 }
