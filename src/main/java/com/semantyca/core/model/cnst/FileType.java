@@ -10,6 +10,10 @@ public enum FileType {
         this.code = code;
     }
 
+    public int getCode() {
+        return code;
+    }
+
     public static FileType fromCode(int code) {
         for (FileType s : values()) {
             if (s.code == code) return s;

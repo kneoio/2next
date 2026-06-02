@@ -2,6 +2,7 @@ package com.semantyca.core.model;
 
 import com.semantyca.core.model.cnst.AccessType;
 import com.semantyca.core.model.cnst.FileStorageType;
+import com.semantyca.core.model.cnst.FileType;
 import com.semantyca.core.service.exceptions.FileMaterializationException;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.infrastructure.Infrastructure;
@@ -37,6 +38,7 @@ public class FileMetadata {
     private String fileKey;
     private String fileOriginalName;
     private FileStorageType fileStorageType;
+    private FileType fileType;
     private byte[] fileBin;
     private AccessType accessType;
     private Path filePath;
