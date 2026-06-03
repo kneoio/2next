@@ -19,7 +19,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class EmployeeDTO extends AbstractReferenceDTO {
     @Positive(message = "{employee.userId.invalid}")
-    long userId;
+    Long userId;
     LocalDate birthDate;
     @NotNull(message = "{employee.org.invalid}")
     OrganizationDTO org;

@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Owner {
-    private long userId;
+    private Long userID;
     private String name;
     private String email;
     private boolean exposeWhileSharing;

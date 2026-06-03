@@ -14,7 +14,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 public class UserBillingDTO extends AbstractDTO {
-    private long userId;
+    private Long userId;
     private String stripeCustomerId;
     private JsonObject meta;
 }

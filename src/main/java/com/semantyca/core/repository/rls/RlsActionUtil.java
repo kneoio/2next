@@ -70,7 +70,7 @@ public final class RlsActionUtil {
     }
 
     public static Uni<Void> grantMerge(SqlClient tx, String rlsTable, UUID entityId,
-                                        long userId, boolean canEdit, boolean canDelete) {
+                                        Long userId, boolean canEdit, boolean canDelete) {
         String sql = String.format(
                 "INSERT INTO %s (reader, entity_id, can_edit, can_delete) VALUES ($1, $2, $3, $4) " +
                 "ON CONFLICT (reader, entity_id) DO UPDATE SET " +
@@ -122,7 +122,7 @@ public final class RlsActionUtil {
                 .chain(() -> ensureSuperUserAccess(tx, rlsTable, entityId));
     }
 
-    public static Uni<Void> revoke(SqlClient tx, String rlsTable, UUID entityId, long userId) {
+    public static Uni<Void> revoke(SqlClient tx, String rlsTable, UUID entityId, Long userId) {
         String sql = String.format(
                 "DELETE FROM %s WHERE entity_id = $1 AND reader = $2",
                 rlsTable);

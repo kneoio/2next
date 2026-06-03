@@ -203,7 +203,7 @@ public class UserRepository extends AsyncRepository {
                 .onItem().transform(result -> (long) result.rowCount());
     }
 
-    public Uni<Long> updateEmail(long userId, String email, IUser actor) {
+    public Uni<Long> updateEmail(Long userId, String email, IUser actor) {
         String sql = "UPDATE _users SET email=$1, last_mod_date=CURRENT_TIMESTAMP, last_mod_user=$2 WHERE id=$3";
         return client.preparedQuery(sql)
                 .execute(Tuple.of(email, actor.getId(), userId))

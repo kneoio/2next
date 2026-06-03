@@ -52,7 +52,7 @@ public class AsyncRepository extends AbstractRepository{
         this.rlsRepository = rlsRepository;
     }
 
-    public Uni<Integer> getAllCount(long userID, String mainTable, String aclTable) {
+    public Uni<Integer> getAllCount(Long userID, String mainTable, String aclTable) {
         String sql = String.format("SELECT count(m.id) FROM %s as m, %s as acl WHERE m.id = acl.entity_id AND acl.reader = $1", mainTable, aclTable);
         return client.preparedQuery(sql)
                 .execute(Tuple.of(userID))

@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
 @Getter
 @NoArgsConstructor
 public class UserSubscription extends DataEntity<java.util.UUID> {
-    private long userId;
+    private Long userId;
     private String stripeSubscriptionId;
     private String subscriptionType;
     private String subscriptionStatus;

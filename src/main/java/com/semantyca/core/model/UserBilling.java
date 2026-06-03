@@ -11,7 +11,7 @@ import java.util.UUID;
 @Setter
 @Getter
 public class UserBilling extends DataEntity<UUID> {
-    private long userId;
+    private Long userId;
     private String stripeCustomerId;
     private JsonObject meta;
 }
