@@ -2,6 +2,7 @@ package com.semantyca.mixpla.model.soundfragment;
 
 import com.semantyca.core.model.FileMetadata;
 import com.semantyca.core.model.SecureDataEntity;
+import com.semantyca.core.model.scheduler.Schedulable;
 import com.semantyca.core.model.scheduler.Scheduler;
 import com.semantyca.mixpla.model.cnst.PlaylistItemType;
 import com.semantyca.mixpla.model.cnst.SourceType;
@@ -18,7 +19,7 @@ import java.util.UUID;
 @Setter
 @Getter
 @NoArgsConstructor
-public class SoundFragment extends SecureDataEntity<UUID> {
+public class SoundFragment extends SecureDataEntity<UUID> implements Schedulable {
     private SourceType source;
     private int status;
     private PlaylistItemType type;
