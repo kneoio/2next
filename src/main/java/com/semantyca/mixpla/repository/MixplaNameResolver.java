@@ -33,7 +33,7 @@ public class MixplaNameResolver extends TableNameResolver {
     private static final String PROFILE_TABLE_NAME = "mixpla__profiles";
     private static final String PROFILE_ACCESS_TABLE_NAME = "mixpla__profile_readers";
     private static final String MEMORY_TABLE_NAME = "mixpla__memories";
-    private static final String BRAND_STATS_TABLE_NAME = "mixpla__brand_agent_stats";
+    //private static final String BRAND_STATS_TABLE_NAME = "mixpla__brand_agent_stats";
     private static final String AI_AGENT_TABLE_NAME = "mixpla__ai_agents";
     private static final String AI_AGENT_ACCESS_TABLE_NAME = "mixpla__ai_agent_readers";
     private static final String EVENT_TABLE_NAME = "mixpla__events";
@@ -75,9 +75,9 @@ public class MixplaNameResolver extends TableNameResolver {
             case MEMORY -> new EntityData(
                     MEMORY_TABLE_NAME
             );
-            case BRAND_STATS -> new EntityData(
+           /* case BRAND_STATS -> new EntityData(
                     BRAND_STATS_TABLE_NAME
-            );
+            );*/
             case AI_AGENT -> new EntityData(
                     AI_AGENT_TABLE_NAME,
                     AI_AGENT_ACCESS_TABLE_NAME

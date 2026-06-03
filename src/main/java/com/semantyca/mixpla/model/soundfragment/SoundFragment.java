@@ -2,6 +2,7 @@ package com.semantyca.mixpla.model.soundfragment;
 
 import com.semantyca.core.model.FileMetadata;
 import com.semantyca.core.model.SecureDataEntity;
+import com.semantyca.core.model.scheduler.Scheduler;
 import com.semantyca.mixpla.model.cnst.PlaylistItemType;
 import com.semantyca.mixpla.model.cnst.SourceType;
 import lombok.Getter;
@@ -32,6 +33,7 @@ public class SoundFragment extends SecureDataEntity<UUID> {
     private int boost;
     private String description;
     private OffsetDateTime expiresAt;
+    private Scheduler scheduler;
     private List<FileMetadata> fileMetadataList;
 
     public String getMetadata() {
