@@ -18,8 +18,7 @@ import io.vertx.mutiny.sqlclient.Pool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jboss.logging.Logger;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -30,7 +29,7 @@ import java.util.function.Function;
 
 public class AsyncRepository extends AbstractRepository{
 
-    protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass().getSimpleName());
+    protected final Logger LOGGER = Logger.getLogger(this.getClass().getSimpleName());
     protected static final String COLUMN_AUTHOR = "author";
     protected static final String COLUMN_REG_DATE = "reg_date";
     protected static final String COLUMN_LAST_MOD_DATE = "last_mod_date";
@@ -152,7 +151,7 @@ public class AsyncRepository extends AbstractRepository{
         return tx.preparedQuery(rlsSql)
                 .execute(Tuple.of(user.getId(), entityId, true, true))
                 .onFailure().invoke(throwable ->
-                        LOGGER.error("Failed to insert/update RLS permissions for entity: {} by user: {}",
+                        LOGGER.errorf("Failed to insert/update RLS permissions for entity: %s by user: %s",
                                 entityId, user.getId(), throwable))
                 .onItem().transformToUni(ignored -> {
                     String selectSuUsersSql = "SELECT id FROM _users WHERE i_su = true";
@@ -164,7 +163,7 @@ public class AsyncRepository extends AbstractRepository{
                                 return tx.preparedQuery(rlsSql)
                                         .execute(Tuple.of(suUserId, entityId, true, true))
                                         .onFailure().invoke(throwable ->
-                                                LOGGER.error("Failed to insert/update RLS permissions for entity: {} by super user: {}",
+                                                LOGGER.errorf("Failed to insert/update RLS permissions for entity: %s by super user: %s",
                                                         entityId, suUserId, throwable))
                                         .onItem().ignore().andContinueWithNull();
                             })
