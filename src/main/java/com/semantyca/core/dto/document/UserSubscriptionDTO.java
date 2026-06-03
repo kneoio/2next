@@ -16,7 +16,7 @@ import java.time.ZonedDateTime;
 @SuperBuilder
 @NoArgsConstructor
 public class UserSubscriptionDTO extends AbstractDTO {
-    private long userId;
+    private Long userId;
     private String stripeSubscriptionId;
     private String subscriptionType;
     private String subscriptionStatus;

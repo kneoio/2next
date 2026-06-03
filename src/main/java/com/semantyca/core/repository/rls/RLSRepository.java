@@ -22,7 +22,7 @@ public class RLSRepository {
         this.client = client;
     }
 
-    public Uni<boolean[]> findById(String accessTableName, long userID, UUID uuid) {
+    public Uni<boolean[]> findById(String accessTableName, Long userID, UUID uuid) {
         return client.preparedQuery("SELECT can_edit, can_delete FROM " + accessTableName + " a WHERE a.reader = $1 AND a.entity_id = $2")
                 .execute(Tuple.of(userID, uuid))
                 .onItem().transform(RowSet::iterator)

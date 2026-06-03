@@ -15,7 +15,7 @@ import java.util.UUID;
 @Setter
 @Getter
 public class Listener extends SecureDataEntity<UUID> {
-    private long userId;
+    private Long userId;
     private EnumMap<LanguageCode, String> localizedName;
     private EnumMap<LanguageCode, Set<String>> nickName;
     private UserData userData;

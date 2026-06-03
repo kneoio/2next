@@ -134,7 +134,7 @@ public class UserService {
         }
     }
 
-    public Uni<Void> updateEmail(long userId, String email, IUser actor) {
+    public Uni<Void> updateEmail(Long userId, String email, IUser actor) {
         return repository.updateEmail(userId, email, actor)
                 .onItem().transform(count -> null);
     }
