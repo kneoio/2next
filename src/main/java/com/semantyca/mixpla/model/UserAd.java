@@ -14,7 +14,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 public class UserAd extends DataEntity<UUID> {
-    private Long userID;
+    private Long userId;
     private UUID brandId;
     private String title;
     private String slugName;

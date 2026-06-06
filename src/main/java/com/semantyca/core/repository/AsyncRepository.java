@@ -22,6 +22,7 @@ import org.jboss.logging.Logger;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.UUID;
@@ -170,6 +171,32 @@ public class AsyncRepository extends AbstractRepository{
                             .collect().asList()
                             .onItem().ignore().andContinueWithNull();
                 });
+    }
+
+    public Uni<Void> insertCoOwnerRLSPermissions(io.vertx.mutiny.sqlclient.SqlClient tx, UUID entityId,
+                                                   EntityData entityData, List<Long> coOwnerIds) {
+        if (coOwnerIds == null || coOwnerIds.isEmpty()) {
+            return Uni.createFrom().voidItem();
+        }
+        String rlsSql = String.format(
+                "INSERT INTO %s (reader, entity_id, can_edit, can_delete) VALUES ($1, $2, $3, $4) " +
+                        "ON CONFLICT DO NOTHING",
+                entityData.getRlsName()
+        );
+        List<Uni<Void>> unis = new ArrayList<>();
+        for (Long userId : coOwnerIds) {
+            if (userId != null) {
+                unis.add(tx.preparedQuery(rlsSql)
+                        .execute(Tuple.of(userId, entityId, true, true))
+                        .onFailure().invoke(t -> LOGGER.errorf(
+                                "Failed to insert co-owner RLS for entity: %s, userId: %s", entityId, userId, t))
+                        .onItem().ignore().andContinueWithNull());
+            }
+        }
+        if (unis.isEmpty()) {
+            return Uni.createFrom().voidItem();
+        }
+        return Uni.combine().all().unis(unis).discardItems();
     }
 
     public Uni<Integer> archive(UUID uuid, EntityData entityData, IUser user) {
