@@ -2,7 +2,8 @@ package com.semantyca.core.model.cnst;
 
 public enum FileType {
     SOUND_FRAGMENT(101),
-    OPUS_ENCODED_SOUND_FRAGMENT(102);
+    OPUS_ENCODED_SOUND_FRAGMENT(102),
+    BRAND_LOGO(201);
 
     private final int code;
 
