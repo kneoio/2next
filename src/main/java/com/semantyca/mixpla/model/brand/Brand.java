@@ -1,5 +1,6 @@
 package com.semantyca.mixpla.model.brand;
 
+import com.semantyca.core.model.FileMetadata;
 import com.semantyca.core.model.SecureDataEntity;
 import com.semantyca.core.model.cnst.LanguageCode;
 import com.semantyca.mixpla.model.cnst.ManagedBy;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.UUID;
@@ -44,6 +46,7 @@ public class Brand extends SecureDataEntity<UUID> {
     private Owner owner;
     private List<UUID> labels;
     private List<UUID> genres;
+    private List<FileMetadata> fileMetadataList = new ArrayList<>();
 
     public String toString() {
         return String.format("id: %s, slug: %s", getId(), slugName);

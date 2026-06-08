@@ -94,6 +94,11 @@ public class FileMetadata {
             case "audio/aac" -> ".aac";
             case "audio/ogg" -> ".ogg";
             case "audio/m4a" -> ".m4a";
+            case "image/jpeg", "image/jpg" -> ".jpg";
+            case "image/png" -> ".png";
+            case "image/gif" -> ".gif";
+            case "image/webp" -> ".webp";
+            case "image/svg+xml" -> ".svg";
             default -> ".tmp";
         };
     }
