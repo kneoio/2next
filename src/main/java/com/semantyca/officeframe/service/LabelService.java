@@ -58,20 +58,26 @@ public class LabelService extends AbstractService<Label, LabelDTO> implements IR
 
     public Uni<List<LabelDTO>> getOfCategory(String categoryName, LanguageCode languageCode) {
         return repository.getOfCategory(categoryName)
-                .chain(labels -> Uni.join().all(
-                        labels.stream()
-                                .map(this::mapToDTO)
-                                .collect(Collectors.toList())
-                ).andFailFast());
+                .chain(labels -> {
+                    if (labels.isEmpty()) return Uni.createFrom().item(List.of());
+                    return Uni.join().all(
+                            labels.stream()
+                                    .map(this::mapToDTO)
+                                    .collect(Collectors.toList())
+                    ).andFailFast();
+                });
     }
 
     public Uni<List<LabelDTO>> getLabels(UUID id, String type) {
         return repository.findForDocument(id, type)
-                .chain(labels -> Uni.join().all(
-                        labels.stream()
-                                .map(this::mapToDTO)
-                                .collect(Collectors.toList())
-                ).andFailFast());
+                .chain(labels -> {
+                    if (labels.isEmpty()) return Uni.createFrom().item(List.of());
+                    return Uni.join().all(
+                            labels.stream()
+                                    .map(this::mapToDTO)
+                                    .collect(Collectors.toList())
+                    ).andFailFast();
+                });
     }
 
     public Uni<LabelDTO> getDTO(UUID uuid, IUser user, LanguageCode language) {
