@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -20,4 +22,5 @@ public class SubscriptionProduct extends SimpleReferenceEntity {
     private String stripeProductId;
     private boolean active = true;
     private List<UUID> labels;
+    private Map<String, Object> defaultValues = new HashMap<>();
 }
