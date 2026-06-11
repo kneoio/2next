@@ -1,8 +1,6 @@
 package com.semantyca.core.service;
 
-import com.semantyca.core.dto.document.SubscriptionProductDTO;
 import com.semantyca.core.model.SubscriptionProduct;
-import com.semantyca.core.model.cnst.LanguageCode;
 import com.semantyca.core.model.user.IUser;
 import com.semantyca.core.repository.SubscriptionProductRepository;
 import io.smallrye.mutiny.Uni;
@@ -11,77 +9,36 @@ import jakarta.inject.Inject;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
-public class SubscriptionProductService extends AbstractService<SubscriptionProduct, SubscriptionProductDTO> implements IRESTService<SubscriptionProductDTO> {
+public class SubscriptionProductService {
     private final SubscriptionProductRepository repository;
 
     @Inject
-    public SubscriptionProductService(UserService userService, SubscriptionProductRepository repository) {
-        super(userService);
+    public SubscriptionProductService(SubscriptionProductRepository repository) {
         this.repository = repository;
     }
 
-    public Uni<List<SubscriptionProductDTO>> getAll(final int limit, final int offset, LanguageCode languageCode) {
-        return repository.getAll(limit, offset)
-                .chain(list -> Uni.join().all(
-                        list.stream()
-                                .map(this::mapToDTO)
-                                .collect(Collectors.toList())
-                ).andFailFast());
+    public Uni<List<SubscriptionProduct>> getAll(int limit, int offset) {
+        return repository.getAll(limit, offset);
     }
 
-    @Override
-    public Uni<Integer> getAllCount(IUser user) {
+    public Uni<Integer> getAllCount() {
         return repository.getAllCount();
     }
 
-    @Override
-    public Uni<SubscriptionProductDTO> getDTO(UUID uuid, IUser user, LanguageCode language) {
-        return repository.findById(uuid).chain(this::mapToDTO);
+    public Uni<SubscriptionProduct> findById(UUID id) {
+        return repository.findById(id);
     }
 
-    @Override
-    public Uni<SubscriptionProductDTO> upsert(String id, SubscriptionProductDTO dto, IUser user, LanguageCode code) {
-        SubscriptionProduct doc = new SubscriptionProduct();
-        doc.setIdentifier(dto.getIdentifier());
-        doc.setLocalizedName(dto.getLocalizedName());
-        doc.setLocalizedDescription(dto.getLocalizedDescription());
-        doc.setStripePriceId(dto.getStripePriceId());
-        doc.setStripeProductId(dto.getStripeProductId());
-        doc.setActive(dto.isActive());
-
+    public Uni<SubscriptionProduct> upsert(String id, SubscriptionProduct doc, IUser user) {
         if ("new".equalsIgnoreCase(id) || id == null) {
-            return repository.insert(doc, user).chain(this::mapToDTO);
-        } else {
-            return repository.update(UUID.fromString(id), doc, user).chain(this::mapToDTO);
+            return repository.insert(doc, user);
         }
+        return repository.update(UUID.fromString(id), doc, user);
     }
 
-    private Uni<SubscriptionProductDTO> mapToDTO(SubscriptionProduct doc) {
-        return Uni.combine().all().unis(
-                userService.getName(doc.getAuthor()),
-                userService.getName(doc.getLastModifier())
-        ).asTuple().onItem().transform(tuple ->
-                SubscriptionProductDTO.builder()
-                        .id(doc.getId())
-                        .author(tuple.getItem1())
-                        .regDate(doc.getRegDate())
-                        .lastModifier(tuple.getItem2())
-                        .lastModifiedDate(doc.getLastModifiedDate())
-                        .identifier(doc.getIdentifier())
-                        .localizedName(doc.getLocalizedName())
-                        .localizedDescription(doc.getLocalizedDescription())
-                        .stripePriceId(doc.getStripePriceId())
-                        .stripeProductId(doc.getStripeProductId())
-                        .active(doc.isActive())
-                        .build()
-        );
-    }
-
-    @Override
-    public Uni<Integer> delete(String id, IUser user) {
-        return repository.delete(UUID.fromString(id));
+    public Uni<Integer> delete(UUID id) {
+        return repository.delete(id);
     }
 }

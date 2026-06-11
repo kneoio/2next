@@ -1,7 +1,6 @@
 package com.semantyca.core.server;
 
 import com.semantyca.core.controller.LanguageController;
-import com.semantyca.core.controller.SubscriptionProductController;
 import com.semantyca.core.controller.UserBillingController;
 import com.semantyca.core.controller.UserController;
 import com.semantyca.core.controller.UserSubscriptionController;
@@ -56,9 +55,6 @@ public class AbstractApplicationInit {
     UserSubscriptionController userSubscriptionController;
 
     @Inject
-    SubscriptionProductController subscriptionProductController;
-
-    @Inject
     EndpointConfig endpointConfig;
 
     private Set<String> enabledControllers;
@@ -107,9 +103,6 @@ public class AbstractApplicationInit {
         }
         if (isControllerEnabled("user-subscriptions")) {
             userSubscriptionController.setupRoutes(router);
-        }
-        if (isControllerEnabled("subscription-products")) {
-            subscriptionProductController.setupRoutes(router);
         }
     }
 
