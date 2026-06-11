@@ -32,7 +32,6 @@ public class SubscriptionProductRepository extends AsyncRepository {
     }
 
     public Uni<List<SubscriptionProduct>> getAll(final int limit, final int offset) {
-
         String sql = String.format("SELECT * FROM %s ORDER BY order_number DESC", entityData.getTableName());
         if (limit > 0) {
             sql += String.format(" LIMIT %s OFFSET %s", limit, offset);
@@ -62,12 +61,15 @@ public class SubscriptionProductRepository extends AsyncRepository {
         doc.setLocalizedDescription(getLocData(row, "loc_descr"));
         Boolean active = row.getBoolean("active");
         doc.setActive(active != null ? active : true);
+        JsonObject dv = row.getJsonObject("default_values");
+        doc.setDefaultValues(dv != null ? dv.getMap() : new java.util.HashMap<>());
         return doc;
     }
 
     public Uni<SubscriptionProduct> insert(SubscriptionProduct doc, IUser user) {
-        String sql = String.format("INSERT INTO %s (author, reg_date, last_mod_user, last_mod_date, identifier, stripe_price_id, stripe_product_id, loc_name, loc_descr, active) " +
-                        "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id",
+        String sql = String.format(
+                "INSERT INTO %s (author, reg_date, last_mod_user, last_mod_date, identifier, stripe_price_id, stripe_product_id, loc_name, loc_descr, active, default_values) " +
+                "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id",
                 entityData.getTableName());
 
         OffsetDateTime now = OffsetDateTime.now();
@@ -80,7 +82,8 @@ public class SubscriptionProductRepository extends AsyncRepository {
                 .addString(doc.getStripeProductId())
                 .addJsonObject(JsonObject.mapFrom(doc.getLocalizedName()))
                 .addJsonObject(JsonObject.mapFrom(doc.getLocalizedDescription()))
-                .addBoolean(doc.isActive());
+                .addBoolean(doc.isActive())
+                .addJsonObject(doc.getDefaultValues() != null ? new JsonObject(doc.getDefaultValues()) : new JsonObject());
 
         return client.preparedQuery(sql)
                 .execute(params)
@@ -91,7 +94,8 @@ public class SubscriptionProductRepository extends AsyncRepository {
     }
 
     public Uni<SubscriptionProduct> update(UUID id, SubscriptionProduct doc, IUser user) {
-        String sql = String.format("UPDATE %s SET %s=$1, %s=$2, identifier=$3, stripe_price_id=$4, stripe_product_id=$5, loc_name=$6, loc_descr=$7, active=$8 WHERE id=$9",
+        String sql = String.format(
+                "UPDATE %s SET %s=$1, %s=$2, identifier=$3, stripe_price_id=$4, stripe_product_id=$5, loc_name=$6, loc_descr=$7, active=$8, default_values=$9 WHERE id=$10",
                 entityData.getTableName(), COLUMN_LAST_MOD_USER, COLUMN_LAST_MOD_DATE);
 
         OffsetDateTime now = OffsetDateTime.now();
@@ -103,6 +107,7 @@ public class SubscriptionProductRepository extends AsyncRepository {
                 .addJsonObject(JsonObject.mapFrom(doc.getLocalizedName()))
                 .addJsonObject(JsonObject.mapFrom(doc.getLocalizedDescription()))
                 .addBoolean(doc.isActive())
+                .addJsonObject(doc.getDefaultValues() != null ? new JsonObject(doc.getDefaultValues()) : new JsonObject())
                 .addUUID(id);
 
         return client.preparedQuery(sql)
