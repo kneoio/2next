@@ -47,6 +47,7 @@ public class Brand extends SecureDataEntity<UUID> {
     private List<UUID> labels;
     private List<UUID> genres;
     private List<FileMetadata> fileMetadataList = new ArrayList<>();
+    private StreamingOptions streamingOptions;
 
     public String toString() {
         return String.format("id: %s, slug: %s", getId(), slugName);
