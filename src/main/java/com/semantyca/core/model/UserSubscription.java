@@ -16,6 +16,7 @@ import java.util.UUID;
 public class UserSubscription extends DataEntity<UUID> {
     private Long userId;
     private String stripeSubscriptionId;
+    private String stripeCustomerId;
     private String subscriptionType;
     private String subscriptionStatus;
     private ZonedDateTime trialEnd;
