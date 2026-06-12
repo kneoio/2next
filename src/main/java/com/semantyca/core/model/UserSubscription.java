@@ -7,12 +7,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Setter
 @Getter
 @NoArgsConstructor
-public class UserSubscription extends DataEntity<java.util.UUID> {
+public class UserSubscription extends DataEntity<UUID> {
     private Long userId;
     private String stripeSubscriptionId;
     private String subscriptionType;
