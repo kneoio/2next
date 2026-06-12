@@ -4,6 +4,7 @@ import com.semantyca.core.model.UserSubscription;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -21,4 +22,7 @@ public class MixplaUserSubscription extends UserSubscription {
     private UUID djTypeId;
     private short supportLevel;
     private boolean customScriptAllowed;
+    private Integer maxStations;
+    private boolean bulkUploadAllowed;
+    private BigDecimal priceEur;
 }
