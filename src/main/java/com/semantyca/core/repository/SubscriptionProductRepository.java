@@ -51,7 +51,7 @@ public class SubscriptionProductRepository extends AsyncRepository {
         return findById(uuid, entityData, this::from);
     }
 
-    private SubscriptionProduct from(Row row) {
+    protected SubscriptionProduct from(Row row) {
         SubscriptionProduct doc = new SubscriptionProduct();
         setDefaultFields(doc, row);
         doc.setIdentifier(row.getString("identifier"));
