@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Setter
@@ -25,4 +26,5 @@ public class MixplaUserSubscription extends UserSubscription {
     private Integer maxStations;
     private boolean bulkUploadAllowed;
     private BigDecimal priceEur;
+    private List<String> codecs;
 }
