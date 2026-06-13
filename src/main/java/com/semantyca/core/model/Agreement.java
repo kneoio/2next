@@ -6,11 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Setter
 @Getter
 @NoArgsConstructor
-public class Agreement extends DataEntity<java.util.UUID> {
+public class Agreement extends DataEntity<UUID> {
     private CountryCode country;
     private String userAgent;
     private String agreementVersion;
