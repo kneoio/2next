@@ -6,7 +6,7 @@
 
     <groupId>com.semantyca</groupId>
     <artifactId>2next</artifactId>
-    <version>1.4.35</version>
+    <version>1.4.36</version>
     <packaging>jar</packaging>
     <name>2next</name>
 
@@ -60,6 +60,14 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-reactive-routes</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-vertx</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.smallrye.reactive</groupId>
+            <artifactId>smallrye-mutiny-vertx-web-client</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
