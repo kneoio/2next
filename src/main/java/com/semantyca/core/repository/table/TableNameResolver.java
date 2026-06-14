@@ -13,7 +13,6 @@ public class TableNameResolver implements ITableResolver{
     private static final String AGREEMENTS_TABLE_NAME = "_agreements";
     private static final String USER_CONSENTS_TABLE_NAME = "_user_consents";
     private static final String USER_BILLINGS_TABLE_NAME = "_user_billings";
-    private static final String USER_SUBSCRIPTIONS_TABLE_NAME = "mixpla__user_subscriptions";
     private static final String SUBSCRIPTION_PRODUCTS_TABLE_NAME = "_subscription_products";
     protected static final String DEFAULT_SCHEMA = "public";
 
@@ -24,7 +23,6 @@ public class TableNameResolver implements ITableResolver{
             case AGREEMENT_ENTITY_NAME -> new EntityData(DEFAULT_SCHEMA + "." + AGREEMENTS_TABLE_NAME, null);
             case USER_CONSENT_ENTITY_NAME -> new EntityData(DEFAULT_SCHEMA + "." + USER_CONSENTS_TABLE_NAME, null);
             case USER_BILLING_ENTITY_NAME -> new EntityData(DEFAULT_SCHEMA + "." + USER_BILLINGS_TABLE_NAME, null);
-            case USER_SUBSCRIPTION_ENTITY_NAME -> new EntityData(DEFAULT_SCHEMA + "." + USER_SUBSCRIPTIONS_TABLE_NAME, null);
             case SUBSCRIPTION_PRODUCT_ENTITY_NAME -> new EntityData(DEFAULT_SCHEMA + "." + SUBSCRIPTION_PRODUCTS_TABLE_NAME, null);
             default -> throw new IllegalStateException("Unexpected value: " + type);
         };
