@@ -1,5 +1,6 @@
 package com.semantyca.core.llm;
 
+import com.semantyca.core.config.LlmConfig;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -43,7 +44,7 @@ public class AnthropicTextClient implements LlmTextClient {
 
         return webClient
                 .postAbs(MESSAGES_URL)
-                .putHeader("x-api-key", config.getAnthropicApiKey())
+                .putHeader("x-api-key", config.anthropicApiKey())
                 .putHeader("anthropic-version", ANTHROPIC_VERSION)
                 .putHeader("Content-Type", "application/json")
                 .timeout(60_000)

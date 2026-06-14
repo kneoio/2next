@@ -1,5 +1,6 @@
 package com.semantyca.core.llm;
 
+import com.semantyca.core.config.LlmConfig;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -40,7 +41,7 @@ public class GroqTextClient implements LlmTextClient {
 
         return webClient
                 .postAbs(CHAT_URL)
-                .putHeader("Authorization", "Bearer " + config.getGroqApiKey().orElseThrow(() -> new IllegalStateException("Groq API key not configured")))
+                .putHeader("Authorization", "Bearer " + config.groqApiKey())
                 .putHeader("Content-Type", "application/json")
                 .timeout(60_000)
                 .sendJsonObject(body)
