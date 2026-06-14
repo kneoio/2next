@@ -23,9 +23,6 @@ public class MixplaNameResolver extends TableNameResolver {
 
     private static final String SOUND_FRAGMENT_TABLE_NAME = "mixpla__sound_fragments";
     private static final String SOUND_FRAGMENT_ACCESS_TABLE_NAME = "mixpla__sound_fragment_readers";
-    private static final String SHARED_SOUND_FRAGMENT_TABLE_NAME = "mixpla__shared_sound_fragments";
-    private static final String SHARED_SOUND_FRAGMENT_ACCESS_TABLE_NAME = "mixpla__shared_sound_fragment_readers";
-    //private static final String SOUND_FRAGMENT_FILES_TABLE_NAME = "mixpla__sound_fragment_files";
     private static final String LISTENER_TABLE_NAME = "mixpla__listeners";
     private static final String LISTENER_ACCESS_TABLE_NAME = "mixpla__listener_readers";
     private static final String RADIO_STATION_TABLE_NAME = "mixpla__brands";
@@ -50,6 +47,7 @@ public class MixplaNameResolver extends TableNameResolver {
     private static final String SCENE_OVERRIDE_TABLE_NAME = "mixpla__scene_overrides";
     private static final String SCENE_OVERRIDE_ACCESS_TABLE_NAME = "mixpla__scene_override_readers";
     private static final String USER_AD_TABLE_NAME = "mixpla__user_ads";
+    private static final String USER_SUBSCRIPTIONS_TABLE_NAME = "mixpla__user_subscriptions";
 
     @Override
     public EntityData getEntityNames(String type) {
@@ -114,6 +112,7 @@ public class MixplaNameResolver extends TableNameResolver {
             case USER_AD -> new EntityData(
                     USER_AD_TABLE_NAME
             );
+            case USER_SUBSCRIPTION_ENTITY_NAME -> new EntityData(DEFAULT_SCHEMA + "." + USER_SUBSCRIPTIONS_TABLE_NAME, null);
             default -> super.getEntityNames(type);
         };
     }
