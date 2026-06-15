@@ -1,6 +1,5 @@
 package com.semantyca.core.llm;
 
-import com.semantyca.core.config.LlmConfig;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -19,9 +18,6 @@ public class AnthropicTextClient implements LlmTextClient {
     private static final String ANTHROPIC_VERSION = "2023-06-01";
 
     @Inject
-    LlmConfig config;
-
-    @Inject
     Vertx vertx;
 
     private WebClient webClient;
@@ -32,7 +28,7 @@ public class AnthropicTextClient implements LlmTextClient {
     }
 
     @Override
-    public Uni<LlmTextResult> createTextMessage(String model, long maxTokens, String systemPrompt, String userMessage) {
+    public Uni<LlmTextResult> createTextMessage(String apiKey, String model, long maxTokens, String systemPrompt, String userMessage) {
         JsonObject body = new JsonObject()
                 .put("model", model)
                 .put("max_tokens", maxTokens)
@@ -44,7 +40,7 @@ public class AnthropicTextClient implements LlmTextClient {
 
         return webClient
                 .postAbs(MESSAGES_URL)
-                .putHeader("x-api-key", config.anthropicApiKey())
+                .putHeader("x-api-key", apiKey)
                 .putHeader("anthropic-version", ANTHROPIC_VERSION)
                 .putHeader("Content-Type", "application/json")
                 .timeout(60_000)

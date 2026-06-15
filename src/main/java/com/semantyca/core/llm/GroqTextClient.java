@@ -1,6 +1,5 @@
 package com.semantyca.core.llm;
 
-import com.semantyca.core.config.LlmConfig;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -18,9 +17,6 @@ public class GroqTextClient implements LlmTextClient {
     private static final String CHAT_URL = "https://api.groq.com/openai/v1/chat/completions";
 
     @Inject
-    LlmConfig config;
-
-    @Inject
     Vertx vertx;
 
     private WebClient webClient;
@@ -31,7 +27,7 @@ public class GroqTextClient implements LlmTextClient {
     }
 
     @Override
-    public Uni<LlmTextResult> createTextMessage(String model, long maxTokens, String systemPrompt, String userMessage) {
+    public Uni<LlmTextResult> createTextMessage(String apiKey, String model, long maxTokens, String systemPrompt, String userMessage) {
         JsonObject body = new JsonObject()
                 .put("model", model)
                 .put("max_tokens", (int) maxTokens)
@@ -41,7 +37,7 @@ public class GroqTextClient implements LlmTextClient {
 
         return webClient
                 .postAbs(CHAT_URL)
-                .putHeader("Authorization", "Bearer " + config.groqApiKey())
+                .putHeader("Authorization", "Bearer " + apiKey)
                 .putHeader("Content-Type", "application/json")
                 .timeout(60_000)
                 .sendJsonObject(body)
