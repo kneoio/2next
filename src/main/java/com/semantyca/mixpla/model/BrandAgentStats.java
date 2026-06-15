@@ -1,6 +1,5 @@
 package com.semantyca.mixpla.model;
 
-import com.semantyca.mixpla.model.cnst.StreamType;
 import com.semantyca.officeframe.model.cnst.CountryCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +15,6 @@ public class BrandAgentStats {
     private String ipAddress;
     private CountryCode countryCode;
     private Long accessCount;
-    private StreamType streamType;
+    private String streamType;
     private OffsetDateTime lastAccessTime;
 }

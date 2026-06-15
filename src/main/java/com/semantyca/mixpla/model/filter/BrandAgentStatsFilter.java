@@ -1,6 +1,5 @@
 package com.semantyca.mixpla.model.filter;
 
-import com.semantyca.mixpla.model.cnst.StreamType;
 import com.semantyca.officeframe.model.cnst.CountryCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +12,7 @@ public class BrandAgentStatsFilter implements IFilter {
     private boolean activated = false;
     private String stationName;
     private CountryCode countryCode;
-    private StreamType streamType;
+    private String streamType;
 
     @Override
     public boolean isActivated() {
