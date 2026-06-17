@@ -21,6 +21,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class SoundFragment extends SecureDataEntity<UUID> implements Schedulable {
     private SourceType source;
+    private String streamUrl;
     private int status;
     private PlaylistItemType type;
     private String title;
