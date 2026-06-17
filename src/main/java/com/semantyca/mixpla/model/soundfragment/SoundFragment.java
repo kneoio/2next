@@ -4,6 +4,7 @@ import com.semantyca.core.model.FileMetadata;
 import com.semantyca.core.model.SecureDataEntity;
 import com.semantyca.core.model.scheduler.Schedulable;
 import com.semantyca.core.model.scheduler.Scheduler;
+import com.semantyca.mixpla.model.PlayHistory;
 import com.semantyca.mixpla.model.cnst.PlaylistItemType;
 import com.semantyca.mixpla.model.cnst.SourceType;
 import lombok.Getter;
@@ -36,6 +37,7 @@ public class SoundFragment extends SecureDataEntity<UUID> implements Schedulable
     private String description;
     private OffsetDateTime expiresAt;
     private Scheduler scheduler;
+    private List<PlayHistory> playHistory;
     private List<FileMetadata> fileMetadataList;
 
     public String getMetadata() {
