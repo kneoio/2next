@@ -2,6 +2,7 @@ package com.semantyca.mixpla.model;
 
 import com.semantyca.mixpla.model.cnst.ExpirationType;
 import com.semantyca.mixpla.model.cnst.SceneTimingMode;
+import com.semantyca.mixpla.model.cnst.SceneType;
 import com.semantyca.core.model.SecureDataEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +26,7 @@ public class Scene extends SecureDataEntity<UUID> {
     private List<LocalTime> startTime;
     private int durationSeconds;
     private int seqNum;
+    private SceneType sceneType;
     private boolean oneTimeRun;
     private boolean allowJingles;
     private boolean allowAds;
@@ -34,4 +36,15 @@ public class Scene extends SecureDataEntity<UUID> {
     private ExpirationType expiration;
     private int expiredAfterMinutes;
     private List<UUID> labels;
+
+    /**
+     * Defaults to LOOP. Falls back to the legacy {@code oneTimeRun} flag when not set,
+     * so scenes persisted before sceneType existed still classify correctly.
+     */
+    public SceneType getSceneType() {
+        if (sceneType != null) {
+            return sceneType;
+        }
+        return oneTimeRun ? SceneType.ONE_TIME : SceneType.LOOP;
+    }
 }
