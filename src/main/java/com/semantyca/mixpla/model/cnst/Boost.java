@@ -1,7 +1,7 @@
 package com.semantyca.mixpla.model.cnst;
 
 public enum Boost {
-    SUPER_BOOST(1),
+    SUPER_BOOST(2),
     BOOST(1),
     NOTHING(0),
     QUARANTINE(-1);
