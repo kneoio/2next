@@ -15,6 +15,8 @@ public class SongInfoDTO {
     private int durationSeconds;
     private SourceType sourceType;
     private String streamUrl;
+    private String overrideTitle;
+    private String overrideArtist;
 
     public SongInfoDTO(UUID songId, int durationSeconds) {
         this.songId = songId;
