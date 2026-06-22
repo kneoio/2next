@@ -11,6 +11,7 @@ public record CommandDTO(
         ICommandType type,
         Instant timestamp,
         UUID traceId,
+        @Deprecated
         String command,
         Map<String, Object> payload
 ) {
