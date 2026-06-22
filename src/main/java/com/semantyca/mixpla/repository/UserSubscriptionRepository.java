@@ -31,7 +31,7 @@ public class UserSubscriptionRepository extends AsyncRepository {
     }
 
     public Uni<List<MixplaUserSubscription>> findByUserId(Long userId) {
-        String sql = String.format("SELECT * FROM %s WHERE user_id=$1", TABLE);
+        String sql = String.format("SELECT * FROM %s WHERE user_id=$1 ORDER BY reg_date DESC", TABLE);
         return client.preparedQuery(sql)
                 .execute(Tuple.of(userId))
                 .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
