@@ -1,5 +1,6 @@
 package com.semantyca.mixpla.dto.playlist;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,7 +14,7 @@ public class PlaylistQueueEntryDTO {
     }
 
     public static class SongInfo {
-        public List<String> labels;
+        public List<String> labels = new ArrayList<>();
         public String title;
         public String artist;
     }
@@ -28,8 +29,8 @@ public class PlaylistQueueEntryDTO {
         public Integer duration;
     }
 
-    @Deprecated
     public SongInfo songInfo;
+    @Deprecated
     public DjInfo dj;
     public TechInfo tech;
 }
