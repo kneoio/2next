@@ -32,9 +32,16 @@ public class GroovyTemplateEngine {
                 "groovy.lang.GroovyClassLoader",
                 "groovy.util.Eval"
         ));
-        secure.setDisallowedMethodNames(List.of(
-                "execute", "exec", "eval", "loadClass", "forName", "getRuntime",
-                "newInstance", "defineClass", "getClassLoader"
+        secure.setDisallowedReceivers(List.of(
+                "java.lang.Runtime",
+                "java.lang.ProcessBuilder",
+                "java.lang.Process",
+                "java.lang.ClassLoader",
+                "java.lang.Thread",
+                "java.lang.reflect.Method",
+                "groovy.lang.GroovyShell",
+                "groovy.lang.GroovyClassLoader",
+                "groovy.util.Eval"
         ));
 
         config = new CompilerConfiguration();
