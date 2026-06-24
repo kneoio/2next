@@ -1,45 +1,58 @@
 package com.semantyca.mixpla.template;
 
-import javax.script.Bindings;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptEngineManager;
-import javax.script.SimpleBindings;
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
+import org.codehaus.groovy.control.CompilerConfiguration;
+import org.codehaus.groovy.control.customizers.SecureASTCustomizer;
+
+import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class GroovyTemplateEngine {
-    private final ScriptEngine engine;
+    private final CompilerConfiguration config;
 
     public GroovyTemplateEngine() {
-        ScriptEngineManager manager = new ScriptEngineManager();
+        SecureASTCustomizer secure = new SecureASTCustomizer();
+        secure.setDisallowedImports(List.of(
+                "java.io.File",
+                "java.io.FileInputStream",
+                "java.io.FileOutputStream",
+                "java.io.PrintWriter",
+                "java.lang.Runtime",
+                "java.lang.ProcessBuilder",
+                "java.lang.Process",
+                "java.lang.ClassLoader",
+                "java.lang.Thread",
+                "java.lang.reflect.Method",
+                "java.net.Socket",
+                "java.net.ServerSocket",
+                "java.net.URL",
+                "java.net.HttpURLConnection",
+                "groovy.lang.GroovyShell",
+                "groovy.lang.GroovyClassLoader",
+                "groovy.util.Eval"
+        ));
+        secure.setDisallowedMethodNames(List.of(
+                "execute", "exec", "eval", "loadClass", "forName", "getRuntime",
+                "newInstance", "defineClass", "getClassLoader"
+        ));
 
-        ScriptEngine eng = manager.getEngineByName("groovy");
-        if (eng == null) eng = manager.getEngineByExtension("groovy");
-
-        if (eng == null) {
-            String available = manager.getEngineFactories().stream()
-                    .map(ScriptEngineFactory::getEngineName)
-                    .collect(Collectors.joining(", "));
-            throw new IllegalStateException(
-                    "Groovy scripting engine not found. Ensure groovy is on the classpath. " +
-                            "Available engines: [" + available + "]");
-        }
-        this.engine = eng;
+        config = new CompilerConfiguration();
+        config.addCompilationCustomizers(secure);
     }
 
     public String render(String script, Map<String, Object> context, String draftSlug) {
         try {
-            Bindings bindings = new SimpleBindings();
+            Binding binding = new Binding();
             if (context != null) {
-                bindings.putAll(context);
+                context.forEach(binding::setVariable);
             }
-            engine.put(ScriptEngine.FILENAME, String.format("%s.groovy", draftSlug));
-            return String.valueOf(engine.eval(script, bindings));
+            GroovyShell shell = new GroovyShell(getClass().getClassLoader(), binding, config);
+            Object result = shell.evaluate(script);
+            return String.valueOf(result);
         } catch (Exception e) {
             String msg = e.getClass().getName() + ": " + (e.getMessage() == null ? "" : e.getMessage());
-            
-            // Log script context for debugging
+
             StringBuilder contextInfo = new StringBuilder();
             if (context != null) {
                 contextInfo.append("Context variables: ");
@@ -49,10 +62,10 @@ public class GroovyTemplateEngine {
                     contextInfo.append(key).append("=").append(valueStr).append(", ");
                 });
                 if (contextInfo.length() > 2) {
-                    contextInfo.setLength(contextInfo.length() - 2); // Remove trailing comma
+                    contextInfo.setLength(contextInfo.length() - 2);
                 }
             }
-            
+
             String errorMsg = String.format("Failed to evaluate Groovy script '%s': %s. %s", draftSlug, msg, contextInfo);
             throw new RuntimeException(errorMsg, e);
         }
