@@ -6,7 +6,7 @@
 
     <groupId>com.semantyca</groupId>
     <artifactId>2next</artifactId>
-    <version>1.4.62</version>
+    <version>1.4.63</version>
     <packaging>jar</packaging>
     <name>2next</name>
 
@@ -49,6 +49,11 @@
     </distributionManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.groovy</groupId>
+            <artifactId>groovy</artifactId>
+            <version>4.0.15</version>
+        </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-resteasy-reactive</artifactId>
