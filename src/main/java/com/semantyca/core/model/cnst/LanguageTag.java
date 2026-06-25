@@ -30,7 +30,6 @@ public enum LanguageTag {
     NL_NL("nl-NL"),
     NL_BE("nl-BE"),
     SV_SE("sv-SE"),
-    NO_NO("no-NO"),
     NB_NO("nb-NO"),
     DA_DK("da-DK"),
     FI_FI("fi-FI"),
@@ -128,7 +127,7 @@ public enum LanguageTag {
             case IT_IT -> LanguageCode.it;
             case LV_LV -> LanguageCode.lv;
             case FI_FI -> LanguageCode.fi;
-            case NO_NO, NB_NO -> LanguageCode.no;
+            case NB_NO -> LanguageCode.no;
             case SV_SE -> LanguageCode.sv;
             case PL_PL -> LanguageCode.pl;
             case TR_TR -> LanguageCode.tr;
