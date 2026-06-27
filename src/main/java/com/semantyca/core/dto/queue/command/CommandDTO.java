@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public record CommandDTO(
         String serviceId,
-        ICommandType type,
+        String type,
         Instant timestamp,
         UUID traceId,
         @Deprecated
@@ -16,6 +16,6 @@ public record CommandDTO(
         Map<String, Object> payload
 ) {
     public static CommandDTO of(String serviceId, ICommandType type, UUID traceId, String command, Map<String, Object> payload) {
-        return new CommandDTO(serviceId, type, Instant.now(), traceId, command, payload);
+        return new CommandDTO(serviceId, type.name(), Instant.now(), traceId, command, payload);
     }
 }
