@@ -1,5 +1,6 @@
 package com.semantyca.mixpla.model.filter;
 
+import com.semantyca.core.model.cnst.LanguageTag;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +15,7 @@ public class AiAgentFilter implements IFilter {
     private boolean activated = false;
     private List<UUID> labels;
     private String searchTerm;
+    private LanguageTag languageTag;
 
     public boolean isActivated() {
         if (activated) {
@@ -24,6 +26,9 @@ public class AiAgentFilter implements IFilter {
 
     public boolean hasAnyFilter() {
         if (labels != null && !labels.isEmpty()) {
+            return true;
+        }
+        if (languageTag != null) {
             return true;
         }
         return searchTerm != null && !searchTerm.trim().isEmpty();
