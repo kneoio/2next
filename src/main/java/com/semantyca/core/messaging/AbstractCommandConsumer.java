@@ -10,8 +10,11 @@ import org.jboss.logging.Logger;
 public abstract class AbstractCommandConsumer {
 
     private static final Logger LOGGER = Logger.getLogger(AbstractCommandConsumer.class);
-    protected static final ObjectMapper objectMapper = new ObjectMapper()
-            .registerModule(new JavaTimeModule());
+    protected final ObjectMapper objectMapper = createObjectMapper();
+
+    protected ObjectMapper createObjectMapper() {
+        return new ObjectMapper().registerModule(new JavaTimeModule());
+    }
 
     protected abstract Uni<Void> handleCommand(CommandDTO dto);
 
