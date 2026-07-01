@@ -123,14 +123,21 @@ public class UserController extends AbstractSecuredController<User, UserDTO> {
 
             UserDTO dto = json.mapTo(UserDTO.class);
             String id = rc.pathParam("id");
+            LOGGER.infof("upsert user id=%s login=%s email=%s", id, dto.getLogin(), dto.getEmail());
 
             getContextUser(rc, false, false)
                     .chain(u -> service.upsert(id, dto, u))
                     .subscribe().with(
-                            ignored -> rc.response()
-                                    .setStatusCode(id == null ? 201 : 200)
-                                    .end(),
-                            throwable -> handleFailure(rc, throwable)
+                            result -> {
+                                LOGGER.infof("upsert user success id=%s result=%s", id, result);
+                                rc.response()
+                                        .setStatusCode(id == null ? 201 : 200)
+                                        .end(new JsonObject().put("id", result).encode());
+                            },
+                            throwable -> {
+                                LOGGER.errorf("upsert user failed id=%s: %s", id, throwable.getMessage());
+                                handleFailure(rc, throwable);
+                            }
                     );
 
         } catch (Exception e) {
