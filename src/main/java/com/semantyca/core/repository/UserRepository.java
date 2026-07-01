@@ -213,19 +213,19 @@ public class UserRepository extends AsyncRepository {
     }
 
     public Uni<Long> update(User doc, IUser user) {
-        String sql = "UPDATE _users SET default_lang=$1, email=$2, i_su=$3, status=$4, time_zone=$5, last_mod_date=CURRENT_TIMESTAMP, last_mod_user=$6 WHERE id=$7";
+        String sql = "UPDATE _users SET default_lang=$1, email=$2, i_su=$3, status=$4, time_zone=$5, last_mod_date=CURRENT_TIMESTAMP, last_mod_user=$6 WHERE id=$7 RETURNING id";
 
         String timeZoneId = doc.getTimeZone() != null ? doc.getTimeZone().getID() : TimeZone.getDefault().getID();
 
         Tuple params = Tuple.of(doc.getDefaultLang(), doc.getEmail(), doc.isSupervisor())
-                .addInteger(doc.getRegStatus().ordinal())  // Convert enum to integer
+                .addInteger(doc.getRegStatus().ordinal())
                 .addString(timeZoneId)
                 .addLong(user.getId())
                 .addLong(doc.getId());
 
         return client.preparedQuery(sql)
                 .execute(params)
-                .onItem().transform(result -> (long) result.rowCount());
+                .onItem().transform(result -> result.iterator().next().getLong("id"));
     }
 
     public Uni<Long> updateEmail(Long userId, String email, IUser actor) {
