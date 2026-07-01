@@ -137,6 +137,7 @@ public class UserService {
         User user = new User();
         user.setLogin(userDTO.getLogin());
         user.setEmail(userDTO.getEmail() != null ? userDTO.getEmail() : userDTO.getLogin() + "_place_holder@kneo.io");
+        user.setLabels(userDTO.getLabels());
 
         if (id == null || "new".equalsIgnoreCase(id)) {
             return repository.insert(user, actor);
@@ -214,6 +215,7 @@ public class UserService {
                     dto.setName(doc.getUserName());
                     dto.setLogin(doc.getLogin());
                     dto.setEmail(doc.getEmail());
+                    dto.setLabels(doc.getLabels());
                     return dto;
                 }
         );
