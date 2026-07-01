@@ -6,6 +6,7 @@ import com.semantyca.core.dto.view.View;
 import com.semantyca.core.dto.view.ViewPage;
 import com.semantyca.core.dto.form.FormPage;
 import com.semantyca.core.model.cnst.LanguageCode;
+import com.semantyca.core.model.filter.UserFilter;
 import com.semantyca.core.model.user.User;
 import com.semantyca.core.service.UserService;
 import com.semantyca.core.util.RuntimeUtil;
@@ -79,10 +80,23 @@ public class UserController extends AbstractSecuredController<User, UserDTO> {
         int page = Integer.parseInt(rc.request().getParam("page", "1"));
         int size = Integer.parseInt(rc.request().getParam("size", "10"));
         LanguageCode languageCode = resolveLanguage(rc);
+        UserFilter filter = new UserFilter();
+        String filterParam = rc.request().getParam("filter");
+        if (filterParam != null && !filterParam.trim().isEmpty()) {
+            try {
+                JsonObject json = new JsonObject(filterParam);
+                String search = json.getString("search");
+                if (search != null && !search.trim().isEmpty()) {
+                    filter.setSearchTerm(search.trim());
+                }
+            } catch (Exception e) {
+                LOGGER.warnf("Invalid filter param: %s", e.getMessage());
+            }
+        }
 
         Uni.combine().all().unis(
-                        service.getAllCount(),
-                        service.getAll(size, (page - 1) * size)
+                        service.getAllCount(filter),
+                        service.getAll(size, (page - 1) * size, filter)
                 ).asTuple().map(tuple -> {
                     ViewPage viewPage = new ViewPage();
                     viewPage.addPayload(PayloadType.CONTEXT_ACTIONS, languageCode);

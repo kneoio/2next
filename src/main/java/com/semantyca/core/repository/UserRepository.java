@@ -1,6 +1,7 @@
 package com.semantyca.core.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.semantyca.core.model.filter.UserFilter;
 import com.semantyca.core.model.user.*;
 import com.semantyca.core.repository.cnst.UserRegStatus;
 import com.semantyca.core.server.EnvConst;
@@ -49,9 +50,33 @@ public class UserRepository extends AsyncRepository {
                 .collect().asList();
     }
 
+    public Uni<List<User>> getAll(final int limit, final int offset, final UserFilter filter) {
+        if (filter == null || !filter.isActivated()) {
+            return getAll(limit, offset);
+        }
+        String sql = "SELECT * FROM _users WHERE search_name ILIKE '%' || $1 || '%'";
+        if (limit > 0) {
+            sql += String.format(" LIMIT %s OFFSET %s", limit, offset);
+        }
+        return client.preparedQuery(sql)
+                .execute(Tuple.of(filter.getSearchTerm().trim()))
+                .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
+                .onItem().transform(this::from)
+                .collect().asList();
+    }
+
     public Uni<Integer> getAllCount() {
         return client.query("SELECT COUNT(*) FROM _users")
                 .execute()
+                .onItem().transform(rowSet -> rowSet.iterator().next().getInteger(0));
+    }
+
+    public Uni<Integer> getAllCount(final UserFilter filter) {
+        if (filter == null || !filter.isActivated()) {
+            return getAllCount();
+        }
+        return client.preparedQuery("SELECT COUNT(*) FROM _users WHERE search_name ILIKE '%' || $1 || '%'")
+                .execute(Tuple.of(filter.getSearchTerm().trim()))
                 .onItem().transform(rowSet -> rowSet.iterator().next().getInteger(0));
     }
 
