@@ -1,6 +1,7 @@
 package com.semantyca.core.service;
 
 import com.semantyca.core.model.cnst.LanguageCode;
+import com.semantyca.core.model.filter.UserFilter;
 import com.semantyca.core.repository.cnst.UserRegStatus;
 import com.semantyca.core.dto.document.UserDTO;
 import com.semantyca.core.model.user.IUser;
@@ -42,6 +43,20 @@ public class UserService {
     public Uni<Integer> getAllCount() {
         assert repository != null;
         return repository.getAllCount("_users");
+    }
+
+    public Uni<List<UserDTO>> getAll(final int limit, final int offset, final UserFilter filter) {
+        return repository.getAll(limit, offset, filter)
+                .chain(list -> {
+                    List<Uni<UserDTO>> unis = list.stream()
+                            .map(this::mapToDTO)
+                            .collect(Collectors.toList());
+                    return Uni.join().all(unis).andFailFast();
+                });
+    }
+
+    public Uni<Integer> getAllCount(final UserFilter filter) {
+        return repository.getAllCount(filter);
     }
 
     public Uni<List<User>> search(String keyword) {
