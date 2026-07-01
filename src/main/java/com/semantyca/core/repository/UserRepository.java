@@ -47,7 +47,8 @@ public class UserRepository extends AsyncRepository {
                 .execute()
                 .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
                 .onItem().transform(this::from)
-                .collect().asList();
+                .collect().asList()
+                .chain(this::loadLabelsForList);
     }
 
     public Uni<List<User>> getAll(final int limit, final int offset, final UserFilter filter) {
@@ -62,7 +63,8 @@ public class UserRepository extends AsyncRepository {
                 .execute(Tuple.of(filter.getSearchTerm().trim()))
                 .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
                 .onItem().transform(this::from)
-                .collect().asList();
+                .collect().asList()
+                .chain(this::loadLabelsForList);
     }
 
     public Uni<Integer> getAllCount() {
@@ -115,14 +117,22 @@ public class UserRepository extends AsyncRepository {
         return client.preparedQuery("SELECT * FROM _users WHERE id = $1")
                 .execute(Tuple.of(id))
                 .onItem().transform(RowSet::iterator)
-                .onItem().transform(iterator -> iterator.hasNext() ? Optional.of(from(iterator.next())) : Optional.empty());
+                .onItem().transform(iterator -> iterator.hasNext() ? Optional.of(from(iterator.next())) : Optional.<IUser>empty())
+                .chain(opt -> {
+                    if (opt.isEmpty() || !(opt.get() instanceof User u)) return Uni.createFrom().item(opt);
+                    return loadLabels(u.getId()).onItem().transform(labels -> { u.setLabels(labels); return opt; });
+                });
     }
 
     public Uni<Optional<IUser>> findById(long id) {
         return client.preparedQuery("SELECT * FROM _users WHERE id = $1")
                 .execute(Tuple.of(id))
                 .onItem().transform(RowSet::iterator)
-                .onItem().transform(iterator -> iterator.hasNext() ? Optional.of(from(iterator.next())) : Optional.empty());
+                .onItem().transform(iterator -> iterator.hasNext() ? Optional.of(from(iterator.next())) : Optional.<IUser>empty())
+                .chain(opt -> {
+                    if (opt.isEmpty() || !(opt.get() instanceof User u)) return Uni.createFrom().item(opt);
+                    return loadLabels(u.getId()).onItem().transform(labels -> { u.setLabels(labels); return opt; });
+                });
     }
 
     public Uni<IUser> findByLogin(String userName) {
@@ -203,13 +213,15 @@ public class UserRepository extends AsyncRepository {
                 .addLong(user.getId())
                 .addString(timeZoneId);
 
-        return client.preparedQuery(sql)
-                .execute(finalParams)
-                .onItem().transform(result -> result.iterator().next().getLong("id"))
-                .onFailure().recoverWithUni(throwable -> {
-                    LOGGER.error(throwable.getMessage(), throwable);
-                    return Uni.createFrom().failure(new RuntimeException("Failed to insert user", throwable));
-                });
+        return client.withTransaction(tx ->
+                tx.preparedQuery(sql)
+                        .execute(finalParams)
+                        .onItem().transform(result -> result.iterator().next().getLong("id"))
+                        .chain(id -> upsertLabels(tx, id, doc.getLabels()).replaceWith(id))
+        ).onFailure().recoverWithUni(throwable -> {
+            LOGGER.error(throwable.getMessage(), throwable);
+            return Uni.createFrom().failure(new RuntimeException("Failed to insert user", throwable));
+        });
     }
 
     public Uni<Long> update(User doc, IUser user) {
@@ -223,9 +235,12 @@ public class UserRepository extends AsyncRepository {
                 .addLong(user.getId())
                 .addLong(doc.getId());
 
-        return client.preparedQuery(sql)
-                .execute(params)
-                .onItem().transform(result -> result.iterator().next().getLong("id"));
+        return client.withTransaction(tx ->
+                tx.preparedQuery(sql)
+                        .execute(params)
+                        .onItem().transform(result -> result.iterator().next().getLong("id"))
+                        .chain(id -> upsertLabels(tx, id, doc.getLabels()).replaceWith(id))
+        );
     }
 
     public Uni<Long> updateEmail(Long userId, String email, IUser actor) {
@@ -239,6 +254,34 @@ public class UserRepository extends AsyncRepository {
         return client.preparedQuery("DELETE FROM _users WHERE id = $1")
                 .execute(Tuple.of(id))
                 .onItem().transform(result -> (long) result.rowCount());
+    }
+
+    private Uni<List<UUID>> loadLabels(Long userId) {
+        return client.preparedQuery("SELECT label_id FROM _user_labels WHERE user_id = $1")
+                .execute(Tuple.of(userId))
+                .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
+                .onItem().transform(row -> row.getUUID("label_id"))
+                .collect().asList();
+    }
+
+    private Uni<List<User>> loadLabelsForList(List<User> users) {
+        if (users.isEmpty()) return Uni.createFrom().item(users);
+        List<Uni<User>> unis = users.stream()
+                .map(u -> loadLabels(u.getId()).onItem().transform(labels -> { u.setLabels(labels); return u; }))
+                .toList();
+        return Uni.join().all(unis).andFailFast();
+    }
+
+    private Uni<Void> upsertLabels(SqlClient tx, Long userId, List<UUID> labels) {
+        String deleteSql = "DELETE FROM _user_labels WHERE user_id = $1";
+        String insertSql = "INSERT INTO _user_labels (user_id, label_id) VALUES ($1, $2) ON CONFLICT DO NOTHING";
+        return tx.preparedQuery(deleteSql).execute(Tuple.of(userId))
+                .chain(() -> {
+                    if (labels == null || labels.isEmpty()) return Uni.createFrom().voidItem();
+                    return Multi.createFrom().iterable(labels)
+                            .onItem().transformToUni(labelId -> tx.preparedQuery(insertSql).execute(Tuple.of(userId, labelId)))
+                            .concatenate().collect().last().replaceWithVoid();
+                });
     }
 
 }

@@ -11,6 +11,8 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.UUID;
 @Setter
 @Getter
 @SuperBuilder
@@ -34,4 +36,5 @@ public class UserDTO {
     String email;
     String language;
     String theme;
+    List<UUID> labels;
 }

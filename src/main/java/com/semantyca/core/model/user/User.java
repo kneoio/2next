@@ -8,7 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.TimeZone;
+import java.util.UUID;
 
 @Setter
 @Getter
@@ -24,6 +26,7 @@ public class User extends DataEntity<Long> implements IUser {
     private TimeZone timeZone;
     private UserRegStatus regStatus;
     private int confirmationCode;
+    private List<UUID> labels;
 
     @Override
     public String getUserName() {
