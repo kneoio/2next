@@ -39,7 +39,7 @@ public class UserRepository extends AsyncRepository {
     }
 
     public Uni<List<User>> getAll(final int limit, final int offset) {
-        String sql = "SELECT * FROM _users";
+        String sql = "SELECT * FROM _users ORDER BY last_mod_date DESC";
         if (limit > 0) {
             sql += String.format(" LIMIT %s OFFSET %s", limit, offset);
         }
@@ -54,7 +54,7 @@ public class UserRepository extends AsyncRepository {
         if (filter == null || !filter.isActivated()) {
             return getAll(limit, offset);
         }
-        String sql = "SELECT * FROM _users WHERE search_name ILIKE '%' || $1 || '%'";
+        String sql = "SELECT * FROM _users WHERE search_name ILIKE '%' || $1 || '%' ORDER BY last_mod_date DESC";
         if (limit > 0) {
             sql += String.format(" LIMIT %s OFFSET %s", limit, offset);
         }
