@@ -125,14 +125,19 @@ public class UserController extends AbstractSecuredController<User, UserDTO> {
             String id = rc.pathParam("id");
             LOGGER.infof("upsert user id=%s login=%s email=%s", id, dto.getLogin(), dto.getEmail());
 
+            LanguageCode languageCode = resolveLanguage(rc);
+
             getContextUser(rc, false, false)
-                    .chain(u -> service.upsert(id, dto, u))
+                    .chain(u -> service.upsert(id, dto, u)
+                            .chain(resultId -> service.getDTO(resultId, u, languageCode)))
                     .subscribe().with(
-                            result -> {
-                                LOGGER.infof("upsert user success id=%s result=%s", id, result);
+                            resultDto -> {
+                                LOGGER.infof("upsert user success id=%s", id);
+                                FormPage page = new FormPage();
+                                page.addPayload(PayloadType.DOC_DATA, resultDto);
                                 rc.response()
                                         .setStatusCode(id == null ? 201 : 200)
-                                        .end(new JsonObject().put("id", result).encode());
+                                        .end(JsonObject.mapFrom(page).encode());
                             },
                             throwable -> {
                                 LOGGER.errorf("upsert user failed id=%s: %s", id, throwable.getMessage());
