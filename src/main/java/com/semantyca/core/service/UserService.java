@@ -2,6 +2,7 @@ package com.semantyca.core.service;
 
 import com.semantyca.core.model.cnst.LanguageCode;
 import com.semantyca.core.model.filter.UserFilter;
+import com.semantyca.core.util.WebHelper;
 import com.semantyca.core.repository.cnst.UserRegStatus;
 import com.semantyca.core.dto.document.UserDTO;
 import com.semantyca.core.model.user.IUser;
@@ -206,10 +207,13 @@ public class UserService {
                     UserDTO dto = new UserDTO();
                     dto.setId(doc.getId());
                     dto.setAuthor(tuple.getItem1());
+                    dto.setRegDate(doc.getRegDate());
                     dto.setLastModifier(tuple.getItem2());
+                    dto.setLastModifiedDate(doc.getLastModifiedDate());
+                    dto.setIdentifier(WebHelper.generateSlug(doc.getLogin()));
                     dto.setName(doc.getUserName());
-                    dto.setEmail(doc.getEmail());
                     dto.setLogin(doc.getLogin());
+                    dto.setEmail(doc.getEmail());
                     return dto;
                 }
         );

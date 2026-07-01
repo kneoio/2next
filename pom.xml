@@ -6,7 +6,7 @@
 
     <groupId>com.semantyca</groupId>
     <artifactId>2next</artifactId>
-    <version>1.4.80</version>
+    <version>1.4.81</version>
     <packaging>jar</packaging>
     <name>2next</name>
 
@@ -235,26 +235,6 @@
                             <goal>generate-code</goal>
                             <goal>generate-code-tests</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- On every deploy (i.e. a new shared version), regenerate the SHARED block of each
-                 Mixpla service's CLAUDE.md from MIXPLA_COMMON.md. The script skips any sibling repo
-                 that is absent, so this is safe on CI / partial checkouts. -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <id>sync-claude-md</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${project.basedir}/Scripts/sync-claude-md.sh</executable>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
