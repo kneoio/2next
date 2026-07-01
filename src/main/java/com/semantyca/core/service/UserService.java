@@ -189,6 +189,9 @@ public class UserService {
                 getName(doc.getLastModifier())
         ).asTuple().onItem().transform(tuple -> {
                     UserDTO dto = new UserDTO();
+                    dto.setId(doc.getId());
+                    dto.setAuthor(tuple.getItem1());
+                    dto.setLastModifier(tuple.getItem2());
                     dto.setName(doc.getUserName());
                     dto.setEmail(doc.getEmail());
                     dto.setLogin(doc.getLogin());
