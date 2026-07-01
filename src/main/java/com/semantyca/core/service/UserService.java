@@ -140,12 +140,27 @@ public class UserService {
         if (id == null || "new".equalsIgnoreCase(id)) {
             return repository.insert(user, actor);
         } else {
+            long userId;
             try {
-                user.setId(Long.parseLong(id));
+                userId = Long.parseLong(id);
             } catch (NumberFormatException e) {
                 return Uni.createFrom().failure(e);
             }
-            return repository.update(user, actor);
+            user.setId(userId);
+            return repository.findById(userId).chain(opt -> {
+                if (opt.isEmpty()) {
+                    return Uni.createFrom().failure(new IllegalArgumentException("User not found: " + userId));
+                }
+                if (opt.get() instanceof User existing) {
+                    user.setRegStatus(existing.getRegStatus());
+                    user.setSupervisor(existing.isSupervisor());
+                    user.setDefaultLang(existing.getDefaultLang());
+                    if (user.getTimeZone() == null) {
+                        user.setTimeZone(existing.getTimeZone());
+                    }
+                }
+                return repository.update(user, actor);
+            });
         }
     }
 
