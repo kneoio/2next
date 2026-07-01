@@ -159,7 +159,7 @@ public class UserService {
                         user.setTimeZone(existing.getTimeZone());
                     }
                 }
-                return repository.update(user, actor).map(ignored -> userId);
+                return repository.update(user, actor);
             });
         }
     }
