@@ -1,6 +1,7 @@
 package com.semantyca.core.dto.document;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -15,6 +16,7 @@ import java.time.ZonedDateTime;
 @SuperBuilder
 @NoArgsConstructor
 public class UserDTO {
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     long id;
     String author;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm")
@@ -30,8 +32,6 @@ public class UserDTO {
     String login;
     @NotNull @Email
     String email;
-    @NotNull
     String language;
-    @NotNull
     String theme;
 }
