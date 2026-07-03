@@ -117,22 +117,26 @@ public class UserRepository extends AsyncRepository {
         return client.preparedQuery("SELECT * FROM _users WHERE id = $1")
                 .execute(Tuple.of(id))
                 .onItem().transform(RowSet::iterator)
-                .onItem().transform(iterator -> iterator.hasNext() ? Optional.of(from(iterator.next())) : Optional.<IUser>empty())
-                .chain(opt -> {
-                    if (opt.isEmpty() || !(opt.get() instanceof User u)) return Uni.createFrom().item(opt);
-                    return loadLabels(u.getId()).onItem().transform(labels -> { u.setLabels(labels); return opt; });
-                });
+                .onItem().transform(iterator -> iterator.hasNext() ? Optional.<IUser>of(from(iterator.next())) : Optional.<IUser>empty())
+                .chain(this::attachLabelsIfPresent);
     }
 
     public Uni<Optional<IUser>> findById(long id) {
         return client.preparedQuery("SELECT * FROM _users WHERE id = $1")
                 .execute(Tuple.of(id))
                 .onItem().transform(RowSet::iterator)
-                .onItem().transform(iterator -> iterator.hasNext() ? Optional.of(from(iterator.next())) : Optional.<IUser>empty())
-                .chain(opt -> {
-                    if (opt.isEmpty() || !(opt.get() instanceof User u)) return Uni.createFrom().item(opt);
-                    return loadLabels(u.getId()).onItem().transform(labels -> { u.setLabels(labels); return opt; });
-                });
+                .onItem().transform(iterator -> iterator.hasNext() ? Optional.<IUser>of(from(iterator.next())) : Optional.<IUser>empty())
+                .chain(this::attachLabelsIfPresent);
+    }
+
+    private Uni<Optional<IUser>> attachLabelsIfPresent(Optional<IUser> opt) {
+        if (opt.isEmpty() || !(opt.get() instanceof User u)) {
+            return Uni.createFrom().item(opt);
+        }
+        return loadLabels(u.getId()).onItem().transform(labels -> {
+            u.setLabels(labels);
+            return opt;
+        });
     }
 
     public Uni<IUser> findByLogin(String userName) {
