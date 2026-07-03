@@ -19,6 +19,7 @@ import io.vertx.ext.web.RoutingContext;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
 import lombok.Getter;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +35,11 @@ public abstract class AbstractController<T, V> extends BaseController {
 
     @Getter
     private final UserService userService;
+
+    // Field-injected (not constructor) since JsonWebToken is a request-scoped CDI proxy - adding it
+    // to the constructor would force every subclass's super(userService) call site to change.
+    @Inject
+    JsonWebToken jsonWebToken;
 
     @Inject
     public AbstractController(UserService userService) {
@@ -78,10 +84,15 @@ public abstract class AbstractController<T, V> extends BaseController {
         if (vertxUser == null) {
             return Uni.createFrom().failure(new IllegalStateException("No authenticated user found"));
         }
-        JsonObject principal = vertxUser.principal();
-        String email = principal.getString(EMAIL_CLAIM);
+        // vertxUser.principal() is a stripped-down JsonObject (just {"username": ...}) built by the
+        // smallrye-jwt/MP-JWT auth layer - it does not carry the token's other claims. The injected
+        // JsonWebToken wraps the full parsed claim set (via our JWTPrincipalFactory) and is the
+        // correct place to read anything beyond username/subject.
+        String email = jsonWebToken.getClaim(EMAIL_CLAIM);
         if (email == null || email.isEmpty()) {
-            LOGGER.error("Email claim is missing from token. Full principal: {}", principal.encode());
+            JsonObject principal = vertxUser.principal();
+            LOGGER.error("Email claim is missing from token. Vert.x principal: {}, JWT claim names: {}",
+                    principal.encode(), jsonWebToken.getClaimNames());
             return Uni.createFrom().failure(new IllegalArgumentException("Email is null or empty"));
         }
 
