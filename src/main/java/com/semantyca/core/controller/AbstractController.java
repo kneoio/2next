@@ -30,11 +30,6 @@ import static com.semantyca.core.util.RuntimeUtil.countMaxPage;
 
 public abstract class AbstractController<T, V> extends BaseController {
     protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass().getSimpleName());
-    private static final String EMAIL_PATTERN = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-
-    @Deprecated
-    protected static final String USER_NAME_CLAIM = "preferred_username";
-    protected static final String USER_NAME = "username";
     protected static final String EMAIL_CLAIM = "email";
 
     @Getter
@@ -84,60 +79,33 @@ public abstract class AbstractController<T, V> extends BaseController {
             return Uni.createFrom().failure(new IllegalStateException("No authenticated user found"));
         }
         JsonObject principal = vertxUser.principal();
-        String username = principal.getString(USER_NAME);
-        if (username == null || username.isEmpty()) {
-            username = principal.getString(USER_NAME_CLAIM);
-            if (username == null || username.isEmpty()) {
-                LOGGER.error("Both username and preferred_username claims are missing from token");
-                return Uni.createFrom().failure(new IllegalArgumentException("Username is null or empty"));
-            }
-            LOGGER.debug("Using preferred_username claim: {}", username);
+        String email = principal.getString(EMAIL_CLAIM);
+        if (email == null || email.isEmpty()) {
+            LOGGER.error("Email claim is missing from token");
+            return Uni.createFrom().failure(new IllegalArgumentException("Email is null or empty"));
         }
 
-        String finalUsername = username;
-        String email = principal.getString(EMAIL_CLAIM);
-        boolean hasEmail = email != null && !email.isEmpty();
-
-        // Prefer matching by email over login/preferred_username. A user can already exist locally
-        // under a different login than their IdP username - e.g. someone resolved-or-created by
-        // email during an anonymous flow (public song submission, OTP-verified contribution, ...)
-        // before they ever registered a real account. Falling back to login-only lookup would miss
-        // that existing row and silently auto-register a second, disconnected user for the same
-        // person, orphaning whatever was already granted to the first one.
-        Uni<IUser> byEmail = hasEmail ? userService.findByEmail(email) : Uni.createFrom().item(UndefinedUser.Build());
-
-        return byEmail.onItem().transformToUni(emailUser -> {
-            if (emailUser != null && !(emailUser instanceof UndefinedUser)) {
-                return Uni.createFrom().item(emailUser);
-            }
-            return userService.findByLogin(finalUsername)
-                    .onItem().transformToUni(user -> {
-                        if (user == null || user instanceof UndefinedUser) {
-                            if (autoRegisterUser) {
-                                return userService.addOrGet(buildUser(finalUsername, hasEmail ? email : null), true)
-                                        .onItem().transformToUni(userId -> userService.get(userId))
-                                        .onItem().transform(Optional::get);
-                            } else if (allowUndefinedUser) {
-                                return Uni.createFrom().item(buildUser(finalUsername, hasEmail ? email : null));
-                            } else {
-                                return Uni.createFrom().failure(new UserNotFoundException(finalUsername));
-                            }
+        return userService.findByEmail(email)
+                .onItem().transformToUni(user -> {
+                    if (user == null || user instanceof UndefinedUser) {
+                        if (autoRegisterUser) {
+                            return userService.addOrGet(buildUser(email), true)
+                                    .onItem().transformToUni(userId -> userService.get(userId))
+                                    .onItem().transform(Optional::get);
+                        } else if (allowUndefinedUser) {
+                            return Uni.createFrom().item(buildUser(email));
+                        } else {
+                            return Uni.createFrom().failure(new UserNotFoundException(email));
                         }
-                        return Uni.createFrom().item(user);
-                    });
-        });
+                    }
+                    return Uni.createFrom().item(user);
+                });
     }
 
-    private com.semantyca.core.model.user.User buildUser(String userName, String realEmail) {
+    private com.semantyca.core.model.user.User buildUser(String email) {
         com.semantyca.core.model.user.User newUser = new com.semantyca.core.model.user.User();
-        newUser.setLogin(userName);
-        if (realEmail != null) {
-            newUser.setEmail(realEmail);
-        } else if (userName.matches(EMAIL_PATTERN)) {
-            newUser.setEmail(userName);
-        } else {
-            newUser.setEmail(userName + "@fake.local");
-        }
+        newUser.setLogin(email);
+        newUser.setEmail(email);
         return newUser;
     }
 
