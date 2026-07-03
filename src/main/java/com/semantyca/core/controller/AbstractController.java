@@ -35,6 +35,7 @@ public abstract class AbstractController<T, V> extends BaseController {
     @Deprecated
     protected static final String USER_NAME_CLAIM = "preferred_username";
     protected static final String USER_NAME = "username";
+    protected static final String EMAIL_CLAIM = "email";
 
     @Getter
     private final UserService userService;
@@ -94,27 +95,45 @@ public abstract class AbstractController<T, V> extends BaseController {
         }
 
         String finalUsername = username;
-        return userService.findByLogin(username)
-                .onItem().transformToUni(user -> {
-                    if (user == null || user instanceof UndefinedUser) {
-                        if (autoRegisterUser) {
-                            return userService.addOrGet(buildUser(finalUsername), true)
-                                    .onItem().transformToUni(userId -> userService.get(userId))
-                                    .onItem().transform(Optional::get);
-                        } else if (allowUndefinedUser) {
-                            return Uni.createFrom().item(buildUser(finalUsername));
-                        } else {
-                            return Uni.createFrom().failure(new UserNotFoundException(finalUsername));
+        String email = principal.getString(EMAIL_CLAIM);
+        boolean hasEmail = email != null && !email.isEmpty();
+
+        // Prefer matching by email over login/preferred_username. A user can already exist locally
+        // under a different login than their IdP username - e.g. someone resolved-or-created by
+        // email during an anonymous flow (public song submission, OTP-verified contribution, ...)
+        // before they ever registered a real account. Falling back to login-only lookup would miss
+        // that existing row and silently auto-register a second, disconnected user for the same
+        // person, orphaning whatever was already granted to the first one.
+        Uni<IUser> byEmail = hasEmail ? userService.findByEmail(email) : Uni.createFrom().item(UndefinedUser.Build());
+
+        return byEmail.onItem().transformToUni(emailUser -> {
+            if (emailUser != null && !(emailUser instanceof UndefinedUser)) {
+                return Uni.createFrom().item(emailUser);
+            }
+            return userService.findByLogin(finalUsername)
+                    .onItem().transformToUni(user -> {
+                        if (user == null || user instanceof UndefinedUser) {
+                            if (autoRegisterUser) {
+                                return userService.addOrGet(buildUser(finalUsername, hasEmail ? email : null), true)
+                                        .onItem().transformToUni(userId -> userService.get(userId))
+                                        .onItem().transform(Optional::get);
+                            } else if (allowUndefinedUser) {
+                                return Uni.createFrom().item(buildUser(finalUsername, hasEmail ? email : null));
+                            } else {
+                                return Uni.createFrom().failure(new UserNotFoundException(finalUsername));
+                            }
                         }
-                    }
-                    return Uni.createFrom().item(user);
-                });
+                        return Uni.createFrom().item(user);
+                    });
+        });
     }
 
-    private com.semantyca.core.model.user.User buildUser(String userName) {
+    private com.semantyca.core.model.user.User buildUser(String userName, String realEmail) {
         com.semantyca.core.model.user.User newUser = new com.semantyca.core.model.user.User();
         newUser.setLogin(userName);
-        if (userName.matches(EMAIL_PATTERN)) {
+        if (realEmail != null) {
+            newUser.setEmail(realEmail);
+        } else if (userName.matches(EMAIL_PATTERN)) {
             newUser.setEmail(userName);
         } else {
             newUser.setEmail(userName + "@fake.local");
