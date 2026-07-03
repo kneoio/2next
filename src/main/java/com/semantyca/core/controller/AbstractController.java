@@ -81,7 +81,7 @@ public abstract class AbstractController<T, V> extends BaseController {
         JsonObject principal = vertxUser.principal();
         String email = principal.getString(EMAIL_CLAIM);
         if (email == null || email.isEmpty()) {
-            LOGGER.error("Email claim is missing from token");
+            LOGGER.error("Email claim is missing from token. Full principal: {}", principal.encode());
             return Uni.createFrom().failure(new IllegalArgumentException("Email is null or empty"));
         }
 
