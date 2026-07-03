@@ -87,20 +87,15 @@ public abstract class AbstractController<T, V> extends BaseController {
             return Uni.createFrom().failure(new IllegalStateException("No authenticated user found"));
         }
         // vertxUser.principal() is a stripped-down JsonObject (just {"username": ...}) - it doesn't
-        // carry the token's other claims. Plain `@Inject JsonWebToken` is ambiguous here since both
-        // quarkus-oidc and quarkus-smallrye-jwt are present - it resolves through OIDC's producer,
-        // which only populates from an "access token" concept this app's auth flow never sets,
-        // so every claim reads back null. SecurityIdentity's principal is the one actually backed by
-        // our JWTPrincipalFactory-parsed claims; cast it to JsonWebToken to read them.
+        // carry the token's other claims. SecurityIdentity's principal is backed by the full claim
+        // set our JWTPrincipalFactory parses from the real token; cast it to JsonWebToken to read
+        // anything beyond username/subject.
         Principal identityPrincipal = securityIdentity != null ? securityIdentity.getPrincipal() : null;
-        String resolvedEmail = identityPrincipal instanceof JsonWebToken jwt ? jwt.getClaim(EMAIL_CLAIM) : null;
-        if (resolvedEmail == null || resolvedEmail.isEmpty()) {
-            JsonObject principal = vertxUser.principal();
-            LOGGER.error("Email claim is missing from token. Vert.x principal: {}, identity principal type: {}",
-                    principal.encode(), identityPrincipal != null ? identityPrincipal.getClass().getName() : "null");
+        String email = identityPrincipal instanceof JsonWebToken jwt ? jwt.getClaim(EMAIL_CLAIM) : null;
+        if (email == null || email.isEmpty()) {
+            LOGGER.error("Email claim is missing from token");
             return Uni.createFrom().failure(new IllegalArgumentException("Email is null or empty"));
         }
-        final String email = resolvedEmail;
 
         return userService.findByEmail(email)
                 .onItem().transformToUni(user -> {
@@ -125,7 +120,6 @@ public abstract class AbstractController<T, V> extends BaseController {
         newUser.setEmail(email);
         return newUser;
     }
-
 
     protected Response postError(Throwable e) {
         Random rand = new Random();
