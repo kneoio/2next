@@ -12,6 +12,7 @@ import com.semantyca.core.repository.exception.UserNotFoundException;
 import com.semantyca.core.service.IRESTService;
 import com.semantyca.core.service.UserService;
 import com.semantyca.core.util.RuntimeUtil;
+import io.quarkus.security.identity.SecurityIdentity;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
@@ -23,6 +24,7 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -36,10 +38,10 @@ public abstract class AbstractController<T, V> extends BaseController {
     @Getter
     private final UserService userService;
 
-    // Field-injected (not constructor) since JsonWebToken is a request-scoped CDI proxy - adding it
-    // to the constructor would force every subclass's super(userService) call site to change.
+    // Field-injected (not constructor) since SecurityIdentity is a request-scoped CDI proxy - adding
+    // it to the constructor would force every subclass's super(userService) call site to change.
     @Inject
-    JsonWebToken jsonWebToken;
+    SecurityIdentity securityIdentity;
 
     @Inject
     public AbstractController(UserService userService) {
@@ -84,17 +86,21 @@ public abstract class AbstractController<T, V> extends BaseController {
         if (vertxUser == null) {
             return Uni.createFrom().failure(new IllegalStateException("No authenticated user found"));
         }
-        // vertxUser.principal() is a stripped-down JsonObject (just {"username": ...}) built by the
-        // smallrye-jwt/MP-JWT auth layer - it does not carry the token's other claims. The injected
-        // JsonWebToken wraps the full parsed claim set (via our JWTPrincipalFactory) and is the
-        // correct place to read anything beyond username/subject.
-        String email = jsonWebToken.getClaim(EMAIL_CLAIM);
-        if (email == null || email.isEmpty()) {
+        // vertxUser.principal() is a stripped-down JsonObject (just {"username": ...}) - it doesn't
+        // carry the token's other claims. Plain `@Inject JsonWebToken` is ambiguous here since both
+        // quarkus-oidc and quarkus-smallrye-jwt are present - it resolves through OIDC's producer,
+        // which only populates from an "access token" concept this app's auth flow never sets,
+        // so every claim reads back null. SecurityIdentity's principal is the one actually backed by
+        // our JWTPrincipalFactory-parsed claims; cast it to JsonWebToken to read them.
+        Principal identityPrincipal = securityIdentity != null ? securityIdentity.getPrincipal() : null;
+        String resolvedEmail = identityPrincipal instanceof JsonWebToken jwt ? jwt.getClaim(EMAIL_CLAIM) : null;
+        if (resolvedEmail == null || resolvedEmail.isEmpty()) {
             JsonObject principal = vertxUser.principal();
-            LOGGER.error("Email claim is missing from token. Vert.x principal: {}, JWT claim names: {}",
-                    principal.encode(), jsonWebToken.getClaimNames());
+            LOGGER.error("Email claim is missing from token. Vert.x principal: {}, identity principal type: {}",
+                    principal.encode(), identityPrincipal != null ? identityPrincipal.getClass().getName() : "null");
             return Uni.createFrom().failure(new IllegalArgumentException("Email is null or empty"));
         }
+        final String email = resolvedEmail;
 
         return userService.findByEmail(email)
                 .onItem().transformToUni(user -> {
