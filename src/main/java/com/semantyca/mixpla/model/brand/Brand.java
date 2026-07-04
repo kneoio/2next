@@ -14,7 +14,9 @@ import lombok.Setter;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Setter
@@ -40,6 +42,7 @@ public class Brand extends SecureDataEntity<UUID> {
     private SubmissionPolicy oneTimeStreamPolicy = SubmissionPolicy.NOT_ALLOWED;
     private SubmissionPolicy submissionPolicy = SubmissionPolicy.NOT_ALLOWED;
     private SubmissionPolicy messagingPolicy = SubmissionPolicy.REVIEW_REQUIRED;
+    private Map<String, Boolean> chatFeatureFlags = new HashMap<>();
     private List<Label> labelList;
     private List<BrandScriptEntry> scriptIds;
     private UUID customScriptId;
