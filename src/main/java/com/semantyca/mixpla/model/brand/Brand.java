@@ -3,6 +3,7 @@ package com.semantyca.mixpla.model.brand;
 import com.semantyca.core.model.FileMetadata;
 import com.semantyca.core.model.SecureDataEntity;
 import com.semantyca.core.model.cnst.LanguageCode;
+import com.semantyca.mixpla.model.cnst.ChatFeatureFlag;
 import com.semantyca.mixpla.model.cnst.ManagedBy;
 import com.semantyca.mixpla.model.cnst.SubmissionPolicy;
 import com.semantyca.officeframe.model.Label;
@@ -42,7 +43,7 @@ public class Brand extends SecureDataEntity<UUID> {
     private SubmissionPolicy oneTimeStreamPolicy = SubmissionPolicy.NOT_ALLOWED;
     private SubmissionPolicy submissionPolicy = SubmissionPolicy.NOT_ALLOWED;
     private SubmissionPolicy messagingPolicy = SubmissionPolicy.REVIEW_REQUIRED;
-    private Map<String, Boolean> chatFeatureFlags = new HashMap<>();
+    private Map<ChatFeatureFlag, Boolean> chatFeatureFlags = new HashMap<>();
     private List<Label> labelList;
     private List<BrandScriptEntry> scriptIds;
     private UUID customScriptId;
