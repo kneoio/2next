@@ -34,37 +34,34 @@ public class LabelRepository extends AsyncRepository {
         super(client, mapper, null);
     }
 
-    public Uni<List<Label>> getAll(final int limit, final int offset) {
-        String sql = BASE_REQUEST;
+    public Uni<List<Label>> getAll(final int limit, final int offset, Long viewerId, boolean seeAll) {
+        String sql = BASE_REQUEST + " WHERE ($1 OR owner IS NULL OR owner = $2)";
         if (limit > 0) {
             sql += String.format(" LIMIT %s OFFSET %s", limit, offset);
         }
-        return client.query(sql)
-                .execute()
+        return client.preparedQuery(sql)
+                .execute(Tuple.of(seeAll).addLong(viewerId))
                 .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
                 .onItem().transform(this::from)
                 .collect().asList();
     }
 
-    public Uni<List<Label>> getAll(final int limit, final int offset, LabelFilterDTO filter) {
-        StringBuilder sql = new StringBuilder(BASE_REQUEST);
-        Tuple params = null;
-        boolean whereAdded = false;
-        int index = 0;
+    public Uni<List<Label>> getAll(final int limit, final int offset, LabelFilterDTO filter, Long viewerId, boolean seeAll) {
+        StringBuilder sql = new StringBuilder(BASE_REQUEST + " WHERE ($1 OR owner IS NULL OR owner = $2)");
+        Tuple params = Tuple.of(seeAll).addLong(viewerId);
+        int index = 2;
 
         if (filter != null) {
             if (filter.getCategory() != null && !filter.getCategory().isBlank()) {
                 index++;
-                sql.append(whereAdded ? " AND" : " WHERE").append(" category = $").append(index);
-                params = params == null ? Tuple.of(filter.getCategory()) : params.addString(filter.getCategory());
-                whereAdded = true;
+                sql.append(" AND category = $").append(index);
+                params = params.addString(filter.getCategory());
             }
             if (filter.getSearch() != null && !filter.getSearch().isBlank()) {
                 String likeParam = "%" + filter.getSearch() + "%";
                 index++;
-                sql.append(whereAdded ? " AND" : " WHERE").append(" identifier ILIKE $").append(index);
-                params = params == null ? Tuple.of(likeParam) : params.addString(likeParam);
-                whereAdded = true;
+                sql.append(" AND identifier ILIKE $").append(index);
+                params = params.addString(likeParam);
             }
         }
 
@@ -72,62 +69,48 @@ public class LabelRepository extends AsyncRepository {
             sql.append(String.format(" LIMIT %s OFFSET %s", limit, offset));
         }
 
-        if (params == null) {
-            return client.query(sql.toString())
-                    .execute()
-                    .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
-                    .onItem().transform(this::from)
-                    .collect().asList();
-        } else {
-            return client.preparedQuery(sql.toString())
-                    .execute(params)
-                    .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
-                    .onItem().transform(this::from)
-                    .collect().asList();
-        }
+        return client.preparedQuery(sql.toString())
+                .execute(params)
+                .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
+                .onItem().transform(this::from)
+                .collect().asList();
     }
 
-    public Uni<Integer> getAllCount() {
-        return getAllCount(entityData.getTableName());
+    public Uni<Integer> getAllCount(Long viewerId, boolean seeAll) {
+        String sql = String.format("SELECT count(id) FROM %s WHERE ($1 OR owner IS NULL OR owner = $2)", entityData.getTableName());
+        return client.preparedQuery(sql)
+                .execute(Tuple.of(seeAll).addLong(viewerId))
+                .onItem().transform(rows -> rows.iterator().next().getInteger(0));
     }
 
-    public Uni<Integer> getAllCount(LabelFilterDTO filter) {
-        StringBuilder sql = new StringBuilder(String.format("SELECT count(m.id) FROM %s as m", entityData.getTableName()));
-        Tuple params = null;
-        boolean whereAdded = false;
-        int index = 0;
+    public Uni<Integer> getAllCount(LabelFilterDTO filter, Long viewerId, boolean seeAll) {
+        StringBuilder sql = new StringBuilder(String.format("SELECT count(m.id) FROM %s as m WHERE ($1 OR m.owner IS NULL OR m.owner = $2)", entityData.getTableName()));
+        Tuple params = Tuple.of(seeAll).addLong(viewerId);
+        int index = 2;
 
         if (filter != null) {
             if (filter.getCategory() != null && !filter.getCategory().isBlank()) {
                 index++;
-                sql.append(whereAdded ? " AND" : " WHERE").append(" m.category = $").append(index);
-                params = params == null ? Tuple.of(filter.getCategory()) : params.addString(filter.getCategory());
-                whereAdded = true;
+                sql.append(" AND m.category = $").append(index);
+                params = params.addString(filter.getCategory());
             }
             if (filter.getSearch() != null && !filter.getSearch().isBlank()) {
                 String likeParam = "%" + filter.getSearch() + "%";
                 index++;
-                sql.append(whereAdded ? " AND" : " WHERE").append(" m.identifier ILIKE $").append(index);
-                params = params == null ? Tuple.of(likeParam) : params.addString(likeParam);
-                whereAdded = true;
+                sql.append(" AND m.identifier ILIKE $").append(index);
+                params = params.addString(likeParam);
             }
         }
 
-        if (params == null) {
-            return client.preparedQuery(sql.toString())
-                    .execute()
-                    .onItem().transform(rows -> rows.iterator().next().getInteger(0));
-        } else {
-            return client.preparedQuery(sql.toString())
-                    .execute(params)
-                    .onItem().transform(rows -> rows.iterator().next().getInteger(0));
-        }
+        return client.preparedQuery(sql.toString())
+                .execute(params)
+                .onItem().transform(rows -> rows.iterator().next().getInteger(0));
     }
 
-    public Uni<List<Label>> getOfCategory(String categoryName) {
-        String sql = String.format("SELECT * FROM %s WHERE category=$1", entityData.getTableName());
+    public Uni<List<Label>> getOfCategory(String categoryName, Long viewerId, boolean seeAll) {
+        String sql = String.format("SELECT * FROM %s WHERE category=$1 AND ($2 OR owner IS NULL OR owner = $3)", entityData.getTableName());
         return client.preparedQuery(sql)
-                .execute(Tuple.of(categoryName))
+                .execute(Tuple.of(categoryName).addBoolean(seeAll).addLong(viewerId))
                 .onItem().transformToMulti(rows -> Multi.createFrom().iterable(rows))
                 .onItem().transform(this::from)
                 .collect().asList();
@@ -147,10 +130,10 @@ public class LabelRepository extends AsyncRepository {
                 .collect().asList();
     }
 
-    public Uni<Label> findByCategoryAndNameOrSlug(String category, String slug, JsonObject localizedName) {
-        String sql = BASE_REQUEST + " WHERE category = $1 AND (identifier = $2 OR loc_name @> $3::jsonb) LIMIT 1";
+    public Uni<Label> findByCategoryAndNameOrSlug(String category, String slug, JsonObject localizedName, Long viewerId, boolean seeAll) {
+        String sql = BASE_REQUEST + " WHERE category = $1 AND (identifier = $2 OR ($3::jsonb <> '{}'::jsonb AND loc_name @> $3::jsonb)) AND ($4 OR owner IS NULL OR owner = $5) LIMIT 1";
         return client.preparedQuery(sql)
-                .execute(Tuple.of(category, slug, localizedName))
+                .execute(Tuple.of(category, slug, localizedName).addBoolean(seeAll).addLong(viewerId))
                 .onItem().transform(rows -> {
                     var it = rows.iterator();
                     return it.hasNext() ? from(it.next()) : null;
@@ -180,13 +163,14 @@ public class LabelRepository extends AsyncRepository {
         doc.setCategory(row.getString("category"));
         doc.setHidden(row.getBoolean("hidden"));
         doc.setParent(row.getUUID("parent"));
+        doc.setOwner(row.getLong("owner"));
         setLocalizedNames(doc, row);
         return doc;
     }
 
     public Uni<Label> insert(Label doc, IUser user) {
-        String sql = String.format("INSERT INTO %s (id, author, reg_date, last_mod_user, last_mod_date, identifier, color, font_color, category, parent, hidden, loc_name) " +
-                        "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id",
+        String sql = String.format("INSERT INTO %s (id, author, reg_date, last_mod_user, last_mod_date, identifier, color, font_color, category, parent, hidden, loc_name, owner) " +
+                        "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id",
                 entityData.getTableName());
 
         JsonObject localizedNameJson = JsonObject.mapFrom(doc.getLocalizedName());
@@ -204,7 +188,8 @@ public class LabelRepository extends AsyncRepository {
                 .addString(doc.getCategory())
                 .addUUID(doc.getParent())
                 .addBoolean(doc.isHidden())
-                .addJsonObject(localizedNameJson);
+                .addJsonObject(localizedNameJson)
+                .addValue(doc.getOwner());
 
         return client.preparedQuery(sql)
                 .execute(params)

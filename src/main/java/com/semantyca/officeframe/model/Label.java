@@ -18,5 +18,6 @@ public class Label extends SimpleReferenceEntity {
     private UUID parent;
     private boolean hidden;
     private String category;
+    private Long owner;
 
 }
