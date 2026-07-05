@@ -1,5 +1,6 @@
 package com.semantyca.officeframe.service;
 
+import com.semantyca.core.model.user.SuperUser;
 import com.semantyca.officeframe.dto.LabelDTO;
 import com.semantyca.officeframe.dto.LabelFilterDTO;
 import com.semantyca.officeframe.model.Label;
@@ -30,8 +31,13 @@ public class LabelService extends AbstractService<Label, LabelDTO> implements IR
         this.repository = repository;
     }
 
-    public Uni<List<LabelDTO>> getAll(final int limit, final int offset, LanguageCode languageCode) {
-        return repository.getAll(limit, offset)
+    @Override
+    public Uni<List<LabelDTO>> getAll(int pageSize, int offset, LanguageCode languageCode) {
+        return getAll(pageSize, offset, SuperUser.build(), languageCode);
+    }
+
+    public Uni<List<LabelDTO>> getAll(final int limit, final int offset, IUser user, LanguageCode languageCode) {
+        return repository.getAll(limit, offset, user.getId(), user.isSupervisor())
                 .chain(labels -> Uni.join().all(
                         labels.stream()
                                 .map(this::mapToDTO)
@@ -39,8 +45,8 @@ public class LabelService extends AbstractService<Label, LabelDTO> implements IR
                 ).andFailFast());
     }
 
-    public Uni<List<LabelDTO>> getAll(final int limit, final int offset, LabelFilterDTO filter, LanguageCode languageCode) {
-        return repository.getAll(limit, offset, filter)
+    public Uni<List<LabelDTO>> getAll(final int limit, final int offset, LabelFilterDTO filter, IUser user, LanguageCode languageCode) {
+        return repository.getAll(limit, offset, filter, user.getId(), user.isSupervisor())
                 .chain(labels -> Uni.join().all(
                         labels.stream()
                                 .map(this::mapToDTO)
@@ -49,15 +55,15 @@ public class LabelService extends AbstractService<Label, LabelDTO> implements IR
     }
 
     public Uni<Integer> getAllCount(IUser user) {
-        return repository.getAllCount();
+        return repository.getAllCount(user.getId(), user.isSupervisor());
     }
 
     public Uni<Integer> getAllCount(IUser user, LabelFilterDTO filter) {
-        return repository.getAllCount(filter);
+        return repository.getAllCount(filter, user.getId(), user.isSupervisor());
     }
 
-    public Uni<List<LabelDTO>> getOfCategory(String categoryName, LanguageCode languageCode) {
-        return repository.getOfCategory(categoryName)
+    public Uni<List<LabelDTO>> getOfCategory(String categoryName, IUser user, LanguageCode languageCode) {
+        return repository.getOfCategory(categoryName, user.getId(), user.isSupervisor())
                 .chain(labels -> {
                     if (labels.isEmpty()) return Uni.createFrom().item(List.of());
                     return Uni.join().all(
@@ -94,31 +100,42 @@ public class LabelService extends AbstractService<Label, LabelDTO> implements IR
     
     @Override
     public Uni<LabelDTO> upsert(String id, LabelDTO dto, IUser user, LanguageCode code) {
-        String slug = WebHelper.generateSlug(dto.getLocalizedName());
+        String generatedSlug = WebHelper.generateSlug(dto.getLocalizedName());
+        if (generatedSlug.isEmpty() && dto.getIdentifier() != null && !dto.getIdentifier().isBlank()) {
+            generatedSlug = WebHelper.generateSlug(dto.getIdentifier());
+        }
+        final String slug = generatedSlug;
 
         if ("new".equalsIgnoreCase(id) || id == null) {
             JsonObject localizedNameJson = JsonObject.mapFrom(dto.getLocalizedName());
-            return repository.findByCategoryAndNameOrSlug(dto.getCategory(), slug, localizedNameJson)
+            return repository.findByCategoryAndNameOrSlug(dto.getCategory(), slug, localizedNameJson, user.getId(), user.isSupervisor())
                     .chain(existing -> {
                         if (existing != null) {
                             dto.getLocalizedName().forEach((lang, val) ->
                                     existing.getLocalizedName().putIfAbsent(lang, val));
                             return repository.update(existing.getId(), existing, user).chain(this::mapToDTO);
                         }
-                        return repository.insert(buildLabel(dto, slug), user).chain(this::mapToDTO);
+                        return repository.insert(buildLabel(dto, slug, user), user).chain(this::mapToDTO);
                     });
         } else {
-            return repository.update(UUID.fromString(id), buildLabel(dto, slug), user).chain(this::mapToDTO);
+            UUID uuid = UUID.fromString(id);
+            return repository.findById(uuid).chain(existing -> {
+                if (existing.getOwner() != null && !existing.getOwner().equals(user.getId()) && !user.isSupervisor()) {
+                    return Uni.createFrom().failure(new SecurityException("Not permitted to edit this label"));
+                }
+                return repository.update(uuid, buildLabel(dto, slug, user), user).chain(this::mapToDTO);
+            });
         }
     }
 
-    private Label buildLabel(LabelDTO dto, String slug) {
+    private Label buildLabel(LabelDTO dto, String slug, IUser user) {
         Label doc = new Label();
         doc.setIdentifier(slug);
         doc.setParent(dto.getParent());
         doc.setCategory(dto.getCategory());
         doc.setLocalizedName(dto.getLocalizedName());
         doc.setHidden(dto.isHidden());
+        doc.setOwner(user.isSupervisor() ? null : user.getId());
         if (dto.getColor() == null || dto.getColor().isBlank()) {
             String[] pair = ColorUtil.generateContrastColorPair();
             doc.setColor(pair[0]);
@@ -149,12 +166,19 @@ public class LabelService extends AbstractService<Label, LabelDTO> implements IR
                         .color(label.getColor())
                         .fontColor(label.getFontColor())
                         .hidden(label.isHidden())
+                        .owner(label.getOwner())
                         .build()
         );
     }
 
     @Override
     public Uni<Integer> delete(String id, IUser user) {
-        return repository.delete(UUID.fromString(id));
+        UUID uuid = UUID.fromString(id);
+        return repository.findById(uuid).chain(existing -> {
+            if (existing.getOwner() != null && !existing.getOwner().equals(user.getId()) && !user.isSupervisor()) {
+                return Uni.createFrom().failure(new SecurityException("Not permitted to delete this label"));
+            }
+            return repository.delete(uuid);
+        });
     }
 }

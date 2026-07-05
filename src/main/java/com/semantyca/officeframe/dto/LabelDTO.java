@@ -27,6 +27,8 @@ public class LabelDTO extends AbstractReferenceDTO {
     private String identifier;
     @JsonView(Views.DetailView.class)
     private String category;
+    @JsonView(Views.DetailView.class)
+    private Long owner;
 
     public LabelDTO(String id) {
         this.id = UUID.fromString(id);

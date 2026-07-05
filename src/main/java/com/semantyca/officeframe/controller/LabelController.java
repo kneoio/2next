@@ -73,7 +73,7 @@ public class LabelController extends AbstractSecuredController<Label, LabelDTO> 
         getContextUser(rc)
                 .chain(user -> Uni.combine().all().unis(
                         service.getAllCount(user, filter),
-                        service.getAll(size, (page - 1) * size, filter, languageCode)
+                        service.getAll(size, (page - 1) * size, filter, user, languageCode)
                 ).asTuple().map(tuple -> {
                     ViewPage viewPage = new ViewPage();
                     viewPage.addPayload(PayloadType.CONTEXT_ACTIONS, new ActionBox());
@@ -95,7 +95,7 @@ public class LabelController extends AbstractSecuredController<Label, LabelDTO> 
         LanguageCode languageCode = resolveLanguage(rc);
 
         getContextUser(rc)
-                .chain(user -> service.getOfCategory(categoryName, languageCode))
+                .chain(user -> service.getOfCategory(categoryName, user, languageCode))
                 .subscribe().with(
                         dtoList -> {
                             ViewPage viewPage = new ViewPage();
