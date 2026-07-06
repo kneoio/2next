@@ -15,9 +15,6 @@ import java.util.UUID;
 @Getter
 @Setter
 public class SharedSoundFragment  extends SecureDataEntity<UUID> {
-    private UUID id;
-    private OffsetDateTime regDate;
-    private OffsetDateTime lastModDate;
     private Long sourceUserId;
     private String sourceUserName;
     private String sourceUserEmail;
@@ -28,7 +25,6 @@ public class SharedSoundFragment  extends SecureDataEntity<UUID> {
     private Integer ratedCount;
     private Integer boost;
     private Integer status;
-    private Integer archived;
     private String brandSlugName;
     private String title;
     private String artist;
