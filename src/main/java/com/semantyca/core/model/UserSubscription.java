@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -22,4 +23,15 @@ public class UserSubscription extends DataEntity<UUID> {
     private ZonedDateTime trialEnd;
     private boolean active;
     private JsonObject meta;
+    private List<PaymentError> paymentErrors;
+
+    @Setter
+    @Getter
+    @NoArgsConstructor
+    public static class PaymentError {
+        private String invoiceId;
+        private int attemptCount;
+        private long nextPaymentAttempt;
+        private ZonedDateTime occurredAt;
+    }
 }
