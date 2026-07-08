@@ -2,6 +2,7 @@ package com.semantyca.core.dto.document;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.semantyca.core.dto.AbstractDTO;
+import com.semantyca.core.model.UserSubscription;
 import io.vertx.core.json.JsonObject;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Setter
@@ -23,4 +25,5 @@ public class UserSubscriptionDTO extends AbstractDTO {
     private ZonedDateTime trialEnd;
     private boolean active;
     private JsonObject meta;
+    private List<UserSubscription.PaymentError> paymentErrors;
 }

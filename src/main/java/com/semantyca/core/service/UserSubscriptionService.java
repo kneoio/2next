@@ -79,6 +79,7 @@ public class UserSubscriptionService extends AbstractService<UserSubscription, U
                         .trialEnd(doc.getTrialEnd())
                         .active(doc.isActive())
                         .meta(doc.getMeta())
+                        .paymentErrors(doc.getPaymentErrors())
                         .build()
         );
     }

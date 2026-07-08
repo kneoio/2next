@@ -8,6 +8,7 @@ import com.semantyca.core.repository.table.EntityData;
 import com.semantyca.core.repository.table.TableNameResolver;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.sqlclient.Pool;
 import io.vertx.mutiny.sqlclient.Row;
@@ -19,6 +20,7 @@ import jakarta.inject.Inject;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.semantyca.core.repository.table.TableNameResolver.USER_SUBSCRIPTION_ENTITY_NAME;
 
@@ -69,6 +71,12 @@ public class UserSubscriptionRepository extends AsyncRepository {
         doc.setActive(active != null ? active : false);
         JsonObject meta = row.getJsonObject("meta");
         doc.setMeta(meta);
+        JsonArray paymentErrors = row.getJsonArray("payment_errors");
+        if (paymentErrors != null) {
+            doc.setPaymentErrors(paymentErrors.stream()
+                    .map(o -> ((JsonObject) o).mapTo(UserSubscription.PaymentError.class))
+                    .collect(Collectors.toList()));
+        }
         return doc;
     }
 
