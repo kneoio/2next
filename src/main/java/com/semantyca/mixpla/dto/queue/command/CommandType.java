@@ -10,5 +10,6 @@ public enum CommandType implements ICommandType {
     REBUILD_AGENDA,
     BACK_PRESSURE_EMISSION,
     AIVOX_INIT_BRAND,
-    JESOOS_START_BRAND
+    JESOOS_START_BRAND,
+    JESOOS_START_OTS
 }
