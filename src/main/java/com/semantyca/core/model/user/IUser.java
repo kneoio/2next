@@ -3,6 +3,8 @@ package com.semantyca.core.model.user;
 import com.semantyca.core.server.EnvConst;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.TimeZone;
+
 public interface IUser {
     Long getId();
 
@@ -23,4 +25,6 @@ public interface IUser {
     }
 
     @NotNull String getLogin();
+
+    TimeZone getTimeZone();
 }
