@@ -1,8 +1,6 @@
 package com.semantyca.mixpla.dto.queue.command;
 
-import com.semantyca.core.dto.queue.ICommandType;
-
-public enum CommandType implements ICommandType {
+public enum CommandType {
     FLOW_RESTART,
     SONG_RATED,
     WAKE_UP_DJ,
