@@ -83,6 +83,7 @@ public abstract class AbstractSecuredController<T, V> extends AbstractController
     protected void sendUpsertResponse(RoutingContext rc, Object doc, String id) {
         rc.response()
                 .setStatusCode(id == null ? 201 : 200)
+                .putHeader("Content-Type", "application/json")
                 .end(JsonObject.mapFrom(doc).encode());
     }
 

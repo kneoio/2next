@@ -1,5 +1,6 @@
 package com.semantyca.core.server.security;
 
+import com.semantyca.core.repository.exception.DocumentHasNotFoundException;
 import io.vertx.core.Handler;
 import io.vertx.core.json.Json;
 import io.vertx.ext.web.RoutingContext;
@@ -23,27 +24,28 @@ public class GlobalErrorHandler implements Handler<RoutingContext> {
         }
 
         String errorId = UUID.randomUUID().toString();
+        Long userId = failure instanceof DocumentHasNotFoundException dnf ? dnf.getUserId() : null;
 
         if (failure != null) {
             if (failure instanceof PgException e) {
-                e.printStackTrace();
                 LOGGER.errorf(
-                        "ErrorId %s | Path %s | Status %s | PgState %s | Message %s | Detail %s",
+                        e,
+                        "ErrorId %s | Path %s | Status %s | UserId %s | PgState %s | Detail %s",
                         errorId,
                         ctx.normalizedPath(),
                         status,
+                        userId,
                         e.getSqlState(),
-                        e.getMessage(),
                         e.getDetail()
                 );
             } else {
                 LOGGER.errorf(
-                        "ErrorId %s | Path %s | Status %s | Message %s | Throwable %s",
+                        failure,
+                        "ErrorId %s | Path %s | Status %s | UserId %s",
                         errorId,
                         ctx.normalizedPath(),
                         status,
-                        failure.getMessage(),
-                        failure
+                        userId
                 );
             }
         } else {
