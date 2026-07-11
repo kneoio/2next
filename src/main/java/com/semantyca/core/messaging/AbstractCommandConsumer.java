@@ -19,10 +19,9 @@ public abstract class AbstractCommandConsumer {
     protected abstract Uni<Void> handleCommand(CommandDTO dto);
 
     protected Uni<Void> processMessage(Message<byte[]> message) {
-        byte[] payload = message.getPayload();
         return Uni.createFrom().item(() -> {
                     try {
-                        return objectMapper.readValue(payload, CommandDTO.class);
+                        return objectMapper.readValue(message.getPayload(), CommandDTO.class);
                     } catch (Exception e) {
                         LOGGER.error("Failed to deserialize CommandDTO", e);
                         throw new RuntimeException(e);
