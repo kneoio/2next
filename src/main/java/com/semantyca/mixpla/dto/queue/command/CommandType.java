@@ -10,5 +10,6 @@ public enum CommandType {
     AIVOX_INIT_BRAND,
     JESOOS_START_BRAND,
     JESOOS_START_OTS,
+    JESOOS_STOP_OTS,
     JESOOS_OTS_FINISHED
 }
