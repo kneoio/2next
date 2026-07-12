@@ -20,7 +20,7 @@ public interface IStream {
 
     String getStreamId();
 
-    UUID getMasterBrandId();
+    UUID getBrandId();
 
     String getSlugName();
 
