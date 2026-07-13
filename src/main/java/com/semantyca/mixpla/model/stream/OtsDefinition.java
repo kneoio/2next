@@ -25,4 +25,5 @@ public class OtsDefinition extends SecureDataEntity<UUID> {
     private List<OtsStatusHistoryEntry> statusHistory;
     private OtsRunType type;
     private Integer estimatedDurationMin;
+    private String chatContext;
 }
