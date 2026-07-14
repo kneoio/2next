@@ -1,5 +1,6 @@
 package com.semantyca.core.model.cnst;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum LanguageTag {
@@ -105,7 +106,11 @@ public enum LanguageTag {
         return tag;
     }
 
+    @JsonCreator
     public static LanguageTag fromTag(String tag) {
+        if ("no-NO".equalsIgnoreCase(tag)) {
+            return NB_NO;
+        }
         for (LanguageTag lt : values()) {
             if (lt.tag.equalsIgnoreCase(tag)) {
                 return lt;
