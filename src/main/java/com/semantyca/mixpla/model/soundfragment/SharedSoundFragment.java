@@ -25,6 +25,7 @@ public class SharedSoundFragment  extends SecureDataEntity<UUID> {
     private Integer ratedCount;
     private Integer boost;
     private Integer status;
+    private Boolean notifyOnPlay;
     private String brandSlugName;
     private String title;
     private String artist;
