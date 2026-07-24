@@ -11,6 +11,7 @@ public enum PlaylistItemType {
     BACKGROUND_LOOP,
     NEWS,
     WEATHER,
+    PODCAST,
     MIX_INTRO_SONG,
     MIX_1_INTRO_FADED_SONG,
     MIX_2_SONG,
