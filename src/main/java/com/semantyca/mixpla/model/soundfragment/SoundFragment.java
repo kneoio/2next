@@ -14,6 +14,7 @@ import lombok.Setter;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -39,6 +40,7 @@ public class SoundFragment extends SecureDataEntity<UUID> implements Schedulable
     private Scheduler scheduler;
     private List<PlayHistory> playHistory;
     private List<FileMetadata> fileMetadataList;
+    private Map<String, Object> addInfo;
 
     public String getMetadata() {
         return String.format("%s#%s", title, artist);

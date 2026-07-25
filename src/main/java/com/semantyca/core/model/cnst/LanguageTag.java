@@ -1,5 +1,6 @@
 package com.semantyca.core.model.cnst;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum LanguageTag {
@@ -82,6 +83,7 @@ public enum LanguageTag {
 
     // Middle Eastern
     AR_XA("ar-XA"),
+    AR_SA("ar-SA"),
     HE_IL("he-IL"),
 
     // African
@@ -105,7 +107,17 @@ public enum LanguageTag {
         return tag;
     }
 
+    @JsonCreator
     public static LanguageTag fromTag(String tag) {
+        if ("no-NO".equalsIgnoreCase(tag)) {
+            return NB_NO;
+        }
+        if ("en-UK".equalsIgnoreCase(tag)) {
+            return EN_GB;
+        }
+        if ("zn-CN".equalsIgnoreCase(tag)) {
+            return ZH_CN;
+        }
         for (LanguageTag lt : values()) {
             if (lt.tag.equalsIgnoreCase(tag)) {
                 return lt;
@@ -137,7 +149,7 @@ public enum LanguageTag {
             case KO_KR -> LanguageCode.ko;
             case HI_IN -> LanguageCode.hi;
             case AM_ET -> LanguageCode.am;
-            case AR_XA -> LanguageCode.ar;
+            case AR_XA, AR_SA -> LanguageCode.ar;
             case BG_BG -> LanguageCode.bg;
             case BN_IN -> LanguageCode.bn;
             case CS_CZ -> LanguageCode.cs;

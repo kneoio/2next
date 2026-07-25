@@ -1,6 +1,7 @@
 package com.semantyca.mixpla.model.cnst;
 
 public enum Boost {
+    @Deprecated
     SUPER_BOOST(2),
     BOOST(1),
     NOTHING(0),
