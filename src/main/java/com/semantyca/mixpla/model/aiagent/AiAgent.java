@@ -14,6 +14,7 @@ import java.util.UUID;
 @Getter
 public class AiAgent extends SimpleReferenceEntity {
     private String name;
+    private String slugName;
     private List<LanguagePreference> preferredLang;
     private ZoneId timeZone;
     private LlmType llmType;
