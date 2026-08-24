@@ -22,6 +22,10 @@ public class SoundFragmentFilter implements IFilter {
     private int author;
     private List<UUID> brands;
     private boolean shared;
+    /** BOOST | PLAYED | RATE — not a filter criterion */
+    private String sortBy;
+    /** null = DESC when sortBy is set */
+    private Boolean sortDesc;
 
     public boolean isActivated() {
         if (activated) {

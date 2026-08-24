@@ -10,6 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Profile extends SimpleReferenceEntity {
     private String name;
+    private String slugName;
     private String description;
     private boolean explicitContent;
 }

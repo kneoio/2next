@@ -26,4 +26,6 @@ public class OtsDefinition extends SecureDataEntity<UUID> {
     private OtsRunType type;
     private Integer estimatedDurationMin;
     private String chatContext;
+    private String color;
+    private Map<UUID, Integer> sceneDurations;
 }
