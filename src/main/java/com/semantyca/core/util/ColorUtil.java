@@ -61,4 +61,27 @@ public class ColorUtil {
         int brightness = (299 * r + 587 * g + 114 * b) / 1000;
         return brightness > 240 || (r > 245 && g > 245 && b > 245);
     }
+
+
+    public static String generateRandomBrightColor() {
+        Random random = new Random();
+        int r, g, b;
+
+        do {
+            r = 100 + random.nextInt(156); // 100-255
+            g = 100 + random.nextInt(156); // 100-255
+            b = 100 + random.nextInt(156); // 100-255
+
+            if (Math.max(Math.max(r, g), b) < 200) {
+                int brightComponent = random.nextInt(3);
+                switch (brightComponent) {
+                    case 0: r = 200 + random.nextInt(56); break;
+                    case 1: g = 200 + random.nextInt(56); break;
+                    case 2: b = 200 + random.nextInt(56); break;
+                }
+            }
+        } while (isGrayish(r, g, b) || isBrownish(r, g, b) || isTooDark(r, g, b) || isTooWhite(r, g, b));
+
+        return String.format("#%02X%02X%02X", r, g, b);
+    }
 }

@@ -137,6 +137,7 @@ public class WebHelper {
         return s;
     }
 
+    @Deprecated
     public static String generateRandomBrightColor() {
         Random random = new Random();
         int r, g, b;
