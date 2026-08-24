@@ -27,7 +27,6 @@ public class Brand extends SecureDataEntity<UUID> {
     private EnumMap<LanguageCode, String> localizedName = new EnumMap<>(LanguageCode.class);
     private String slugName;
     private ZoneId timeZone;
-    private Integer isTemporary = 0;
     private int publicBrand;
     private CountryCode country;
     private long bitRate;
