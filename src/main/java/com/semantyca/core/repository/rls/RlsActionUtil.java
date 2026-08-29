@@ -1,7 +1,7 @@
 package com.semantyca.core.repository.rls;
 
 import com.semantyca.core.dto.rls.RlsActionDTO;
-import com.semantyca.core.dto.rls.RlsActionType;
+import com.semantyca.core.model.cnst.RlsActionType;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.sqlclient.SqlClient;
 import io.vertx.mutiny.sqlclient.Tuple;

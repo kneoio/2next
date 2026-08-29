@@ -1,5 +1,6 @@
 package com.semantyca.core.dto.rls;
 
+import com.semantyca.core.model.cnst.RlsActionType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
