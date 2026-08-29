@@ -28,5 +28,6 @@ public class OtsDefinition extends SecureDataEntity<UUID> {
     private String chatContext;
     private String color;
     private Map<UUID, Integer> sceneDurations;
+    private Map<UUID, Double> sceneTalkativities;
     private int publicOts;
 }
