@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:24px;background:#f7f7fb;font-family:Inter,Arial,sans-serif;color:#1f2937;">
+    <div style="max-width:600px;margin:0 auto;background:#fff;border:1px solid #ececf2;border-radius:14px;padding:28px;">
+        <div style="font-size:22px;font-weight:700;color:#4f46e5;margin-bottom:8px;">Mixpla</div>
+        <h2 style="font-size:18px;margin:0 0 4px;">Action Debug</h2>
+        <p style="margin:0 0 20px;color:#6b7280;font-size:14px;">{actionName}</p>
+
+        <h3 style="font-size:13px;font-weight:700;color:#4f46e5;letter-spacing:.05em;text-transform:uppercase;margin:0 0 6px;">Instruction</h3>
+        <div style="background:#f3f4ff;border:1px solid #dfe1ff;border-radius:10px;padding:14px;margin-bottom:20px;">
+            <pre style="margin:0;font-size:13px;color:#312e81;font-family:'Courier New',monospace;white-space:pre-wrap;word-break:break-word;">{instruction}</pre>
+        </div>
+
+        <h3 style="font-size:13px;font-weight:700;color:#4f46e5;letter-spacing:.05em;text-transform:uppercase;margin:0 0 6px;">Variables</h3>
+        <div style="background:#f9fafb;border:1px solid #ececf2;border-radius:10px;padding:10px;margin-bottom:20px;overflow-x:auto;">
+            <table style="border-collapse:collapse;width:100%;font-size:13px;font-family:'Courier New',monospace;">
+                {#for e in variables}
+                <tr><td style="padding:4px 8px;font-weight:600;color:#4b5563;white-space:nowrap;">{e.key}</td><td style="padding:4px 8px;color:#1f2937;">{e.value}</td></tr>
+                {/for}
+            </table>
+        </div>
+
+        <h3 style="font-size:13px;font-weight:700;color:#4f46e5;letter-spacing:.05em;text-transform:uppercase;margin:0 0 6px;">Result</h3>
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;margin-bottom:8px;">
+            <p style="margin:0;font-size:14px;color:#14532d;line-height:1.6;">{result}</p>
+        </div>
+    </div>
+</body>
+</html>

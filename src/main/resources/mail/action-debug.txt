@@ -1,0 +1,12 @@
+Action Debug: {actionName}
+
+Instruction:
+{instruction}
+
+Variables:
+{#for e in variables}
+{e.key} = {e.value}
+{/for}
+
+Result:
+{result}

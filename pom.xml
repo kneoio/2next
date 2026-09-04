@@ -6,7 +6,7 @@
 
     <groupId>com.semantyca</groupId>
     <artifactId>2next</artifactId>
-    <version>1.4.135</version>
+    <version>1.4.137</version>
     <packaging>jar</packaging>
     <name>2next</name>
 
@@ -113,6 +113,10 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-qute</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-mailer</artifactId>
         </dependency>
 
         <!-- Monitoring and API -->
@@ -243,6 +247,13 @@
             <resource>
                 <directory>src/main/java</directory>
                 <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>mail/**</include>
+                </includes>
             </resource>
         </resources>
     </build>

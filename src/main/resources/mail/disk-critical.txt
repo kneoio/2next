@@ -1,0 +1,8 @@
+Disk usage critical
+
+Path: {path}
+Used: {usedPercent}%
+Free: {freeGb} GB of {totalGb} GB
+{#if hostname}
+Host: {hostname}
+{/if}

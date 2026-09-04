@@ -1,0 +1,13 @@
+Hi,
+
+{songTitle} is now in the queue — {#if hasDjName}I'm about to play it{#else}the DJ is about to play it{/if}{#if hasPreviousSong}, right after "{previousSongTitle}"{/if}, roughly in {roughDuration} (around {etaLabel}, current time {nowLabel}).
+
+{stationUrl}
+
+Chat and ask for your next song to play.
+
+{#if hasDjName}Heads up — that's just my best guess, so if I shuffle the lineup at the last second, don't hold it against me!{#else}Heads up — that's just a rough guess, and the DJ might still shuffle the lineup at the last second.{/if}
+{#if hasDjName}
+
+— Your DJ, {djName}
+{/if}

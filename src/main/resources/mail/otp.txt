@@ -1,0 +1,9 @@
+{title}
+
+{subtitle}
+
+Your code: {code}
+
+{note}
+
+Sent by Mixpla

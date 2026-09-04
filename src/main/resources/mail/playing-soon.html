@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<body style="margin: 0; padding: 24px; background: #f7f7fb; font-family: Inter, Arial, sans-serif; color: #1f2937;">
+    <div style="max-width: 520px; margin: 0 auto; background: #fff; border: 1px solid #ececf2; border-radius: 14px; padding: 28px;">
+        <div style="font-size: 22px; font-weight: 700; color: #4f46e5; margin-bottom: 8px;">Mixpla</div>
+        <p style="margin: 0 0 12px; color: #4b5563;">Hi,</p>
+        <h2 style="font-size: 20px; margin: 0 0 12px;">Your song is playing soon!</h2>
+        <p style="margin: 0 0 18px; color: #4b5563; line-height: 1.45;"><strong>{songTitle}</strong> is now in the queue — {#if hasDjName}I'm about to play it{#else}the DJ is about to play it{/if}{#if hasPreviousSong}, right after <strong>{previousSongTitle}</strong>{/if}, roughly in {roughDuration} (around {etaLabel}, current time {nowLabel}).</p>
+        <div style="margin: 16px 0 18px; background: #f3f4ff; border: 1px solid #dfe1ff; border-radius: 12px; text-align: center; padding: 18px;">
+            <a href="{stationUrl}" style="color: #4f46e5; font-weight: 700; text-decoration: none;">{listenLabel}</a>
+        </div>
+        <p style="margin: 0 0 18px; color: #4b5563; line-height: 1.45;"><a href="{stationUrl}" style="color: #4f46e5; font-weight: 700; text-decoration: none;">Chat and ask for your next song to play</a></p>
+        <p style="margin: 0 0 18px; color: #6b7280; font-size: 14px; line-height: 1.45; font-style: italic;">{#if hasDjName}Heads up — that's just my best guess, so if I shuffle the lineup at the last second, don't hold it against me!{#else}Heads up — that's just a rough guess, and the DJ might still shuffle the lineup at the last second.{/if}</p>
+        {#if hasDjName}
+        <p style="margin: 0 0 18px; color: #4b5563; line-height: 1.45;">— Your DJ, {djName}</p>
+        {/if}
+        <p style="margin: 0; color: #6b7280; font-size: 14px; line-height: 1.45;">If this was not you, just ignore this email.</p>
+    </div>
+</body>
+</html>

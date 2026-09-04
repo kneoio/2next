@@ -1,22 +1,37 @@
 package com.semantyca.core.service.template;
 
+import com.semantyca.core.util.ResourceUtil;
 import io.quarkus.qute.Engine;
 import io.quarkus.qute.Template;
+import io.quarkus.qute.TemplateInstance;
+import io.quarkus.qute.Variant;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 @ApplicationScoped
 public class TemplateService {
+
     @Inject
     Engine engine;
 
-    public String renderEmail(String name) {
-        Template template = engine.getTemplate("basic_email");
-        return template.data("name", name).render();
+    private final ConcurrentHashMap<String, Template> cache = new ConcurrentHashMap<>();
+
+    public String render(String resourcePath, Map<String, Object> data) {
+        Template template = cache.computeIfAbsent(resourcePath, this::parse);
+        TemplateInstance instance = template.instance();
+        if (data != null) {
+            data.forEach(instance::data);
+        }
+        return instance.render();
     }
 
-    public String renderRegistrationEmail(int confirmationCode) {
-        Template template = engine.getTemplate("registration_email");
-        return template.data("confirmation_code", confirmationCode).render();
+    private Template parse(String resourcePath) {
+        String source = ResourceUtil.loadResourceAsString(resourcePath);
+        String contentType = resourcePath.endsWith(".txt") ? "text/plain" : "text/html";
+        return engine.parse(source, new Variant(Locale.ENGLISH, contentType, "utf-8"));
     }
 }
