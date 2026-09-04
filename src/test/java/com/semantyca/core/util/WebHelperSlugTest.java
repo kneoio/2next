@@ -47,6 +47,13 @@ class WebHelperSlugTest {
     }
 
     @Test
+    void generateUserLogin_fromDisplayName_notEmail() {
+        String login = WebHelper.generateUserLogin("Jane Doe");
+        org.junit.jupiter.api.Assertions.assertTrue(login.startsWith("jane-doe-"));
+        org.junit.jupiter.api.Assertions.assertEquals(8, login.substring("jane-doe-".length()).length());
+    }
+
+    @Test
     void generateSlug_nullOrBlank_empty() {
         assertEquals("", WebHelper.generateSlug((String) null));
         assertEquals("", WebHelper.generateSlug(""));

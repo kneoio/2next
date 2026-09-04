@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Locale;
 import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -85,6 +87,58 @@ public class WebHelper {
         }
 
         return generateSlug(name);
+    }
+
+    /**
+     * Mixpla user login from a display name, never from email.
+     * Preferred name, then nick, then localized name, then {@code listener}, plus a unique suffix.
+     */
+    public static String generateUserLogin(String preferredName,
+                                           EnumMap<LanguageCode, Set<String>> nickName,
+                                           EnumMap<LanguageCode, String> localizedName) {
+        String name = (preferredName != null && !preferredName.isBlank()) ? preferredName : firstNick(nickName);
+        String slug = generateSlug(name);
+        if (slug == null || slug.isBlank()) {
+            slug = generateSlug(localizedName);
+        }
+        if (slug == null || slug.isBlank()) {
+            slug = "listener";
+        }
+        return slug + "-" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+    }
+
+    public static String generateUserLogin(String name) {
+        return generateUserLogin(name, null, null);
+    }
+
+    private static String firstNick(EnumMap<LanguageCode, Set<String>> nickName) {
+        if (nickName == null || nickName.isEmpty()) {
+            return null;
+        }
+        Set<String> en = nickName.get(LanguageCode.en);
+        String fromEn = firstNonBlank(en);
+        if (fromEn != null) {
+            return fromEn;
+        }
+        for (Set<String> names : nickName.values()) {
+            String found = firstNonBlank(names);
+            if (found != null) {
+                return found;
+            }
+        }
+        return null;
+    }
+
+    private static String firstNonBlank(Set<String> names) {
+        if (names == null) {
+            return null;
+        }
+        for (String n : names) {
+            if (n != null && !n.isBlank()) {
+                return n;
+            }
+        }
+        return null;
     }
 
     protected static String getMimeType(File file) {
