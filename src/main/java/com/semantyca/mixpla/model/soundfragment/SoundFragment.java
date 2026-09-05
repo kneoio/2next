@@ -33,6 +33,8 @@ public class SoundFragment extends SecureDataEntity<UUID> implements Schedulable
     private List<UUID> labels;
     private String album;
     private String slugName;
+    private String playCode;
+    private OffsetDateTime playCodeExpiresAt;
     private Duration length;
     private int boost;
     private String description;
