@@ -47,6 +47,8 @@ public final class MergingTypeMeta {
     private static final Map<MixingType, Info> META = Map.ofEntries(
             Map.entry(MixingType.INTRO_SONG,                                      new Info(1, 1, false, false, false, false, Set.of(SongKey.SONG_1))),
             Map.entry(MixingType.LISTENER_INTRO_SONG,                             new Info(1, 1, false, false, false, false, Set.of(SongKey.SONG_1))),
+            Map.entry(MixingType.LISTENER_SONG,                                   new Info(1, 1, false, false, false, false, Set.of(SongKey.SONG_1))),
+            Map.entry(MixingType.INTRO_LISTENER_SONG,                             new Info(1, 2, false, false, false, false, Set.of(SongKey.SONG_1))),
             Map.entry(MixingType.NOT_MIXED,                                       new Info(1, 0, false, false, false, false, Set.of(SongKey.SONG_1))),
             Map.entry(MixingType.SONG_ONLY,                                       new Info(1, 0, false, false, false, false, Set.of(SongKey.SONG_1))),
             Map.entry(MixingType.SONG_INTRO_SONG,                                 new Info(2, 1, false, false, false, false, Set.of(SongKey.SONG_1, SongKey.SONG_2))),
