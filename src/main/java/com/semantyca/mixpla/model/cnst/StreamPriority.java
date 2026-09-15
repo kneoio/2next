@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum StreamPriority {
     HARD_INTERRUPT(6),
-    GENTLE_INTERRUPT(7),
+    GENTLE_INTERRUPT(7), // RESERVED — unused
     PRIORITIZED_FRONT(8),
     PRIORITIZED(9),
     NORMAL(10),
