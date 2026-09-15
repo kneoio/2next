@@ -6,7 +6,8 @@ import lombok.Getter;
 
 @Getter
 public enum STTEngineType {
-    GOOGLE("google");
+    GOOGLE("google"),
+    FISH_AUDIO("fishaudio");
 
     private final String value;
 
