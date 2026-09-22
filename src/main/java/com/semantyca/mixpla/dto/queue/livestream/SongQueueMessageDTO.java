@@ -24,5 +24,6 @@ public class SongQueueMessageDTO {
     private String sceneTitle;
     private Map<IntroKey, IntroInfoDTO> filePaths;
     private Map<SongKey, SongInfoDTO> songs;
+    private DjJoinDTO djJoin;
     private int priority = 100;
 }
