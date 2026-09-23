@@ -20,8 +20,10 @@ public class TemplateService {
 
     private final ConcurrentHashMap<String, Template> cache = new ConcurrentHashMap<>();
 
-    public String render(String resourcePath, Map<String, Object> data) {
-        Template template = cache.computeIfAbsent(resourcePath, this::parse);
+    public String render(String resourcePath, Locale locale, Map<String, Object> data) {
+        Template template = cache.computeIfAbsent(
+                resourcePath + "|" + locale.toLanguageTag(),
+                key -> parse(resourcePath, locale));
         TemplateInstance instance = template.instance();
         if (data != null) {
             data.forEach(instance::data);
@@ -29,9 +31,9 @@ public class TemplateService {
         return instance.render();
     }
 
-    private Template parse(String resourcePath) {
+    private Template parse(String resourcePath, Locale locale) {
         String source = ResourceUtil.loadResourceAsString(resourcePath);
         String contentType = resourcePath.endsWith(".txt") ? "text/plain" : "text/html";
-        return engine.parse(source, new Variant(Locale.ENGLISH, contentType, "utf-8"));
+        return engine.parse(source, new Variant(locale, contentType, "utf-8"));
     }
 }

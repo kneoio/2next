@@ -1,5 +1,6 @@
 package com.semantyca.core.service.mail;
 
+import com.semantyca.core.model.cnst.LanguageCode;
 import com.semantyca.core.service.template.TemplateService;
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.reactive.ReactiveMailer;
@@ -25,16 +26,19 @@ public class MailService {
 
     private final ReactiveMailer mailer;
     private final TemplateService templateService;
+    private final MailMessageService mailMessageService;
     private final String fromAddress;
 
     @Inject
     public MailService(
             ReactiveMailer mailer,
             TemplateService templateService,
+            MailMessageService mailMessageService,
             @ConfigProperty(name = "quarkus.mailer.from", defaultValue = "noreply@mixpla.io") String fromAddress
     ) {
         this.mailer = mailer;
         this.templateService = templateService;
+        this.mailMessageService = mailMessageService;
         this.fromAddress = fromAddress;
     }
 
@@ -53,24 +57,28 @@ public class MailService {
                 .onFailure().invoke(failure -> LOG.errorf(failure, "Failed to send mail to %s subject=%s", to, subject));
     }
 
-    public Uni<Void> sendTemplate(String to, String subject, String template, Map<String, Object> data) {
-        return sendTemplate(to, subject, template, data, null);
+    public Uni<Void> sendTemplate(String to, String subject, String template, LanguageCode language, Map<String, Object> data) {
+        return sendTemplate(to, subject, template, language, data, null);
     }
 
-    public Uni<Void> sendTemplate(String to, String subject, String template, Map<String, Object> data, String replyTo) {
-        String html = templateService.render("mail/" + template + ".html", data);
-        String text = templateService.render("mail/" + template + ".txt", data);
+    public Uni<Void> sendTemplate(String to, String subject, String template, LanguageCode language, Map<String, Object> data, String replyTo) {
+        Locale locale = mailMessageService.toLocale(language);
+        Map<String, Object> payload = new HashMap<>(data != null ? data : Map.of());
+        payload.put("footer", mailMessageService.get(language, "mail.footer"));
+        String html = templateService.render("mail/" + template + ".html", locale, payload);
+        String text = templateService.render("mail/" + template + ".txt", locale, payload);
         return send(to, subject, html, text, replyTo);
     }
 
-    public Uni<Void> sendOtp(String email, String code, String subject, String title, String subtitle, String note) {
-        LOG.infof("Sending OTP email to %s", email);
+    public Uni<Void> sendOtp(String email, String code, LanguageCode language, OtpPurpose purpose) {
+        LOG.infof("Sending %s OTP email to %s in %s", purpose, email, language);
+        String prefix = purpose.getMessageKeyPrefix();
         Map<String, Object> data = new HashMap<>();
         data.put("code", code);
-        data.put("title", title);
-        data.put("subtitle", subtitle);
-        data.put("note", note);
-        return sendTemplate(email, subject, "otp", data);
+        data.put("title", mailMessageService.get(language, prefix + ".title"));
+        data.put("subtitle", mailMessageService.get(language, prefix + ".subtitle"));
+        data.put("note", mailMessageService.get(language, prefix + ".note"));
+        return sendTemplate(email, mailMessageService.get(language, prefix + ".subject"), "otp", language, data);
     }
 
     public Uni<Void> sendContributionPlayingSoonAsync(String email, String songTitle, String stationUrl, String brandName, String djName,
@@ -96,7 +104,7 @@ public class MailService {
         data.put("nowLabel", now.format(PLAYING_SOON_TIME_FORMAT));
         data.put("stationUrl", stationUrl);
         data.put("listenLabel", listenLabel);
-        return sendTemplate(email, "Your song is playing soon - " + songTitle, "playing-soon", data);
+        return sendTemplate(email, "Your song is playing soon - " + songTitle, "playing-soon", LanguageCode.en, data);
     }
 
     public Uni<Void> sendActionDebugEmail(String email, String actionName, String instruction, Map<String, Object> variables, String result) {
@@ -106,7 +114,7 @@ public class MailService {
         data.put("instruction", instruction != null ? instruction : "");
         data.put("variables", variables != null ? variables : Map.of());
         data.put("result", result != null ? result : "");
-        return sendTemplate(email, "Action Debug: " + actionName, "action-debug", data);
+        return sendTemplate(email, "Action Debug: " + actionName, "action-debug", LanguageCode.en, data);
     }
 
     public Uni<Void> sendMessageToOwner(String to, String replyTo, String subject, String stationSlug, String message) {
@@ -115,7 +123,7 @@ public class MailService {
         data.put("stationSlug", stationSlug);
         data.put("subject", subject);
         data.put("message", message);
-        return sendTemplate(to, subject, "message-to-owner", data, replyTo);
+        return sendTemplate(to, subject, "message-to-owner", LanguageCode.en, data, replyTo);
     }
 
     private static String formatRoughDuration(int seconds) {

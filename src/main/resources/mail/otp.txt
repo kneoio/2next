@@ -6,4 +6,4 @@ Your code: {code}
 
 {note}
 
-Sent by Mixpla
+{footer}
