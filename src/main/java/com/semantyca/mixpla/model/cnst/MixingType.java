@@ -20,5 +20,7 @@ public enum MixingType {
     INTRO_JINGLE_GENERATED_JINGLE_WITH_BACKGROUND,
     DJ_SONG,
     INTRO_DJ_SONG,
-    DJ_JOIN;
+    DJ_JOIN,
+    /** The AI DJ speaking on air with no song, e.g. handing the air to a human DJ. Voice in filePaths INTRO_1. */
+    DJ_ANNOUNCEMENT;
 }

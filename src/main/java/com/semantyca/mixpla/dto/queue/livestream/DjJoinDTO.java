@@ -10,7 +10,10 @@ import java.util.UUID;
  * A human-rendered transition for DJ_JOIN, in up to two renders of the same link:
  * the full one (outgoing song + DJ lanes + incoming song) and plan B (DJ lanes + incoming song, outgoing muted),
  * which airs when the outgoing song has already played past the point the full one would be stitched in.
- * Outgoing and incoming songs travel in SongQueueMessageDTO.songs as SONG_1 and SONG_2.
+ * Outgoing and incoming songs travel in SongQueueMessageDTO.songs as SONG_1 and SONG_2. A join with no
+ * outgoing song (the DJ's voice then the incoming song, e.g. right after the AI DJ handed over) has no
+ * SONG_1 and only a plan B render. A closing link (the outgoing song, then the DJ's goodbye) has no SONG_2
+ * and ends the chain: nothing continues from it.
  */
 @Getter
 @Setter
