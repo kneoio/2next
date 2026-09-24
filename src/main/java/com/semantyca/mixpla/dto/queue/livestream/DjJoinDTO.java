@@ -7,7 +7,9 @@ import lombok.Setter;
 import java.util.UUID;
 
 /**
- * A human-rendered transition file (outgoing song tail + DJ lanes + incoming song) for DJ_JOIN.
+ * A human-rendered transition for DJ_JOIN, in up to two renders of the same link:
+ * the full one (outgoing song + DJ lanes + incoming song) and plan B (DJ lanes + incoming song, outgoing muted),
+ * which airs when the outgoing song has already played past the point the full one would be stitched in.
  * Outgoing and incoming songs travel in SongQueueMessageDTO.songs as SONG_1 and SONG_2.
  */
 @Getter
@@ -17,10 +19,17 @@ public class DjJoinDTO {
     private UUID joinId;
     /** The previous join whose incoming song is this join's outgoing song; null for the first join of a session. */
     private UUID continuesJoinId;
+    /** The full render; null when the outgoing song had already aired past the mix point when the DJ sent it. */
     private String filePath;
     private double durationSeconds;
-    /** Where second 0 of the incoming song sits in this file. */
+    /** Where second 0 of the incoming song sits in the full render. */
     private double incomingSongStartSeconds;
-    /** Where in the outgoing song this file begins; the cut point into the previous join. */
+    /** Where in the outgoing song the full render begins. */
     private double outgoingSongFromSeconds;
+    /** Where in the full render the DJ's mix begins; everything before it is the outgoing song played plain. */
+    private double mixPointSeconds;
+    /** The render without the outgoing song; null for the first join of a session. */
+    private String planBFilePath;
+    /** Where second 0 of the incoming song sits in the plan B render. */
+    private double planBIncomingSongStartSeconds;
 }
