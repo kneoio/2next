@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.text.Normalizer;
 import java.util.regex.Pattern;
 
 public class FileSecurityUtils {
@@ -26,6 +27,7 @@ public class FileSecurityUtils {
         sanitized = sanitized.replaceAll("[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]", "");
         sanitized = sanitized.replaceAll("[:\\*\\?\"<>\\|]", "");
         sanitized = sanitized.trim();
+        sanitized = toAsciiSafe(sanitized);
         if (sanitized.length() > MAX_FILENAME_LENGTH) {
             String extension = "";
             int dotIndex = sanitized.lastIndexOf('.');
@@ -46,6 +48,18 @@ public class FileSecurityUtils {
 
         LOGGER.debug("Sanitized filename '{}' to '{}'", filename, sanitized);
         return sanitized;
+    }
+
+    // The JVM's file-name encoding (sun.jnu.encoding) is taken from the host locale, not
+    // file.encoding, so a non-UTF-8 locale throws InvalidPathException on non-ASCII names
+    // (e.g. Norwegian o/ae/a). Transliterate to ASCII so on-disk names never depend on it.
+    private static String toAsciiSafe(String filename) {
+        String normalized = Normalizer.normalize(filename, Normalizer.Form.NFKD)
+                .replaceAll("\\p{M}", "");
+        normalized = normalized
+                .replace("ø", "o").replace("Ø", "O")
+                .replace("æ", "ae").replace("Æ", "AE");
+        return normalized.replaceAll("[^\\x00-\\x7F]", "_");
     }
 
     public static boolean isSecureFilename(String filename) {
