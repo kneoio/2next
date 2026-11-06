@@ -45,6 +45,7 @@ public class FileMetadata {
     private Path temporaryFilePath;
     private InputStream inputStream;
     private Long contentLength;
+    private String sha256;
 
     public Uni<Path> materializeFileStream(String tempBaseDir) {
         return Uni.createFrom().item(() -> {
