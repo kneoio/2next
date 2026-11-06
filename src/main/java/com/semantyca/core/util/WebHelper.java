@@ -2,6 +2,7 @@ package com.semantyca.core.util;
 
 import com.ibm.icu.text.Transliterator;
 import com.semantyca.core.model.cnst.LanguageCode;
+import io.smallrye.mutiny.Uni;
 
 import java.io.File;
 import java.text.Normalizer;
@@ -11,6 +12,7 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -87,6 +89,24 @@ public class WebHelper {
         }
 
         return generateSlug(name);
+    }
+
+    /**
+     * Returns {@code baseSlug} if free, otherwise {@code baseSlug-2}, {@code -3}, ... A blank base becomes
+     * {@code untitled}. {@code isTaken} is the caller's existence check; it is check-then-insert, so pair
+     * it with a unique index and retry on conflict.
+     */
+    public static Uni<String> generateUniqueSlug(String baseSlug, Function<String, Uni<Boolean>> isTaken) {
+        String base = (baseSlug == null || baseSlug.isBlank()) ? "untitled" : baseSlug;
+        return pickFreeSlug(base, 1, isTaken);
+    }
+
+    private static Uni<String> pickFreeSlug(String base, int n, Function<String, Uni<Boolean>> isTaken) {
+        String candidate = n == 1 ? base : base + "-" + n;
+        return isTaken.apply(candidate)
+                .chain(taken -> taken
+                        ? pickFreeSlug(base, n + 1, isTaken)
+                        : Uni.createFrom().item(candidate));
     }
 
     /**
